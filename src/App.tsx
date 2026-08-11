@@ -3,6 +3,7 @@ import AppShell from './components/AppShell'
 import HomeScreen from './screens/HomeScreen'
 import WorkoutsScreen from './screens/WorkoutsScreen'
 import LibraryScreen from './screens/LibraryScreen'
+import ExerciseDetailScreen from './screens/ExerciseDetailScreen'
 import BuilderScreen from './screens/BuilderScreen'
 import HistoryScreen from './screens/HistoryScreen'
 import SettingsScreen from './screens/SettingsScreen'
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/" element={<HomeScreen />} />
         <Route path="/workouts" element={<WorkoutsScreen />} />
         <Route path="/library" element={<LibraryScreen />} />
+        <Route path="/library/:exerciseId" element={<ExerciseDetailScreen />} />
         <Route path="/builder" element={<BuilderScreen />} />
         <Route path="/history" element={<HistoryScreen />} />
         <Route path="/settings" element={<SettingsScreen />} />
