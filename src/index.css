@@ -1,0 +1,60 @@
+@import 'tailwindcss';
+
+/*
+  PITCHWORK — theme tokens.
+  This is the ONE file that defines the app's colours and fonts.
+  Change a value here and it updates everywhere. Tailwind turns each
+  token into utility classes automatically, e.g. --color-blaze -> bg-blaze / text-blaze.
+*/
+@theme {
+  --color-chalk: #f4f1e9; /* warm off-white background (the painted line) */
+  --color-ink: #14231a; /* primary text + dark "training mode" surfaces */
+  --color-pitch: #1f6f4b; /* brand green — headers, active states */
+  --color-blaze: #ff5a2c; /* the one energetic accent — Start + live timer */
+  --color-lime: #d8e64a; /* streaks, marks, small highlights */
+  --color-slate: #6b7a72; /* muted text, borders, dividers */
+
+  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-chalk text-ink font-body antialiased;
+  }
+
+  /* Numbers and headlines carry the app's personality. */
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+  }
+
+  /* Always show a clear focus ring for keyboard users. */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-blaze;
+  }
+
+  /* Accessibility: honour "reduce motion" system setting everywhere. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/*
+  SIGNATURE ELEMENT — the chalk line.
+  A rough, hand-drawn stroke used to underline active things and mark progress.
+  We'll build on this in later phases (progress bars are chalk lines, not rings).
+*/
+.chalk-line {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-lime);
+  /* slightly uneven ends so it reads as chalk, not a UI bar */
+  box-shadow: 0 0 0 0.5px rgba(20, 35, 26, 0.15);
+}
