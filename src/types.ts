@@ -23,6 +23,7 @@ export interface Exercise {
   id: string
   name: string
   category: Category
+  rank?: number // effectiveness rank within its category (1 = highest return); optional
   shortDescription: string // one line, shown in lists
   instructions: string[] // numbered steps, shown during a session
   coachingCues: string[] // short "do this well" tips

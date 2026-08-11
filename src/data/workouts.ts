@@ -6,7 +6,7 @@ import type { Workout, WorkoutBlock } from '../types'
   (see exercises.ts) and says how many sets and how much rest comes after it.
 
   The little `b()` helper keeps each block short and readable:
-      b('sole-rolls', 3, 30)  ->  3 sets of Sole rolls, 30s rest after.
+      b('dr-sole-rolls', 3, 30)  ->  3 sets of Sole rolls, 30s rest after.
   Pass a fourth value to add a coaching note for that block. Duration and reps are
   left as the drill's own defaults; a custom workout can override them.
 */
@@ -24,11 +24,11 @@ export const workouts: Workout[] = [
     difficulty: 'beginner',
     isCustom: false,
     blocks: [
-      b('toe-taps', 3, 30),
-      b('sole-rolls', 3, 30),
-      b('v-pull', 3, 30),
-      b('figure-eight', 3, 30),
-      b('cruyff-turn', 3, 40, 'Sell the fake before you turn.'),
+      b('dr-sole-rolls', 3, 30),
+      b('ft-juggling', 2, 30),
+      b('dr-cruyff', 2, 30),
+      b('dr-croqueta', 3, 30),
+      b('dr-mastery-circuit', 3, 40, 'Keep the ball moving the whole time.'),
     ],
   },
   {
@@ -40,11 +40,11 @@ export const workouts: Workout[] = [
     difficulty: 'beginner',
     isCustom: false,
     blocks: [
-      b('wall-pass-both', 3, 30),
-      b('one-touch-wall', 4, 30),
-      b('wall-touch-set', 3, 30),
-      b('first-touch-turn', 3, 30),
-      b('weak-foot-wall', 3, 40, 'Weaker foot only — quality over speed.'),
+      b('pa-wall-passing', 3, 30),
+      b('pa-one-touch', 4, 30),
+      b('ft-wall-rebound', 3, 30),
+      b('ft-half-turn', 3, 30),
+      b('pa-weak-foot', 3, 40, 'Weaker foot only — quality over speed.'),
     ],
   },
   {
@@ -56,11 +56,11 @@ export const workouts: Workout[] = [
     difficulty: 'intermediate',
     isCustom: false,
     blocks: [
-      b('placement-corners', 3, 45),
-      b('driven-laces-shot', 3, 45),
-      b('finish-from-layoff', 3, 45),
-      b('weak-foot-finish', 3, 45, 'Weaker foot — placement first, power later.'),
-      b('first-time-finish', 2, 60),
+      b('sh-side-foot-placement', 3, 45),
+      b('sh-instep-drive', 3, 45),
+      b('sh-cutback', 3, 45),
+      b('sh-weak-foot', 3, 45, 'Weaker foot — placement first, power later.'),
+      b('sh-first-time-layoff', 2, 60),
     ],
   },
   {
@@ -72,11 +72,11 @@ export const workouts: Workout[] = [
     difficulty: 'intermediate',
     isCustom: false,
     blocks: [
-      b('weak-foot-wall', 3, 30, 'Weaker foot only.'),
-      b('inside-push-pass', 3, 30, 'Every pass with your weaker foot.'),
-      b('drag-push', 3, 30, 'Lead with your weaker foot.'),
-      b('first-touch-turn', 3, 30, 'Turn onto your weaker side.'),
-      b('cruyff-turn', 3, 40, 'Weaker foot does the work.'),
+      b('pa-weak-foot', 3, 30, 'Weaker foot only.'),
+      b('pa-gates', 3, 30, 'Every pass with your weaker foot.'),
+      b('ft-weak-foot-juggle', 2, 30),
+      b('dr-cruyff', 3, 30, 'Weaker foot does the work.'),
+      b('ft-half-turn', 3, 40, 'Turn onto your weaker side.'),
     ],
   },
   {
@@ -89,10 +89,10 @@ export const workouts: Workout[] = [
     isCustom: false,
     blocks: [
       b('hip-mobility-flow', 1, 20),
-      b('quick-feet', 3, 25),
-      b('toe-taps', 2, 20),
-      b('acceleration-starts', 3, 40),
-      b('cruyff-turn', 2, 30, 'Light and sharp — you are priming, not training.'),
+      b('ath-askips', 3, 25),
+      b('ath-accel-starts', 3, 40),
+      b('dr-sole-rolls', 2, 20),
+      b('dr-cruyff', 2, 30, 'Light and sharp — you are priming, not training.'),
     ],
   },
   {
@@ -104,11 +104,11 @@ export const workouts: Workout[] = [
     difficulty: 'intermediate',
     isCustom: false,
     blocks: [
-      b('quick-feet', 4, 30),
-      b('acceleration-starts', 3, 45),
-      b('shuttle-5-10-5', 3, 45),
-      b('decel-cut', 3, 40),
-      b('pogo-hops', 3, 30),
+      b('ath-zigzag', 4, 35),
+      b('ath-accel-starts', 3, 45),
+      b('ath-pro-agility', 3, 45),
+      b('ath-decel', 3, 40),
+      b('ath-bounding', 3, 40),
     ],
   },
   {
@@ -120,10 +120,10 @@ export const workouts: Workout[] = [
     difficulty: 'advanced',
     isCustom: false,
     blocks: [
-      b('acceleration-starts', 5, 30, 'Short rest on purpose — hold your sprint quality.'),
-      b('shuttle-5-10-5', 4, 40),
-      b('decel-cut', 3, 35),
-      b('tempo-runs', 2, 60, 'Flush out on controlled tempo runs.'),
+      b('ath-accel-starts', 5, 30, 'Short rest on purpose — hold your sprint quality.'),
+      b('ath-pro-agility', 4, 40),
+      b('ath-yoyo', 4, 40),
+      b('ath-tempo-runs', 2, 60, 'Flush out on controlled tempo runs.'),
     ],
   },
   {
@@ -135,11 +135,11 @@ export const workouts: Workout[] = [
     difficulty: 'intermediate',
     isCustom: false,
     blocks: [
-      b('glute-bridge', 3, 30),
-      b('single-leg-rdl', 3, 40),
-      b('bulgarian-split-squat', 3, 40),
-      b('calf-raises', 3, 30),
-      b('copenhagen-plank', 3, 45, 'Bend the top knee if the full version is too much.'),
+      b('st-hip-thrust', 3, 30),
+      b('st-single-leg-rdl', 3, 40),
+      b('st-bulgarian', 3, 40),
+      b('st-calf-raises', 3, 30),
+      b('st-copenhagen', 3, 45, 'Bend the top knee if the full version is too much.'),
     ],
   },
   {
@@ -167,14 +167,14 @@ export const workouts: Workout[] = [
     difficulty: 'intermediate',
     isCustom: false,
     blocks: [
-      b('quick-feet', 2, 20, 'Warm up.'),
-      b('sole-rolls', 2, 20),
-      b('wall-pass-both', 3, 30),
-      b('first-touch-turn', 3, 30),
-      b('driven-pass-target', 3, 30),
-      b('shuttle-5-10-5', 3, 40),
-      b('driven-laces-shot', 3, 45),
-      b('single-leg-rdl', 2, 30),
+      b('ath-askips', 2, 20, 'Warm up.'),
+      b('dr-sole-rolls', 2, 20),
+      b('pa-wall-passing', 3, 30),
+      b('ft-half-turn', 3, 30),
+      b('pa-driven-ball', 3, 30),
+      b('ath-pro-agility', 3, 40),
+      b('sh-instep-drive', 3, 45),
+      b('st-single-leg-rdl', 2, 30),
       b('calf-adductor-stretch', 1, 0, 'Cool down and stretch.'),
     ],
   },

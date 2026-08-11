@@ -34,6 +34,11 @@ export default function ExerciseDetailScreen() {
         {CATEGORY_LABELS[ex.category]}
       </p>
       <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{ex.name}</h1>
+      {ex.rank != null && (
+        <p className="mt-1 text-sm font-semibold text-slate">
+          #{ex.rank} most effective in {CATEGORY_LABELS[ex.category]}
+        </p>
+      )}
       <p className="mt-2 text-slate">{ex.shortDescription}</p>
 
       {/* Meta */}

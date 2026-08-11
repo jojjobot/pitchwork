@@ -20,7 +20,12 @@ export default function ExerciseCard({ exercise }: { exercise: Exercise }) {
         aria-hidden="true"
       />
       <div className="min-w-0 flex-1">
-        <p className="font-display font-bold text-ink leading-tight">{exercise.name}</p>
+        <p className="font-display font-bold text-ink leading-tight">
+          {exercise.rank != null && (
+            <span className="mr-1.5 text-slate">#{exercise.rank}</span>
+          )}
+          {exercise.name}
+        </p>
         <p className="mt-0.5 truncate text-sm text-slate">{exercise.shortDescription}</p>
       </div>
       <div className="shrink-0 text-right">
