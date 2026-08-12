@@ -1,5 +1,6 @@
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { exerciseById } from '../data/exercises'
+import { workoutById } from '../data/workouts'
 import { CATEGORY_ACCENT, CATEGORY_LABELS, DIFFICULTY_LABELS, EQUIPMENT_LABELS, SPACE_LABELS } from '../lib/labels'
 import { prescription, formatSeconds } from '../lib/format'
 import Badge from '../components/Badge'
@@ -7,7 +8,16 @@ import Badge from '../components/Badge'
 export default function ExerciseDetailScreen() {
   const { exerciseId } = useParams()
   const navigate = useNavigate()
+  const [params] = useSearchParams()
   const ex = exerciseId ? exerciseById[exerciseId] : undefined
+
+  // Arrived from a workout? Then that session's prescription is what matters here,
+  // not the drill's own defaults. Read from the URL so the link survives a refresh.
+  const fromWorkout = workoutById[params.get('from') ?? '']
+  const rawBlock = params.get('block')
+  const blockIndex = rawBlock == null ? -1 : Number(rawBlock)
+  const block = fromWorkout && Number.isInteger(blockIndex) ? fromWorkout.blocks[blockIndex] : undefined
+  const inSession = block?.exerciseId === exerciseId ? block : undefined
 
   // Guard against a bad or old link.
   if (!ex) {
@@ -27,7 +37,7 @@ export default function ExerciseDetailScreen() {
   return (
     <section>
       <button onClick={() => navigate(-1)} className="mb-4 inline-flex items-center gap-1 text-sm font-semibold text-slate">
-        <span aria-hidden="true">←</span> Back
+        <span aria-hidden="true">←</span> {fromWorkout ? `Back to ${fromWorkout.name}` : 'Back'}
       </button>
 
       <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: CATEGORY_ACCENT[ex.category] }}>
@@ -49,6 +59,27 @@ export default function ExerciseDetailScreen() {
         {ex.defaultSets > 1 && <Badge>{formatSeconds(ex.restBetweenSets)} rest</Badge>}
         {kit.length === 0 ? <Badge>No kit</Badge> : kit.map((e) => <Badge key={e}>{EQUIPMENT_LABELS[e]}</Badge>)}
       </div>
+
+      {/* What this particular session asks of you — overrides the defaults above. */}
+      {inSession && fromWorkout && (
+        <div className="mt-5 rounded-2xl border border-slate/15 bg-white/70 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate">
+            In {fromWorkout.code} · {fromWorkout.name}
+          </p>
+          <p className="mt-1 font-display text-xl font-bold text-ink">
+            {inSession.sets} ×{' '}
+            {ex.measureType === 'reps'
+              ? `${inSession.reps ?? ex.defaultReps} reps`
+              : formatSeconds(inSession.duration ?? ex.defaultDuration)}
+            {inSession.sets > 1 && (
+              <span className="ml-2 text-base font-semibold text-slate">
+                {formatSeconds(inSession.restBetweenSets ?? ex.restBetweenSets)} rest
+              </span>
+            )}
+          </p>
+          {inSession.note && <p className="mt-1 text-sm text-slate">{inSession.note}</p>}
+        </div>
+      )}
 
       {/* Instructions */}
       <div className="mt-8">

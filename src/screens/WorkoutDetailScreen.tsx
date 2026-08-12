@@ -85,6 +85,7 @@ export default function WorkoutDetailScreen() {
       {/* Exercise list */}
       <div className="mt-8">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-slate">The session</h2>
+        <p className="mt-2 text-sm text-slate">Tap any drill to see how to do it.</p>
         <ol className="mt-3 space-y-2">
           {workout.blocks.map((block, i) => {
             const ex = exerciseById[block.exerciseId]
@@ -94,17 +95,27 @@ export default function WorkoutDetailScreen() {
               ? formatSeconds(block.duration ?? ex.defaultDuration)
               : `${block.reps ?? ex.defaultReps} reps`
             return (
-              <li key={i} className="flex items-center gap-3 rounded-xl border border-slate/15 bg-white/70 p-3">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink font-display text-sm font-bold text-chalk">
-                  {i + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-ink">{ex.name}</p>
-                  {block.note && <p className="truncate text-xs text-slate">{block.note}</p>}
-                </div>
-                <span className="shrink-0 text-sm font-medium text-slate">
-                  {block.sets} × {per}
-                </span>
+              <li key={i}>
+                {/* Opens the drill's own page, told which session sent you so it can
+                    show this workout's numbers instead of the drill's defaults. */}
+                <Link
+                  to={`/library/${ex.id}?from=${workout.id}&block=${i}`}
+                  className="flex items-center gap-3 rounded-xl border border-slate/15 bg-white/70 p-3 active:bg-white"
+                >
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink font-display text-sm font-bold text-chalk">
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold text-ink">{ex.name}</p>
+                    {block.note && <p className="truncate text-xs text-slate">{block.note}</p>}
+                  </div>
+                  <span className="shrink-0 text-sm font-medium text-slate">
+                    {block.sets} × {per}
+                  </span>
+                  <span className="shrink-0 text-slate" aria-hidden="true">
+                    ›
+                  </span>
+                </Link>
               </li>
             )
           })}
