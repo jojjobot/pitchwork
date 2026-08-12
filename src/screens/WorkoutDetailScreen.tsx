@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { workoutById } from '../data/workouts'
 import { exerciseById } from '../data/exercises'
-import { categoryMinutesSorted, workoutMeta } from '../lib/workout'
+import { duplicateWorkout, useWorkout } from '../lib/customWorkouts'
+import { workoutMeta } from '../lib/workout'
 import { formatSeconds } from '../lib/format'
 import {
   CATEGORY_ACCENT,
@@ -11,26 +11,30 @@ import {
   SPACE_LABELS,
 } from '../lib/labels'
 import Badge from '../components/Badge'
+import CategoryBars from '../components/CategoryBars'
+import NotFound from '../components/NotFound'
 
 export default function WorkoutDetailScreen() {
   const { workoutId } = useParams()
   const navigate = useNavigate()
-  const workout = workoutId ? workoutById[workoutId] : undefined
+  const workout = useWorkout(workoutId)
 
   if (!workout) {
     return (
-      <section className="text-center pt-10">
-        <h1 className="font-display text-2xl font-bold">Workout not found</h1>
-        <Link to="/workouts" className="mt-6 inline-block rounded-xl bg-ink px-4 h-11 leading-[44px] font-semibold text-chalk">
-          Back to workouts
-        </Link>
-      </section>
+      <NotFound title="Workout not found" to="/workouts" cta="Back to workouts">
+        It may have been deleted.
+      </NotFound>
     )
   }
 
   const meta = workoutMeta(workout)
   const kit = [...meta.equipment]
-  const breakdown = categoryMinutesSorted(meta.categorySeconds)
+
+  // The programme is read-only. Wanting to change a session is normal, so the way
+  // through is a copy of your own rather than a locked screen.
+  const makeItMine = () => {
+    navigate(`/builder/${duplicateWorkout(workout).id}`)
+  }
 
   return (
     <section className="pb-24">
@@ -40,10 +44,11 @@ export default function WorkoutDetailScreen() {
 
       <p className="text-sm font-bold uppercase tracking-widest" style={{ color: CATEGORY_ACCENT[workout.category] }}>
         {workout.code} · {CATEGORY_LABELS[workout.category]}
+        {workout.isCustom && <span className="text-slate"> · Yours</span>}
       </p>
       <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{workout.name}</h1>
-      <p className="mt-1 font-semibold text-pitch">{workout.goal}</p>
-      <p className="mt-3 text-slate leading-relaxed">{workout.description}</p>
+      {workout.goal && <p className="mt-1 font-semibold text-pitch">{workout.goal}</p>}
+      {workout.description && <p className="mt-3 text-slate leading-relaxed">{workout.description}</p>}
 
       {/* Meta */}
       <div className="mt-4 flex flex-wrap gap-2">
@@ -62,23 +67,10 @@ export default function WorkoutDetailScreen() {
       {/* Category breakdown */}
       <div className="mt-6">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-slate">What it trains</h2>
-        <p className="mt-2 text-sm text-slate">{workout.focus}</p>
-        <div className="mt-3 space-y-2">
-          {breakdown.map(({ category, minutes }) => (
-            <div key={category} className="flex items-center gap-3">
-              <span className="w-24 shrink-0 text-sm font-medium">{CATEGORY_LABELS[category]}</span>
-              <div className="h-2.5 flex-1 rounded-full bg-slate/15">
-                <div
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${Math.min(100, (minutes / meta.minutes) * 100)}%`,
-                    backgroundColor: CATEGORY_ACCENT[category],
-                  }}
-                />
-              </div>
-              <span className="w-12 shrink-0 text-right text-sm text-slate">{minutes}m</span>
-            </div>
-          ))}
+        {/* Sessions you build don't write a focus line — the bars say it better. */}
+        {workout.focus && <p className="mt-2 text-sm text-slate">{workout.focus}</p>}
+        <div className="mt-3">
+          <CategoryBars categorySeconds={meta.categorySeconds} totalMinutes={meta.minutes} />
         </div>
       </div>
 
@@ -120,6 +112,30 @@ export default function WorkoutDetailScreen() {
             )
           })}
         </ol>
+      </div>
+
+      {/* Change it — edit your own, or take a copy of a programme session */}
+      <div className="mt-6">
+        {workout.isCustom ? (
+          <Link
+            to={`/builder/${workout.id}`}
+            className="flex h-12 items-center justify-center rounded-xl border border-slate/25 bg-white font-semibold text-ink active:bg-white/70"
+          >
+            Edit this session
+          </Link>
+        ) : (
+          <>
+            <button
+              onClick={makeItMine}
+              className="flex h-12 w-full items-center justify-center rounded-xl border border-slate/25 bg-white font-semibold text-ink active:bg-white/70"
+            >
+              Make it mine
+            </button>
+            <p className="mt-2 text-center text-xs text-slate">
+              Copies {workout.code} into your own sessions, yours to change.
+            </p>
+          </>
+        )}
       </div>
 
       {/* Start — fixed above the bottom nav so it's always reachable */}

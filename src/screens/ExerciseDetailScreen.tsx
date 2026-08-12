@@ -1,9 +1,10 @@
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { exerciseById } from '../data/exercises'
-import { workoutById } from '../data/workouts'
+import { useWorkout } from '../lib/customWorkouts'
 import { CATEGORY_ACCENT, CATEGORY_LABELS, DIFFICULTY_LABELS, EQUIPMENT_LABELS, SPACE_LABELS } from '../lib/labels'
 import { prescription, formatSeconds } from '../lib/format'
 import Badge from '../components/Badge'
+import NotFound from '../components/NotFound'
 
 export default function ExerciseDetailScreen() {
   const { exerciseId } = useParams()
@@ -13,7 +14,7 @@ export default function ExerciseDetailScreen() {
 
   // Arrived from a workout? Then that session's prescription is what matters here,
   // not the drill's own defaults. Read from the URL so the link survives a refresh.
-  const fromWorkout = workoutById[params.get('from') ?? '']
+  const fromWorkout = useWorkout(params.get('from') ?? undefined)
   const rawBlock = params.get('block')
   const blockIndex = rawBlock == null ? -1 : Number(rawBlock)
   const block = fromWorkout && Number.isInteger(blockIndex) ? fromWorkout.blocks[blockIndex] : undefined
@@ -22,13 +23,9 @@ export default function ExerciseDetailScreen() {
   // Guard against a bad or old link.
   if (!ex) {
     return (
-      <section className="text-center pt-10">
-        <h1 className="font-display text-2xl font-bold">Drill not found</h1>
-        <p className="mt-2 text-slate">It may have been renamed or removed.</p>
-        <Link to="/library" className="mt-6 inline-block rounded-xl bg-ink px-4 h-11 leading-[44px] font-semibold text-chalk">
-          Back to the library
-        </Link>
-      </section>
+      <NotFound title="Drill not found" to="/library" cta="Back to the library">
+        It may have been renamed or removed.
+      </NotFound>
     )
   }
 
@@ -121,10 +118,13 @@ export default function ExerciseDetailScreen() {
         </div>
       )}
 
-      {/* Placeholder for a later phase */}
-      <p className="mt-8 text-sm text-slate">
-        You'll be able to add this drill to a custom workout once the builder ships (Phase 3).
-      </p>
+      {/* Straight into the builder, carrying this drill with it. */}
+      <Link
+        to={`/builder?add=${ex.id}`}
+        className="mt-8 flex h-12 items-center justify-center gap-2 rounded-xl border border-dashed border-slate/40 font-semibold text-pitch active:bg-white"
+      >
+        <span aria-hidden="true">+</span> Add to one of your sessions
+      </Link>
     </section>
   )
 }

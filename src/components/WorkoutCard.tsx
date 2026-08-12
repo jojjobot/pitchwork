@@ -32,6 +32,9 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
       </div>
 
       <div className="mt-3 flex items-center gap-2">
+        {workout.isCustom && (
+          <span className="rounded-full bg-pitch/15 px-2.5 py-1 text-xs font-semibold text-pitch">Yours</span>
+        )}
         <span className="rounded-full bg-slate/15 px-2.5 py-1 text-xs font-medium capitalize text-slate">
           {DIFFICULTY_LABELS[workout.difficulty]}
         </span>

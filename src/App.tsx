@@ -7,6 +7,9 @@ import SessionPlayer from './screens/SessionPlayer'
 import LibraryScreen from './screens/LibraryScreen'
 import ExerciseDetailScreen from './screens/ExerciseDetailScreen'
 import BuilderScreen from './screens/BuilderScreen'
+import BuilderEditScreen from './screens/BuilderEditScreen'
+import BuilderPickScreen from './screens/BuilderPickScreen'
+import BuilderBlockScreen from './screens/BuilderBlockScreen'
 import HistoryScreen from './screens/HistoryScreen'
 import SettingsScreen from './screens/SettingsScreen'
 
@@ -24,7 +27,13 @@ export default function App() {
         <Route path="/workouts/:workoutId" element={<WorkoutDetailScreen />} />
         <Route path="/library" element={<LibraryScreen />} />
         <Route path="/library/:exerciseId" element={<ExerciseDetailScreen />} />
+        {/* The builder is a few small screens rather than one long form: pick a
+            session, pick a drill, set that drill's numbers. Each step is its own URL,
+            so Back always undoes exactly one decision. */}
         <Route path="/builder" element={<BuilderScreen />} />
+        <Route path="/builder/:workoutId" element={<BuilderEditScreen />} />
+        <Route path="/builder/:workoutId/add" element={<BuilderPickScreen />} />
+        <Route path="/builder/:workoutId/block/:blockIndex" element={<BuilderBlockScreen />} />
         <Route path="/history" element={<HistoryScreen />} />
         <Route path="/settings" element={<SettingsScreen />} />
       </Route>

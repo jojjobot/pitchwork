@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { workouts } from '../data/workouts'
+import { useAllWorkouts } from '../lib/customWorkouts'
 import { workoutMeta } from '../lib/workout'
 import type { Category, Difficulty, Equipment, Space } from '../types'
 import {
@@ -16,10 +16,13 @@ import WorkoutCard from '../components/WorkoutCard'
 
 const KIT: Equipment[] = ['ball', 'cones', 'wall', 'goal', 'partner']
 type DurationBand = 'any' | 'short' | 'medium' | 'long'
+// The skill chips, plus two that aren't skills: everything, and everything you built.
+type Filing = Category | 'all' | 'mine'
 
 export default function WorkoutsScreen() {
+  const allWorkouts = useAllWorkouts()
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<Category | 'all'>('all')
+  const [category, setCategory] = useState<Filing>('all')
   const [difficulty, setDifficulty] = useState<Difficulty | 'any'>('any')
   const [duration, setDuration] = useState<DurationBand>('any')
   const [space, setSpace] = useState<Space | 'any'>('any')
@@ -27,13 +30,17 @@ export default function WorkoutsScreen() {
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   // Pre-compute each workout's length, kit, categories, and space once.
-  const withMeta = useMemo(() => workouts.map((w) => ({ workout: w, meta: workoutMeta(w) })), [])
+  const withMeta = useMemo(
+    () => allWorkouts.map((w) => ({ workout: w, meta: workoutMeta(w) })),
+    [allWorkouts],
+  )
 
   // Only offer a chip for a skill that actually has sessions filed under it.
   const categoriesInUse = useMemo(
-    () => CATEGORY_ORDER.filter((c) => workouts.some((w) => w.category === c)),
-    [],
+    () => CATEGORY_ORDER.filter((c) => allWorkouts.some((w) => w.category === c)),
+    [allWorkouts],
   )
+  const anyCustom = allWorkouts.some((w) => w.isCustom)
 
   const activeFilters =
     (category !== 'all' ? 1 : 0) +
@@ -61,7 +68,8 @@ export default function WorkoutsScreen() {
   const results = useMemo(() => {
     const q = search.trim().toLowerCase()
     return withMeta.filter(({ workout, meta }) => {
-      if (category !== 'all' && workout.category !== category) return false
+      if (category === 'mine' && !workout.isCustom) return false
+      if (category !== 'all' && category !== 'mine' && workout.category !== category) return false
       if (difficulty !== 'any' && workout.difficulty !== difficulty) return false
       if (space !== 'any' && SPACE_RANK[meta.space] > SPACE_RANK[space]) return false
       if (duration === 'short' && meta.minutes > 15) return false
@@ -85,7 +93,7 @@ export default function WorkoutsScreen() {
         <h1 className="text-3xl font-extrabold tracking-tight">Workouts</h1>
         <div className="chalk-line mt-2 w-20" aria-hidden="true" />
         <p className="mt-3 text-slate">
-          {results.length} ready-made {results.length === 1 ? 'session' : 'sessions'}. Pick one and press start.
+          {results.length} {results.length === 1 ? 'session' : 'sessions'} to choose from. Pick one and press start.
         </p>
       </header>
 
@@ -106,6 +114,11 @@ export default function WorkoutsScreen() {
           <Chip active={category === 'all'} onClick={() => setCategory('all')}>
             All
           </Chip>
+          {anyCustom && (
+            <Chip active={category === 'mine'} onClick={() => setCategory('mine')}>
+              Yours
+            </Chip>
+          )}
           {categoriesInUse.map((cat) => (
             <Chip key={cat} active={category === cat} onClick={() => setCategory(cat)} dot={CATEGORY_ACCENT[cat]}>
               {CATEGORY_LABELS[cat]}

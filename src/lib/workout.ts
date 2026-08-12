@@ -8,6 +8,11 @@ import type { Category, Equipment, Exercise, Space, Workout, WorkoutBlock } from
   workout cards use this so the numbers always agree.
 */
 
+// Anything made of blocks: a saved workout, or a session still being built. The
+// functions below only ever read `blocks`, so the builder can measure a draft with
+// exactly the same code that measures a finished session.
+export type Blocked = Pick<Workout, 'blocks'>
+
 // A single thing the player shows: either a drill effort, or a rest period.
 export type SessionStep =
   | {
@@ -40,7 +45,7 @@ function setSeconds(ex: Exercise, block: WorkoutBlock, reps: number | null): num
   return ex.defaultDuration
 }
 
-export function buildSteps(workout: Workout): SessionStep[] {
+export function buildSteps(workout: Blocked): SessionStep[] {
   const steps: SessionStep[] = []
 
   workout.blocks.forEach((block, bi) => {
@@ -105,7 +110,7 @@ export interface WorkoutEstimate {
 }
 
 // Honest length + how the work time splits across skill categories.
-export function estimateWorkout(workout: Workout): WorkoutEstimate {
+export function estimateWorkout(workout: Blocked): WorkoutEstimate {
   const steps = buildSteps(workout)
   let seconds = 0
   const categorySeconds: Partial<Record<Category, number>> = {}
@@ -130,7 +135,7 @@ export interface WorkoutMeta extends WorkoutEstimate {
 }
 
 // Everything the browse/filter screen needs about a workout.
-export function workoutMeta(workout: Workout): WorkoutMeta {
+export function workoutMeta(workout: Blocked): WorkoutMeta {
   const categories = new Set<Category>()
   const equipment = new Set<Equipment>()
   let space: Space = 'small'

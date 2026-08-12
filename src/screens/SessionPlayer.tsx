@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { workoutById } from '../data/workouts'
+import { useWorkout } from '../lib/customWorkouts'
 import { buildSteps } from '../lib/workout'
 import { formatSeconds } from '../lib/format'
 import { primeAudio, playTone, vibrate } from '../lib/audio'
@@ -12,7 +12,8 @@ import type { Category, CompletedSession } from '../types'
 export default function SessionPlayer() {
   const { workoutId } = useParams()
   const navigate = useNavigate()
-  const workout = workoutId ? workoutById[workoutId] : undefined
+  // The player doesn't care whether this came from the programme or from your builder.
+  const workout = useWorkout(workoutId)
   const steps = useMemo(() => (workout ? buildSteps(workout) : []), [workout])
 
   const [index, setIndex] = useState(0)

@@ -1,4 +1,4 @@
-import type { CompletedSession } from '../types'
+import type { CompletedSession, Workout } from '../types'
 
 /*
   Everything we keep on the device lives in localStorage under these keys.
@@ -6,6 +6,7 @@ import type { CompletedSession } from '../types'
 */
 const SESSIONS_KEY = 'pitchwork.sessions.v1'
 const SETTINGS_KEY = 'pitchwork.settings.v1'
+const CUSTOM_WORKOUTS_KEY = 'pitchwork.customWorkouts.v1'
 
 export interface Settings {
   soundEnabled: boolean
@@ -35,6 +36,29 @@ export function saveSession(session: CompletedSession): void {
   all.unshift(session) // newest first
   try {
     localStorage.setItem(SESSIONS_KEY, JSON.stringify(all))
+  } catch {
+    // storage full or unavailable — nothing more we can do here
+  }
+}
+
+// --- Workouts you built yourself ---
+// The programme in src/data/workouts.ts is read-only; anything you make is kept
+// here. Reading and writing the whole list at once is fine — there will never be
+// enough custom sessions for that to matter.
+
+export function loadCustomWorkouts(): Workout[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_WORKOUTS_KEY)
+    const parsed = raw ? JSON.parse(raw) : []
+    return Array.isArray(parsed) ? (parsed as Workout[]) : []
+  } catch {
+    return []
+  }
+}
+
+export function saveCustomWorkouts(list: Workout[]): void {
+  try {
+    localStorage.setItem(CUSTOM_WORKOUTS_KEY, JSON.stringify(list))
   } catch {
     // storage full or unavailable — nothing more we can do here
   }
