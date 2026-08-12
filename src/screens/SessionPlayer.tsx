@@ -5,7 +5,8 @@ import { buildSteps } from '../lib/workout'
 import { formatSeconds } from '../lib/format'
 import { primeAudio, playTone, vibrate } from '../lib/audio'
 import { useWakeLock } from '../lib/useWakeLock'
-import { loadSettings, saveSettings, saveSession } from '../lib/storage'
+import { getSettings, updateSettings } from '../lib/settings'
+import { recordSession } from '../lib/sessions'
 import { CATEGORY_ACCENT, CATEGORY_LABELS } from '../lib/labels'
 import type { Category, CompletedSession } from '../types'
 
@@ -21,7 +22,7 @@ export default function SessionPlayer() {
   const [paused, setPaused] = useState(false)
   const [elapsed, setElapsed] = useState(0)
   const [phase, setPhase] = useState<'playing' | 'summary'>('playing')
-  const [muted, setMuted] = useState(() => !loadSettings().soundEnabled)
+  const [muted, setMuted] = useState(() => !getSettings().soundEnabled)
 
   // Accumulators for the summary. Refs so the interval always reads fresh values.
   const catSecondsRef = useRef<Record<string, number>>({})
@@ -40,7 +41,7 @@ export default function SessionPlayer() {
   useWakeLock(phase === 'playing')
   useEffect(() => primeAudio(), []) // allow sound after the Start tap
 
-  const vibrationOn = loadSettings().vibrationEnabled
+  const vibrationOn = getSettings().vibrationEnabled
   const tone = (f: number, d: number) => !mutedRef.current && playTone(f, d)
   const buzz = (p: number | number[]) => !mutedRef.current && vibrationOn && vibrate(p)
   const cueStart = () => {
@@ -125,8 +126,7 @@ export default function SessionPlayer() {
   function toggleMute() {
     setMuted((m) => {
       const nm = !m
-      const s = loadSettings()
-      saveSettings({ ...s, soundEnabled: !nm })
+      updateSettings({ soundEnabled: !nm }) // same switch as the one in Settings
       return nm
     })
   }
@@ -168,8 +168,8 @@ export default function SessionPlayer() {
             perceivedEffort: effort,
             notes,
           }
-          saveSession(session)
-          navigate('/history')
+          recordSession(session)
+          navigate(`/history/${session.id}`)
         }}
         onDiscard={() => navigate('/')}
       />

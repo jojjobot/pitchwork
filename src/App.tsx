@@ -11,6 +11,7 @@ import BuilderEditScreen from './screens/BuilderEditScreen'
 import BuilderPickScreen from './screens/BuilderPickScreen'
 import BuilderBlockScreen from './screens/BuilderBlockScreen'
 import HistoryScreen from './screens/HistoryScreen'
+import SessionDetailScreen from './screens/SessionDetailScreen'
 import SettingsScreen from './screens/SettingsScreen'
 
 /*
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/builder/:workoutId/add" element={<BuilderPickScreen />} />
         <Route path="/builder/:workoutId/block/:blockIndex" element={<BuilderBlockScreen />} />
         <Route path="/history" element={<HistoryScreen />} />
+        <Route path="/history/:sessionId" element={<SessionDetailScreen />} />
         <Route path="/settings" element={<SettingsScreen />} />
       </Route>
 

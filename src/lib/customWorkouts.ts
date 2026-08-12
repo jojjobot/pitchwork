@@ -1,6 +1,7 @@
-import { useSyncExternalStore } from 'react'
+import { useMemo } from 'react'
 import { workouts } from '../data/workouts'
 import { loadCustomWorkouts, saveCustomWorkouts } from './storage'
+import { createStore, useStore } from './store'
 import { deriveFiling } from './builder'
 import { estimateWorkout } from './workout'
 import type { Workout, WorkoutBlock } from '../types'
@@ -14,31 +15,19 @@ import type { Workout, WorkoutBlock } from '../types'
   player all see the change immediately, because they are all reading this.
 */
 
-let customs: Workout[] = loadCustomWorkouts()
-let all: Workout[] = [...workouts, ...customs]
-const listeners = new Set<() => void>()
-
-// Both arrays are rebuilt only on a write. useSyncExternalStore compares snapshots
-// by identity, so handing back the same array between edits is what stops the app
-// re-rendering on every tick.
-function commit(next: Workout[]): void {
-  customs = next
-  all = [...workouts, ...customs]
-  saveCustomWorkouts(customs)
-  listeners.forEach((notify) => notify())
-}
-
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener)
-  return () => listeners.delete(listener)
-}
+const store = createStore(loadCustomWorkouts(), saveCustomWorkouts)
+const customs = () => store.get()
+const commit = (next: Workout[]) => store.set(next)
 
 export function useCustomWorkouts(): Workout[] {
-  return useSyncExternalStore(subscribe, () => customs)
+  return useStore(store)
 }
 
 export function useAllWorkouts(): Workout[] {
-  return useSyncExternalStore(subscribe, () => all)
+  const mine = useStore(store)
+  // Rebuilt only when your sessions actually change, so the identity stays stable
+  // for the filtering and measuring that hangs off it.
+  return useMemo(() => [...workouts, ...mine], [mine])
 }
 
 // The programme and your own sessions look the same to every screen — the player
@@ -65,7 +54,7 @@ function refile(workout: Workout): Workout {
 
 // C1, C2, C3… — short like the programme's own codes, and never a duplicate.
 function nextCode(): string {
-  const used = new Set(customs.map((w) => w.code))
+  const used = new Set(customs().map((w) => w.code))
   let n = 1
   while (used.has(`C${n}`)) n++
   return `C${n}`
@@ -91,7 +80,7 @@ export function createCustomWorkout(seed: Partial<Workout> = {}): Workout {
     estimatedMinutes: 0,
     isCustom: true,
   })
-  commit([...customs, workout])
+  commit([...customs(), workout])
   return workout
 }
 
@@ -107,15 +96,15 @@ export function duplicateWorkout(source: Workout): Workout {
 }
 
 export function updateCustomWorkout(id: string, patch: Partial<Workout>): void {
-  commit(customs.map((w) => (w.id === id ? refile({ ...w, ...patch, id: w.id, isCustom: true }) : w)))
+  commit(customs().map((w) => (w.id === id ? refile({ ...w, ...patch, id: w.id, isCustom: true }) : w)))
 }
 
 export function updateBlocks(id: string, change: (blocks: WorkoutBlock[]) => WorkoutBlock[]): void {
-  const current = customs.find((w) => w.id === id)
+  const current = customs().find((w) => w.id === id)
   if (!current) return
   updateCustomWorkout(id, { blocks: change(current.blocks) })
 }
 
 export function deleteCustomWorkout(id: string): void {
-  commit(customs.filter((w) => w.id !== id))
+  commit(customs().filter((w) => w.id !== id))
 }

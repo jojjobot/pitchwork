@@ -31,11 +31,11 @@ export function loadSessions(): CompletedSession[] {
   }
 }
 
-export function saveSession(session: CompletedSession): void {
-  const all = loadSessions()
-  all.unshift(session) // newest first
+// The whole list is written at once, and only ever by lib/sessions.ts — one write
+// path means what's on screen and what's on disk can't disagree.
+export function saveSessions(sessions: CompletedSession[]): void {
   try {
-    localStorage.setItem(SESSIONS_KEY, JSON.stringify(all))
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions))
   } catch {
     // storage full or unavailable — nothing more we can do here
   }
