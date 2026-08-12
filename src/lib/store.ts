@@ -10,20 +10,30 @@ import { useSyncExternalStore } from 'react'
 
 export interface Store<T> {
   get: () => T
+  /** Change the value and write it out. */
   set: (next: T) => void
+  /** Swap in a value that came *from* storage — used when signing in or out swaps
+   *  which account's data we're looking at. Writing it back would be a pointless
+   *  round trip at best, and at worst would save one account's data over another's. */
+  replace: (next: T) => void
   subscribe: (listener: () => void) => () => void
 }
 
 export function createStore<T>(initial: T, persist?: (value: T) => void): Store<T> {
   let value = initial
   const listeners = new Set<() => void>()
+  const notifyAll = () => listeners.forEach((notify) => notify())
 
   return {
     get: () => value,
     set(next) {
       value = next
       persist?.(next)
-      listeners.forEach((notify) => notify())
+      notifyAll()
+    },
+    replace(next) {
+      value = next
+      notifyAll()
     },
     subscribe(listener) {
       listeners.add(listener)
@@ -32,6 +42,12 @@ export function createStore<T>(initial: T, persist?: (value: T) => void): Store<
       }
     },
   }
+}
+
+// Re-read a store from storage. Called when the signed-in account changes, so what
+// is in memory belongs to whoever is actually signed in now.
+export function reloadFrom<T>(store: Store<T>, load: () => T): void {
+  store.replace(load())
 }
 
 // Read a store from a component. The snapshot is only ever replaced on a write, so

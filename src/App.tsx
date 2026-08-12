@@ -13,6 +13,8 @@ import BuilderBlockScreen from './screens/BuilderBlockScreen'
 import HistoryScreen from './screens/HistoryScreen'
 import SessionDetailScreen from './screens/SessionDetailScreen'
 import SettingsScreen from './screens/SettingsScreen'
+import SignInScreen from './screens/SignInScreen'
+import { useAccount } from './lib/auth'
 
 /*
   All routes live here. Screens with the bottom nav are nested inside <AppShell>.
@@ -20,6 +22,12 @@ import SettingsScreen from './screens/SettingsScreen'
   while you're training).
 */
 export default function App() {
+  const account = useAccount()
+
+  // One gate in front of everything. Signing out swaps this back in, and because
+  // the stores reload with it, no screen is ever left holding the last person's data.
+  if (!account) return <SignInScreen />
+
   return (
     <Routes>
       <Route element={<AppShell />}>

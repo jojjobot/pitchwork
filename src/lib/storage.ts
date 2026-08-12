@@ -1,12 +1,28 @@
 import type { CompletedSession, Workout } from '../types'
 
 /*
-  Everything we keep on the device lives in localStorage under these keys.
-  No account, no server — clearing your browser data clears your history.
+  Everything Pitchwork keeps lives in this browser's localStorage. There is no
+  server, so this file is the whole persistence layer.
+
+  Each account gets its own namespace — `pitchwork.<accountId>.sessions.v1` and so
+  on — which is what keeps two people on the same browser from seeing each other's
+  training. Nothing here knows about passwords; it only knows whose drawer is open.
+  lib/auth.ts decides that and calls setActiveAccount().
 */
-const SESSIONS_KEY = 'pitchwork.sessions.v1'
-const SETTINGS_KEY = 'pitchwork.settings.v1'
-const CUSTOM_WORKOUTS_KEY = 'pitchwork.customWorkouts.v1'
+
+// Who's signed in. Written to localStorage when "remember me" is on and to
+// sessionStorage when it isn't — that single difference is the whole feature.
+const SIGNED_IN_KEY = 'pitchwork.signedIn.v1'
+export const ACCOUNTS_KEY = 'pitchwork.accounts.v1'
+
+// Where data lived before accounts existed. Claimed by the first account created.
+const LEGACY_KEYS = {
+  sessions: 'pitchwork.sessions.v1',
+  settings: 'pitchwork.settings.v1',
+  customWorkouts: 'pitchwork.customWorkouts.v1',
+} as const
+
+type Bucket = keyof typeof LEGACY_KEYS
 
 export interface Settings {
   soundEnabled: boolean
@@ -20,25 +36,108 @@ export const DEFAULT_SETTINGS: Settings = {
   weeklyGoalMinutes: 90,
 }
 
+// --- Whose data are we reading? ---
+
+export interface SignedIn {
+  accountId: string
+  remember: boolean
+}
+
+function readSignedIn(): SignedIn | null {
+  try {
+    // Referenced inside the guard on purpose: this runs at module load, and in any
+    // environment without Web Storage (a test runner, SSR) it must come up signed
+    // out rather than take the whole app down on import.
+    for (const store of [localStorage, sessionStorage]) {
+      const raw = store.getItem(SIGNED_IN_KEY)
+      if (raw) {
+        const parsed = JSON.parse(raw) as SignedIn
+        if (parsed && typeof parsed.accountId === 'string') return parsed
+      }
+    }
+  } catch {
+    // unreadable or unavailable — treat as signed out
+  }
+  return null
+}
+
+/*
+  Resolved once, here, at module load — before any store initialises. The stores are
+  module-level singletons that read their data on first import, so if this were
+  decided later they'd all come up empty and only fill in after a refresh.
+*/
+let activeAccountId: string | null = readSignedIn()?.accountId ?? null
+
+export function getActiveAccountId(): string | null {
+  return activeAccountId
+}
+
+export function setActiveAccount(id: string | null): void {
+  activeAccountId = id
+}
+
+export function rememberSignedIn(accountId: string, remember: boolean): void {
+  const record: SignedIn = { accountId, remember }
+  try {
+    clearSignedIn()
+    const store = remember ? localStorage : sessionStorage
+    store.setItem(SIGNED_IN_KEY, JSON.stringify(record))
+  } catch {
+    // if we can't persist it, the sign-in simply won't outlive this page
+  }
+}
+
+export function clearSignedIn(): void {
+  try {
+    localStorage.removeItem(SIGNED_IN_KEY)
+    sessionStorage.removeItem(SIGNED_IN_KEY)
+  } catch {
+    // nothing to do
+  }
+}
+
+export function isRemembered(): boolean {
+  return readSignedIn()?.remember ?? false
+}
+
+// --- Reading and writing one account's data ---
+
+function bucketKey(bucket: Bucket): string | null {
+  return activeAccountId ? `pitchwork.${activeAccountId}.${bucket}.v1` : null
+}
+
+function read<T>(bucket: Bucket, fallback: T): T {
+  const key = bucketKey(bucket)
+  if (!key) return fallback // signed out: the app is gated, so nothing should ask
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? (JSON.parse(raw) as T) : fallback
+  } catch {
+    return fallback
+  }
+}
+
+function write(bucket: Bucket, value: unknown): void {
+  const key = bucketKey(bucket)
+  if (!key) return // signed out: never write someone's data into a nameless drawer
+  try {
+    localStorage.setItem(key, JSON.stringify(value))
+  } catch {
+    // storage full or unavailable — nothing more we can do here
+  }
+}
+
 // --- Completed sessions (training history) ---
 
 export function loadSessions(): CompletedSession[] {
-  try {
-    const raw = localStorage.getItem(SESSIONS_KEY)
-    return raw ? (JSON.parse(raw) as CompletedSession[]) : []
-  } catch {
-    return []
-  }
+  const value = read<CompletedSession[]>('sessions', [])
+  return Array.isArray(value) ? value : []
 }
 
 // The whole list is written at once, and only ever by lib/sessions.ts — one write
 // path means what's on screen and what's on disk can't disagree.
 export function saveSessions(sessions: CompletedSession[]): void {
-  try {
-    localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions))
-  } catch {
-    // storage full or unavailable — nothing more we can do here
-  }
+  write('sessions', sessions)
 }
 
 // --- Workouts you built yourself ---
@@ -47,38 +146,61 @@ export function saveSessions(sessions: CompletedSession[]): void {
 // enough custom sessions for that to matter.
 
 export function loadCustomWorkouts(): Workout[] {
-  try {
-    const raw = localStorage.getItem(CUSTOM_WORKOUTS_KEY)
-    const parsed = raw ? JSON.parse(raw) : []
-    return Array.isArray(parsed) ? (parsed as Workout[]) : []
-  } catch {
-    return []
-  }
+  const value = read<Workout[]>('customWorkouts', [])
+  return Array.isArray(value) ? value : []
 }
 
 export function saveCustomWorkouts(list: Workout[]): void {
-  try {
-    localStorage.setItem(CUSTOM_WORKOUTS_KEY, JSON.stringify(list))
-  } catch {
-    // storage full or unavailable — nothing more we can do here
-  }
+  write('customWorkouts', list)
 }
 
 // --- Settings ---
 
 export function loadSettings(): Settings {
-  try {
-    const raw = localStorage.getItem(SETTINGS_KEY)
-    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS
-  } catch {
-    return DEFAULT_SETTINGS
-  }
+  return { ...DEFAULT_SETTINGS, ...read<Partial<Settings>>('settings', {}) }
 }
 
 export function saveSettings(settings: Settings): void {
+  write('settings', settings)
+}
+
+// --- Account housekeeping ---
+
+/*
+  Data from before accounts existed belongs to whoever creates the first account —
+  otherwise adding a sign-in screen would look exactly like losing your history.
+  Moved rather than copied, so a second account can't inherit it too.
+*/
+export function claimLegacyData(accountId: string): boolean {
+  let claimed = false
+  for (const bucket of Object.keys(LEGACY_KEYS) as Bucket[]) {
+    try {
+      const raw = localStorage.getItem(LEGACY_KEYS[bucket])
+      if (raw == null) continue
+      localStorage.setItem(`pitchwork.${accountId}.${bucket}.v1`, raw)
+      localStorage.removeItem(LEGACY_KEYS[bucket])
+      claimed = true
+    } catch {
+      // if it can't be moved, leave it where it is rather than lose it
+    }
+  }
+  return claimed
+}
+
+export function hasLegacyData(): boolean {
   try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
+    return Object.values(LEGACY_KEYS).some((key) => localStorage.getItem(key) != null)
   } catch {
-    // ignore
+    return false
+  }
+}
+
+export function dropAccountData(accountId: string): void {
+  for (const bucket of Object.keys(LEGACY_KEYS) as Bucket[]) {
+    try {
+      localStorage.removeItem(`pitchwork.${accountId}.${bucket}.v1`)
+    } catch {
+      // nothing to do
+    }
   }
 }

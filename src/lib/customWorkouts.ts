@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { workouts } from '../data/workouts'
 import { loadCustomWorkouts, saveCustomWorkouts } from './storage'
-import { createStore, useStore } from './store'
+import { createStore, reloadFrom, useStore } from './store'
 import { deriveFiling } from './builder'
 import { estimateWorkout } from './workout'
 import type { Workout, WorkoutBlock } from '../types'
@@ -107,4 +107,9 @@ export function updateBlocks(id: string, change: (blocks: WorkoutBlock[]) => Wor
 
 export function deleteCustomWorkout(id: string): void {
   commit(customs().filter((w) => w.id !== id))
+}
+
+// Called by lib/auth.ts when the signed-in account changes.
+export function reload(): void {
+  reloadFrom(store, loadCustomWorkouts)
 }

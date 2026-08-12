@@ -2,6 +2,8 @@ import { useRef, useState } from 'react'
 import { clearSessions, getSessions, replaceSessions, useSessions } from '../lib/sessions'
 import { updateSettings, useSettings } from '../lib/settings'
 import { useCustomWorkouts } from '../lib/customWorkouts'
+import { deleteAccount, isRemembered, signOut, useAccount, useAccounts } from '../lib/auth'
+import AccountPassword from '../components/AccountPassword'
 import Stepper from '../components/Stepper'
 import type { CompletedSession } from '../types'
 
@@ -14,8 +16,11 @@ export default function SettingsScreen() {
   const settings = useSettings()
   const sessions = useSessions()
   const mine = useCustomWorkouts()
+  const account = useAccount()
+  const accounts = useAccounts()
   const fileInput = useRef<HTMLInputElement>(null)
   const [confirmingClear, setConfirmingClear] = useState(false)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
 
   function exportBackup() {
@@ -67,6 +72,32 @@ export default function SettingsScreen() {
         <h1 className="text-3xl font-extrabold tracking-tight">Settings</h1>
         <div className="chalk-line mt-2 w-20" aria-hidden="true" />
       </header>
+
+      {/* Account */}
+      {account && (
+        <div className="mt-6">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-slate">Account</h2>
+          <div className="mt-2 rounded-2xl border border-slate/15 bg-white/70 p-4">
+            <p className="font-semibold text-ink">{account.email}</p>
+            <p className="mt-0.5 text-sm text-slate">
+              {isRemembered()
+                ? 'Staying signed in on this device.'
+                : 'Signed out when you close the browser.'}
+              {accounts.length > 1 &&
+                ` · ${accounts.length} accounts on this browser, each with its own training.`}
+            </p>
+
+            <button
+              onClick={signOut}
+              className="mt-4 h-11 w-full rounded-xl border border-slate/25 bg-white font-semibold text-ink active:bg-white/70"
+            >
+              {accounts.length > 1 ? 'Sign out / switch account' : 'Sign out'}
+            </button>
+
+            <AccountPassword onDone={setMessage} />
+          </div>
+        </div>
+      )}
 
       {/* During a session */}
       <div className="mt-6">
@@ -186,6 +217,44 @@ export default function SettingsScreen() {
           </button>
         )}
       </div>
+
+      {/* Deleting the account itself — the heaviest button in the app, so it's last */}
+      {account && (
+        <div className="mt-4 rounded-2xl border border-slate/15 p-4">
+          {confirmingDelete ? (
+            <>
+              <p className="font-semibold text-ink">Delete {account.email} completely?</p>
+              <p className="mt-1 text-sm text-slate">
+                The account, its {sessions.length} saved{' '}
+                {sessions.length === 1 ? 'session' : 'sessions'} and its{' '}
+                {mine.length === 1 ? 'built session' : `${mine.length} built sessions`} all go. There
+                is no copy anywhere else and no undo.
+              </p>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={deleteAccount}
+                  className="h-11 flex-1 rounded-xl bg-blaze font-semibold text-white active:brightness-95"
+                >
+                  Delete everything
+                </button>
+                <button
+                  onClick={() => setConfirmingDelete(false)}
+                  className="h-11 flex-1 rounded-xl border border-slate/25 bg-white font-semibold text-ink"
+                >
+                  Cancel
+                </button>
+              </div>
+            </>
+          ) : (
+            <button
+              onClick={() => setConfirmingDelete(true)}
+              className="h-11 w-full text-sm font-semibold text-slate"
+            >
+              Delete this account
+            </button>
+          )}
+        </div>
+      )}
 
       <p className="mt-8 text-center text-xs text-slate">Pitchwork — train on your own, properly.</p>
     </section>

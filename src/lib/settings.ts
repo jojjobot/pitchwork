@@ -1,4 +1,4 @@
-import { createStore, useStore } from './store'
+import { createStore, reloadFrom, useStore } from './store'
 import { loadSettings, saveSettings, DEFAULT_SETTINGS } from './storage'
 import type { Settings } from './storage'
 
@@ -24,4 +24,9 @@ export function updateSettings(patch: Partial<Settings>): void {
 
 export function resetSettings(): void {
   store.set(DEFAULT_SETTINGS)
+}
+
+// Called by lib/auth.ts when the signed-in account changes.
+export function reload(): void {
+  reloadFrom(store, loadSettings)
 }

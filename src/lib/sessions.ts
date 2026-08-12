@@ -1,4 +1,4 @@
-import { createStore, useStore } from './store'
+import { createStore, reloadFrom, useStore } from './store'
 import { loadSessions, saveSessions } from './storage'
 import type { CompletedSession } from '../types'
 
@@ -37,4 +37,9 @@ export function getSessions(): CompletedSession[] {
 // Used by the restore-from-backup path in Settings.
 export function replaceSessions(sessions: CompletedSession[]): void {
   store.set(sessions)
+}
+
+// Called by lib/auth.ts when the signed-in account changes.
+export function reload(): void {
+  reloadFrom(store, loadSessions)
 }
