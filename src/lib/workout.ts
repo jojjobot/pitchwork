@@ -1,6 +1,6 @@
 import { exerciseById } from '../data/exercises'
 import { SPACE_RANK } from './labels'
-import type { Category, Equipment, Exercise, Space, Workout } from '../types'
+import type { Category, Equipment, Exercise, Space, Workout, WorkoutBlock } from '../types'
 
 /*
   Turning a workout (a list of blocks) into the exact sequence of steps the session
@@ -16,8 +16,9 @@ export type SessionStep =
       exercise: Exercise
       setIndex: number // 1-based
       setCount: number
-      seconds: number | null // for timed drills; null for rep-based
+      seconds: number | null // for timed drills; null for rep-based (self-paced)
       reps: number | null // for rep-based drills
+      estimateSeconds: number // how long this set is expected to take, timed or not
       note: string | null
     }
   | {
@@ -28,6 +29,16 @@ export type SessionStep =
       nextSetCount: number | null
       reason: 'set' | 'block' // rest between sets, or rest before the next drill
     }
+
+// How long one set is expected to take. Timed drills know exactly; rep drills are
+// self-paced, so we use the block's own estimate, or scale the drill's default pace
+// by how many reps this block asks for.
+function setSeconds(ex: Exercise, block: WorkoutBlock, reps: number | null): number {
+  if (ex.measureType !== 'reps') return block.duration ?? ex.defaultDuration
+  if (block.estimateSeconds != null) return block.estimateSeconds
+  if (reps != null && ex.defaultReps) return Math.round(ex.defaultDuration * (reps / ex.defaultReps))
+  return ex.defaultDuration
+}
 
 export function buildSteps(workout: Workout): SessionStep[] {
   const steps: SessionStep[] = []
@@ -40,6 +51,8 @@ export function buildSteps(workout: Workout): SessionStep[] {
     const seconds = isTimed ? block.duration ?? ex.defaultDuration : null
     const reps = !isTimed ? block.reps ?? ex.defaultReps : null
     const setCount = Math.max(1, block.sets)
+    const estimateSeconds = setSeconds(ex, block, reps)
+    const restBetweenSets = block.restBetweenSets ?? ex.restBetweenSets
 
     for (let s = 1; s <= setCount; s++) {
       steps.push({
@@ -50,13 +63,14 @@ export function buildSteps(workout: Workout): SessionStep[] {
         setCount,
         seconds,
         reps,
+        estimateSeconds,
         note: block.note,
       })
       // rest between sets
-      if (s < setCount && ex.restBetweenSets > 0) {
+      if (s < setCount && restBetweenSets > 0) {
         steps.push({
           kind: 'rest',
-          seconds: ex.restBetweenSets,
+          seconds: restBetweenSets,
           nextExercise: ex,
           nextSetIndex: s + 1,
           nextSetCount: setCount,
@@ -100,10 +114,9 @@ export function estimateWorkout(workout: Workout): WorkoutEstimate {
     if (step.kind === 'rest') {
       seconds += step.seconds
     } else {
-      // rep-based drills have no fixed time, so estimate with the drill's default
-      const work = step.seconds ?? step.exercise.defaultDuration
-      seconds += work
-      categorySeconds[step.exercise.category] = (categorySeconds[step.exercise.category] ?? 0) + work
+      seconds += step.estimateSeconds
+      categorySeconds[step.exercise.category] =
+        (categorySeconds[step.exercise.category] ?? 0) + step.estimateSeconds
     }
   }
 

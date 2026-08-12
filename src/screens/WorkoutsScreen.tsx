@@ -29,6 +29,12 @@ export default function WorkoutsScreen() {
   // Pre-compute each workout's length, kit, categories, and space once.
   const withMeta = useMemo(() => workouts.map((w) => ({ workout: w, meta: workoutMeta(w) })), [])
 
+  // Only offer a chip for a skill that actually has sessions filed under it.
+  const categoriesInUse = useMemo(
+    () => CATEGORY_ORDER.filter((c) => workouts.some((w) => w.category === c)),
+    [],
+  )
+
   const activeFilters =
     (category !== 'all' ? 1 : 0) +
     (difficulty !== 'any' ? 1 : 0) +
@@ -55,7 +61,7 @@ export default function WorkoutsScreen() {
   const results = useMemo(() => {
     const q = search.trim().toLowerCase()
     return withMeta.filter(({ workout, meta }) => {
-      if (category !== 'all' && !meta.categories.has(category)) return false
+      if (category !== 'all' && workout.category !== category) return false
       if (difficulty !== 'any' && workout.difficulty !== difficulty) return false
       if (space !== 'any' && SPACE_RANK[meta.space] > SPACE_RANK[space]) return false
       if (duration === 'short' && meta.minutes > 15) return false
@@ -64,7 +70,9 @@ export default function WorkoutsScreen() {
       // every piece of kit the workout needs must be available
       for (const e of meta.equipment) if (!available.has(e)) return false
       if (q) {
-        const hay = (workout.name + ' ' + workout.goal + ' ' + workout.description).toLowerCase()
+        const hay = (
+          workout.code + ' ' + workout.name + ' ' + workout.goal + ' ' + workout.focus + ' ' + workout.description
+        ).toLowerCase()
         if (!hay.includes(q)) return false
       }
       return true
@@ -98,7 +106,7 @@ export default function WorkoutsScreen() {
           <Chip active={category === 'all'} onClick={() => setCategory('all')}>
             All
           </Chip>
-          {CATEGORY_ORDER.map((cat) => (
+          {categoriesInUse.map((cat) => (
             <Chip key={cat} active={category === cat} onClick={() => setCategory(cat)} dot={CATEGORY_ACCENT[cat]}>
               {CATEGORY_LABELS[cat]}
             </Chip>

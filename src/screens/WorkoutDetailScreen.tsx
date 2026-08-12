@@ -38,7 +38,10 @@ export default function WorkoutDetailScreen() {
         <span aria-hidden="true">←</span> Back
       </button>
 
-      <h1 className="text-3xl font-extrabold tracking-tight">{workout.name}</h1>
+      <p className="text-sm font-bold uppercase tracking-widest" style={{ color: CATEGORY_ACCENT[workout.category] }}>
+        {workout.code} · {CATEGORY_LABELS[workout.category]}
+      </p>
+      <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{workout.name}</h1>
       <p className="mt-1 font-semibold text-pitch">{workout.goal}</p>
       <p className="mt-3 text-slate leading-relaxed">{workout.description}</p>
 
@@ -50,9 +53,16 @@ export default function WorkoutDetailScreen() {
         {kit.length === 0 ? <Badge>No kit</Badge> : kit.map((e) => <Badge key={e}>{EQUIPMENT_LABELS[e]}</Badge>)}
       </div>
 
+      {meta.equipment.has('partner') && (
+        <p className="mt-3 rounded-xl bg-slate/10 px-4 py-2 text-sm text-slate">
+          You'll need at least one other player for this session.
+        </p>
+      )}
+
       {/* Category breakdown */}
       <div className="mt-6">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-slate">What it trains</h2>
+        <p className="mt-2 text-sm text-slate">{workout.focus}</p>
         <div className="mt-3 space-y-2">
           {breakdown.map(({ category, minutes }) => (
             <div key={category} className="flex items-center gap-3">

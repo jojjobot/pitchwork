@@ -40,19 +40,27 @@ export interface Exercise {
 
 export interface WorkoutBlock {
   exerciseId: string
-  duration: number | null // overrides the exercise default (null = use default)
-  reps: number | null
+  duration: number | null // seconds per set for TIMED drills (null = use the drill's default)
+  reps: number | null // reps per set for REP drills (null = use the drill's default)
   sets: number
+  restBetweenSets: number | null // seconds between sets (null = use the drill's default)
+  // How long one set of a REP drill is expected to take. Rep drills are self-paced in
+  // the player — this number exists only so the session length we advertise is honest.
+  // null = estimate it from the drill's default pace.
+  estimateSeconds: number | null
   restAfter: number // seconds of rest after this block, before the next
   note: string | null // an optional coaching note for this block
 }
 
 export interface Workout {
   id: string
+  code: string // the short label from the programme, e.g. "A1", "D7"
   name: string
+  category: Category // the skill this session is built around (how it's filed)
   description: string
   goal: string // e.g. "Sharper first touch"
-  estimatedMinutes: number
+  focus: string // what the minutes are spent on, e.g. "5 min mechanics · 7 min acceleration"
+  estimatedMinutes: number // the length as written; the app displays the computed length
   difficulty: Difficulty
   isCustom: boolean // true = created by the user
   blocks: WorkoutBlock[]

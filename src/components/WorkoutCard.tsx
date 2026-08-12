@@ -10,6 +10,7 @@ import { CATEGORY_ACCENT, CATEGORY_LABELS, DIFFICULTY_LABELS } from '../lib/labe
 export default function WorkoutCard({ workout }: { workout: Workout }) {
   const meta = workoutMeta(workout)
   const cats = [...meta.categories]
+  const needsPlayers = meta.equipment.has('partner')
 
   return (
     <Link
@@ -18,7 +19,10 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-display text-lg font-bold leading-tight text-ink">{workout.name}</p>
+          <p className="font-display text-lg font-bold leading-tight text-ink">
+            <span className="mr-1.5 text-slate">{workout.code}</span>
+            {workout.name}
+          </p>
           <p className="mt-0.5 text-sm text-slate">{workout.goal}</p>
         </div>
         <div className="shrink-0 text-right">
@@ -31,6 +35,9 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
         <span className="rounded-full bg-slate/15 px-2.5 py-1 text-xs font-medium capitalize text-slate">
           {DIFFICULTY_LABELS[workout.difficulty]}
         </span>
+        {needsPlayers && (
+          <span className="rounded-full bg-slate/15 px-2.5 py-1 text-xs font-medium text-slate">Needs players</span>
+        )}
         <div className="flex items-center gap-1">
           {cats.map((c) => (
             <span

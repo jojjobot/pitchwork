@@ -104,9 +104,8 @@ export default function SessionPlayer() {
   function advance(completed: boolean) {
     const step = steps[indexRef.current]
     if (step && step.kind === 'work' && completed) {
-      const secs = step.seconds ?? step.exercise.defaultDuration
       catSecondsRef.current[step.exercise.category] =
-        (catSecondsRef.current[step.exercise.category] ?? 0) + secs
+        (catSecondsRef.current[step.exercise.category] ?? 0) + step.estimateSeconds
       blocksDoneRef.current.add(step.blockIndex)
     }
     const ni = indexRef.current + 1
@@ -117,7 +116,7 @@ export default function SessionPlayer() {
 
   function completeReps() {
     const step = steps[indexRef.current]
-    if (step && step.kind === 'work') setElapsed((e) => e + step.exercise.defaultDuration)
+    if (step && step.kind === 'work') setElapsed((e) => e + step.estimateSeconds)
     cueEnd()
     advance(true)
   }
