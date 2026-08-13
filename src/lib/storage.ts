@@ -22,7 +22,7 @@ const LEGACY_KEYS = {
   customWorkouts: 'pitchwork.customWorkouts.v1',
 } as const
 
-type Bucket = keyof typeof LEGACY_KEYS
+export type Bucket = keyof typeof LEGACY_KEYS
 
 export interface Settings {
   soundEnabled: boolean
@@ -102,8 +102,37 @@ export function isRemembered(): boolean {
 
 // --- Reading and writing one account's data ---
 
+function accountBucketKey(accountId: string, bucket: Bucket): string {
+  return `pitchwork.${accountId}.${bucket}.v1`
+}
+
 function bucketKey(bucket: Bucket): string | null {
-  return activeAccountId ? `pitchwork.${activeAccountId}.${bucket}.v1` : null
+  return activeAccountId ? accountBucketKey(activeAccountId, bucket) : null
+}
+
+/*
+  Reading and writing a *named* account's drawer rather than the open one.
+
+  Only lib/transfer.ts should need this, and only because importing an account from
+  another device happens on the sign-in screen, where nobody is signed in yet and
+  activeAccountId is null. Everything else in the app must go through the functions
+  below, which can only ever touch the account that's actually open.
+*/
+export function readAccountBucket<T>(accountId: string, bucket: Bucket, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(accountBucketKey(accountId, bucket))
+    return raw ? (JSON.parse(raw) as T) : fallback
+  } catch {
+    return fallback
+  }
+}
+
+export function writeAccountBucket(accountId: string, bucket: Bucket, value: unknown): void {
+  try {
+    localStorage.setItem(accountBucketKey(accountId, bucket), JSON.stringify(value))
+  } catch {
+    // storage full or unavailable — the caller reports what did and didn't land
+  }
 }
 
 function read<T>(bucket: Bucket, fallback: T): T {

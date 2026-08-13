@@ -23,6 +23,12 @@ export function useCustomWorkouts(): Workout[] {
   return useStore(store)
 }
 
+// The same list, outside React — for lib/transfer.ts, which reads it while building
+// a file rather than while rendering.
+export function getCustomWorkouts(): Workout[] {
+  return store.get()
+}
+
 export function useAllWorkouts(): Workout[] {
   const mine = useStore(store)
   // Rebuilt only when your sessions actually change, so the identity stays stable

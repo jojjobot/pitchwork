@@ -279,6 +279,27 @@ export function deleteAccount(): void {
   openAccount(null)
 }
 
+/*
+  Adopting an account record that was exported on another device.
+
+  The record is taken as it is — same id, same salt, same hash — which is the whole
+  point: the password you already know keeps working, and it still isn't stored
+  anywhere, here or there. Credentials stay this file's business, so transfer.ts
+  moves the *data* and asks this to place the account.
+
+  An account with that email already on this browser is left completely alone. Its
+  password wins; only its training gets merged. Overwriting it would let anyone with
+  a transfer file change the password on an account they can already see.
+*/
+export function adoptAccount(incoming: Account): { accountId: string; created: boolean } {
+  const existing = accountsStore.get().find((a) => a.email === normaliseEmail(incoming.email))
+  if (existing) return { accountId: existing.id, created: false }
+
+  const account: Account = { ...incoming, email: normaliseEmail(incoming.email) }
+  accountsStore.set([...accountsStore.get(), account])
+  return { accountId: account.id, created: true }
+}
+
 // True when there's data from before accounts existed, waiting to be claimed.
 export function hasUnclaimedData(): boolean {
   return accountsStore.get().length === 0 && hasLegacyData()

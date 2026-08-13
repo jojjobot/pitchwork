@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   AuthError,
   MIN_PASSWORD_LENGTH,
@@ -9,6 +9,7 @@ import {
   passwordProblem,
   signIn,
 } from '../lib/auth'
+import { applyTransfer } from '../lib/transfer'
 
 /*
   The front door. Two modes on one screen — signing in and creating an account —
@@ -27,9 +28,49 @@ export default function SignInScreen() {
   const [remember, setRemember] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [imported, setImported] = useState<string | null>(null)
+  const transferInput = useRef<HTMLInputElement>(null)
 
   const creating = mode === 'create'
   const inheriting = creating && hasUnclaimedData()
+
+  /*
+    Bringing an account over from another device. This has to live on the sign-in
+    screen rather than in Settings: on a new phone there is no account to sign into
+    yet, so Settings is unreachable — this is the only door.
+
+    It never signs anyone in. The file carries no usable password, so you sign in
+    afterwards exactly as you would have.
+  */
+  async function importTransfer(file: File) {
+    try {
+      const result = applyTransfer(JSON.parse(await file.text()))
+      setEmail(result.email)
+      setMode('signIn')
+      setError(null)
+      setImported(
+        [
+          result.created
+            ? `${result.email} is now on this device.`
+            : `${result.email} was already here.`,
+          result.sessionsAdded > 0 &&
+            `${result.sessionsAdded} ${result.sessionsAdded === 1 ? 'session' : 'sessions'} added.`,
+          result.workoutsAdded > 0 &&
+            `${result.workoutsAdded} built ${result.workoutsAdded === 1 ? 'session' : 'sessions'} added.`,
+          'Sign in with the same password.',
+        ]
+          .filter(Boolean)
+          .join(' '),
+      )
+    } catch (err) {
+      setImported(null)
+      setError(
+        err instanceof Error && err.message
+          ? err.message
+          : "That file couldn't be read as a Pitchwork transfer.",
+      )
+    }
+  }
 
   async function submit(event: React.FormEvent) {
     event.preventDefault()
@@ -182,6 +223,37 @@ export default function SignInScreen() {
             {creating ? 'I already have an account' : 'Create an account'}
           </button>
         )}
+
+        {imported && (
+          <p className="mt-4 rounded-xl bg-lime/25 px-4 py-3 text-sm text-ink">{imported}</p>
+        )}
+
+        {/* The bridge between devices. Quiet, because most people open this screen
+            on a device that already has their account. */}
+        <div className="mt-6 rounded-2xl border border-slate/15 p-4">
+          <p className="text-sm font-semibold text-ink">Already have an account on another device?</p>
+          <p className="mt-1 text-sm leading-relaxed text-slate">
+            Accounts live in one browser, so signing in here won't find it. On that device open
+            Settings → Move to another device, then open the saved file here.
+          </p>
+          <button
+            onClick={() => transferInput.current?.click()}
+            className="mt-3 h-11 w-full rounded-xl border border-slate/25 bg-white font-semibold text-ink active:bg-chalk"
+          >
+            Open a transfer file
+          </button>
+          <input
+            ref={transferInput}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) importTransfer(file)
+              e.target.value = '' // let the same file be picked twice
+            }}
+          />
+        </div>
 
         {/* What this actually protects. Said once, plainly, where it matters. */}
         <div className="mt-8 rounded-2xl border border-slate/15 p-4 text-sm leading-relaxed text-slate">

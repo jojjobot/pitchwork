@@ -3,6 +3,7 @@ import { clearSessions, getSessions, replaceSessions, useSessions } from '../lib
 import { updateSettings, useSettings } from '../lib/settings'
 import { useCustomWorkouts } from '../lib/customWorkouts'
 import { deleteAccount, isRemembered, signOut, useAccount, useAccounts } from '../lib/auth'
+import { buildTransfer, transferFilename } from '../lib/transfer'
 import AccountPassword from '../components/AccountPassword'
 import Stepper from '../components/Stepper'
 import type { CompletedSession } from '../types'
@@ -25,15 +26,21 @@ export default function SettingsScreen() {
 
   function exportBackup() {
     const backup = { exportedAt: new Date().toISOString(), sessions: getSessions() }
-    const url = URL.createObjectURL(
-      new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }),
+    download(
+      JSON.stringify(backup, null, 2),
+      `pitchwork-history-${new Date().toISOString().slice(0, 10)}.json`,
     )
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `pitchwork-history-${new Date().toISOString().slice(0, 10)}.json`
-    link.click()
-    URL.revokeObjectURL(url)
     setMessage(`Saved ${sessions.length} ${sessions.length === 1 ? 'session' : 'sessions'} to your downloads.`)
+  }
+
+  function moveToAnotherDevice() {
+    try {
+      const transfer = buildTransfer()
+      download(JSON.stringify(transfer, null, 2), transferFilename(transfer.account.email))
+      setMessage('Saved to your downloads. Open that file on the other device.')
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Couldn't build the transfer file.")
+    }
   }
 
   async function importBackup(file: File) {
@@ -179,6 +186,36 @@ export default function SettingsScreen() {
         </div>
       </div>
 
+      {/* Another device */}
+      {account && (
+        <div className="mt-7">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-slate">
+            Another device
+          </h2>
+          <div className="mt-2 rounded-2xl border border-slate/15 bg-white/70 p-4">
+            <p className="text-sm leading-relaxed text-slate">
+              Your account only exists in this browser, so signing in on your phone won't find
+              it. This saves a file with your account, your history and the sessions you built —
+              open it on the other device from its sign-in screen, then sign in with the same
+              password.
+            </p>
+
+            <button
+              onClick={moveToAnotherDevice}
+              className="mt-4 h-11 w-full rounded-xl border border-slate/25 bg-white font-semibold text-ink active:bg-white/70"
+            >
+              Move to another device
+            </button>
+
+            <p className="mt-3 text-xs leading-relaxed text-slate">
+              It's a copy, not a sync — train on both and they drift apart, though carrying the
+              file back merges them rather than overwriting. Keep the file to yourself: it holds
+              your training and the scrambled form of your password.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Clearing */}
       <div className="mt-4 rounded-2xl border border-slate/15 p-4">
         {confirmingClear ? (
@@ -259,6 +296,17 @@ export default function SettingsScreen() {
       <p className="mt-8 text-center text-xs text-slate">Pitchwork — train on your own, properly.</p>
     </section>
   )
+}
+
+// Hands a file to the browser. Shared by the history backup and the device transfer
+// so there's one place that knows how a download is triggered.
+function download(text: string, filename: string): void {
+  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 function goalHint(minutes: number): string {
