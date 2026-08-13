@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom'
 import type { Exercise } from '../types'
-import { CATEGORY_ACCENT, CATEGORY_LABELS, efficiencyBand } from '../lib/labels'
+import { CATEGORY_ACCENT, CATEGORY_LABELS } from '../lib/labels'
 import { prescription } from '../lib/format'
+import { EfficiencyBadge } from './Efficiency'
 
 /*
   One row in the exercise library. Tapping it opens the drill's detail screen.
   The whole card is the tap target so it's easy to hit one-handed.
 */
 export default function ExerciseCard({ exercise }: { exercise: Exercise }) {
-  const band = exercise.efficiency != null ? efficiencyBand(exercise.efficiency) : null
   const also = exercise.alsoTrains ?? []
 
   return (
@@ -19,14 +19,8 @@ export default function ExerciseCard({ exercise }: { exercise: Exercise }) {
       {/* The score, in its band's colour — this is the first thing worth reading in a
           list of 172 drills, so it takes the slot the category spine used to hold and
           keeps the spine as a thin edge beside it. */}
-      {band ? (
-        <span
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl font-display text-base font-extrabold text-white"
-          style={{ backgroundColor: band.color }}
-          title={`${band.label} — ${exercise.efficiency}/100 efficiency`}
-        >
-          {exercise.efficiency}
-        </span>
+      {exercise.efficiency != null ? (
+        <EfficiencyBadge score={exercise.efficiency} />
       ) : (
         <span
           className="h-10 w-1.5 shrink-0 rounded-full"

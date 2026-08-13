@@ -13,6 +13,7 @@ import {
 import Badge from '../components/Badge'
 import CategoryBars from '../components/CategoryBars'
 import NotFound from '../components/NotFound'
+import { EfficiencyTile } from '../components/Efficiency'
 
 export default function WorkoutDetailScreen() {
   const { workoutId } = useParams()
@@ -63,6 +64,15 @@ export default function WorkoutDetailScreen() {
         <p className="mt-3 rounded-xl bg-slate/10 px-4 py-2 text-sm text-slate">
           You'll need at least one other player for this session.
         </p>
+      )}
+
+      {meta.efficiency != null && (
+        <div className="mt-4">
+          <EfficiencyTile
+            score={meta.efficiency}
+            what="The average of this session's drills, weighted by how long you spend on each."
+          />
+        </div>
       )}
 
       {/* Category breakdown */}

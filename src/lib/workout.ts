@@ -110,13 +110,35 @@ export interface WorkoutEstimate {
   seconds: number
   minutes: number
   categorySeconds: Partial<Record<Category, number>>
+  // 1–100, on the same scale as a drill's — or null when nothing in it is scored.
+  efficiency: number | null
 }
 
-// Honest length + how the work time splits across skill categories.
+/*
+  Honest length, how the work time splits across skill categories, and what the
+  session is worth.
+
+  A session's efficiency is DERIVED, never stored, for the same reason its length is
+  (see src/data/README.md and the rule in WorkoutCard): swap a drill or cut a set and
+  the number has to move, or it becomes a claim about a session you're no longer
+  doing. Sessions you build yourself get one for free, out of the same code.
+
+  Two decisions inside it:
+
+  - It is weighted by WORK seconds, and rest is excluded from the weighting entirely.
+    Rest is what makes a sprint set a sprint set; charging a session for prescribing
+    it would mark down exactly the conditioning work that needs it most.
+  - Unscored drills — the ones you wrote — are left out of both halves of the
+    average rather than counted as zero. A session that is half your own drills is
+    then scored on the half that has scores, which is the only honest thing to say
+    about it.
+*/
 export function estimateWorkout(workout: Blocked): WorkoutEstimate {
   const steps = buildSteps(workout)
   let seconds = 0
   const categorySeconds: Partial<Record<Category, number>> = {}
+  let scoredSeconds = 0
+  let weightedScore = 0
 
   for (const step of steps) {
     if (step.kind === 'rest') {
@@ -125,10 +147,19 @@ export function estimateWorkout(workout: Blocked): WorkoutEstimate {
       seconds += step.estimateSeconds
       categorySeconds[step.exercise.category] =
         (categorySeconds[step.exercise.category] ?? 0) + step.estimateSeconds
+      if (step.exercise.efficiency != null) {
+        weightedScore += step.exercise.efficiency * step.estimateSeconds
+        scoredSeconds += step.estimateSeconds
+      }
     }
   }
 
-  return { seconds, minutes: Math.max(1, Math.round(seconds / 60)), categorySeconds }
+  return {
+    seconds,
+    minutes: Math.max(1, Math.round(seconds / 60)),
+    categorySeconds,
+    efficiency: scoredSeconds > 0 ? Math.round(weightedScore / scoredSeconds) : null,
+  }
 }
 
 export interface WorkoutMeta extends WorkoutEstimate {

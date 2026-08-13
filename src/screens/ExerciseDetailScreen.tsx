@@ -5,11 +5,11 @@ import {
   CATEGORY_ACCENT,
   CATEGORY_LABELS,
   DIFFICULTY_LABELS,
-  efficiencyBand,
   EQUIPMENT_LABELS,
   SPACE_LABELS,
   trainedCategories,
 } from '../lib/labels'
+import { EfficiencyTile } from '../components/Efficiency'
 import { prescription, formatSeconds } from '../lib/format'
 import Badge from '../components/Badge'
 import NotFound from '../components/NotFound'
@@ -39,7 +39,6 @@ export default function ExerciseDetailScreen() {
 
   const kit = ex.equipment.filter((e) => e !== 'none')
   const skills = trainedCategories(ex)
-  const band = ex.efficiency != null ? efficiencyBand(ex.efficiency) : null
 
   return (
     <section>
@@ -61,22 +60,12 @@ export default function ExerciseDetailScreen() {
       {ex.isCustom && <p className="mt-1 text-sm font-semibold text-pitch">A drill you wrote</p>}
       <p className="mt-2 text-slate">{ex.shortDescription}</p>
 
-      {/* What the score means, said plainly. The number alone invites the wrong
-          reading — that a 50 is a bad drill rather than a narrower one. */}
-      {band && (
-        <div className="mt-4 flex items-start gap-3 rounded-2xl border border-slate/15 bg-white/70 p-4">
-          <span
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-xl font-display text-lg font-extrabold text-white"
-            style={{ backgroundColor: band.color }}
-          >
-            {ex.efficiency}
-          </span>
-          <div className="min-w-0">
-            <p className="font-display font-bold text-ink">
-              {band.label} <span className="font-body text-sm font-normal text-slate">· {ex.efficiency}/100 efficiency</span>
-            </p>
-            <p className="mt-0.5 text-sm text-slate">{band.blurb}</p>
-          </div>
+      {ex.efficiency != null && (
+        <div className="mt-4">
+          <EfficiencyTile
+            score={ex.efficiency}
+            what="How much a minute on this drill moves your match performance — not how hard it is."
+          />
         </div>
       )}
 

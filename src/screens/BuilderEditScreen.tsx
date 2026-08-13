@@ -20,6 +20,7 @@ import {
 import Badge from '../components/Badge'
 import CategoryBars from '../components/CategoryBars'
 import NotFound from '../components/NotFound'
+import { EfficiencyTile } from '../components/Efficiency'
 import type { Workout } from '../types'
 
 /*
@@ -126,6 +127,17 @@ export default function BuilderEditScreen() {
               </span>{' '}
               — where most of your time goes.
             </p>
+
+            {/* Scored as you build. Swapping a drill or cutting a set moves this
+                immediately, which is the whole use of showing it here. */}
+            {meta.efficiency != null && (
+              <div className="mt-4">
+                <EfficiencyTile
+                  score={meta.efficiency}
+                  what="Updates as you add, swap and re-time drills. Drills you wrote aren't scored, so they sit out of the average."
+                />
+              </div>
+            )}
 
             <div className="mt-3 flex flex-wrap gap-2">
               <Badge>{DIFFICULTY_LABELS[workout.difficulty]}</Badge>

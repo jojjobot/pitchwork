@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import type { Workout } from '../types'
 import { workoutMeta } from '../lib/workout'
 import { CATEGORY_ACCENT, CATEGORY_LABELS, DIFFICULTY_LABELS } from '../lib/labels'
+import { EfficiencyBadge } from './Efficiency'
 
 /*
   A workout in the browse list. Shows its honest length, difficulty, and which
@@ -25,9 +26,14 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
           </p>
           <p className="mt-0.5 text-sm text-slate">{workout.goal}</p>
         </div>
-        <div className="shrink-0 text-right">
-          <p className="font-display text-2xl font-extrabold leading-none text-ink">{meta.minutes}</p>
-          <p className="text-xs text-slate">min</p>
+        {/* Length and worth, side by side — the two questions you ask of a session
+            before you commit 40 minutes to it. */}
+        <div className="flex shrink-0 items-center gap-3">
+          <div className="text-right">
+            <p className="font-display text-2xl font-extrabold leading-none text-ink">{meta.minutes}</p>
+            <p className="text-xs text-slate">min</p>
+          </div>
+          {meta.efficiency != null && <EfficiencyBadge score={meta.efficiency} />}
         </div>
       </div>
 
