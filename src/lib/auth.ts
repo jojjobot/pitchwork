@@ -92,6 +92,17 @@ export function accountCount(): number {
   return accountsStore.get().length
 }
 
+// An account is only an email — there is no name field to store one in. Rather than
+// ask for a name we don't use anywhere else, the one we show is read off the address
+// ("jo.boehle@…" → "Jo Boehle"): personal enough to greet you by, and impossible to
+// leave out of sync. Anything unsplittable falls back to the address itself.
+export function displayName(account: Account): string {
+  const local = account.email.split('@')[0] ?? ''
+  const words = local.split(/[._+-]+|\d+/).filter(Boolean)
+  if (words.length === 0) return account.email
+  return words.map((w) => w[0].toUpperCase() + w.slice(1)).join(' ')
+}
+
 export { isRemembered }
 
 // --- Hashing ---

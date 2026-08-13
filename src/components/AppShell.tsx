@@ -1,11 +1,15 @@
 import { Link, Outlet } from 'react-router-dom'
+import AccountMenu from './AccountMenu'
 import BottomNav from './BottomNav'
 
 /*
   The frame that wraps every main screen: a slim top header with the wordmark
-  and a settings button, the screen content in the middle, and the thumb-reachable
+  and the account button, the screen content in the middle, and the thumb-reachable
   bottom navigation. Content is capped at a phone-ish width and centred so it also
   looks intentional on a laptop.
+
+  The top-right corner is the only way to Settings — the bottom nav has no room for
+  it — so whatever lives up there must always keep that route reachable.
 */
 export default function AppShell() {
   return (
@@ -21,13 +25,7 @@ export default function AppShell() {
             <span className="chalk-line mt-1 w-16" aria-hidden="true" />
           </Link>
 
-          <Link
-            to="/settings"
-            aria-label="Settings"
-            className="grid place-items-center h-11 w-11 rounded-full text-ink hover:bg-slate/10"
-          >
-            <GearIcon />
-          </Link>
+          <AccountMenu />
         </div>
       </header>
 
@@ -38,19 +36,5 @@ export default function AppShell() {
 
       <BottomNav />
     </div>
-  )
-}
-
-function GearIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
   )
 }
