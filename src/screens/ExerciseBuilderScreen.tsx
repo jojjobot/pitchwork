@@ -31,7 +31,7 @@ import type { Equipment, Exercise, MeasureType } from '../types'
   Everything here writes through on the tap, exactly like the session builder — there
   is no Save button and nothing to lose by leaving. "Done" is only navigation.
 
-  The shape being filled in is the same one the 146 built-in drills use, which is the
+  The shape being filled in is the same one the 172 built-in drills use, which is the
   whole point: once it exists there is nothing second-class about it. It appears in
   the library, it can be filtered to, and it drops into a session like any other.
 */
@@ -130,19 +130,49 @@ export default function ExerciseBuilderScreen() {
         </Field>
 
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate">Skill</p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate">Main skill</p>
           <div className="flex flex-wrap gap-2">
             {CATEGORY_CHOICES.map((cat) => (
               <Chip
                 key={cat}
                 active={ex.category === cat}
-                onClick={() => edit({ category: cat })}
+                // Promoting a skill to main removes it from the extras, so the same
+                // category can never be listed twice.
+                onClick={() =>
+                  edit({ category: cat, alsoTrains: (ex.alsoTrains ?? []).filter((c) => c !== cat) })
+                }
                 dot={CATEGORY_ACCENT[cat]}
               >
                 {CATEGORY_LABELS[cat]}
               </Chip>
             ))}
           </div>
+          <p className="mt-2 text-xs text-slate">Where the drill is filed, and where its minutes are counted.</p>
+        </div>
+
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate">Also trains</p>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORY_CHOICES.filter((cat) => cat !== ex.category).map((cat) => (
+              <Chip
+                key={cat}
+                active={(ex.alsoTrains ?? []).includes(cat)}
+                onClick={() => {
+                  const also = ex.alsoTrains ?? []
+                  edit({
+                    alsoTrains: also.includes(cat) ? also.filter((c) => c !== cat) : [...also, cat],
+                  })
+                }}
+                dot={CATEGORY_ACCENT[cat]}
+              >
+                {CATEGORY_LABELS[cat]}
+              </Chip>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-slate">
+            Pick as many as it honestly works. A 1v1 trains dribbling and athleticism; a rondo trains
+            passing, first touch and defending. These make it findable under each one.
+          </p>
         </div>
 
         <Segmented

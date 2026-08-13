@@ -8,7 +8,7 @@
 
   Two rules keep it honest:
   - Concrete ids are replaced by their route pattern before sending (see `pattern`),
-    so the dashboard reads "/library/:exercise" rather than 146 separate rows, and
+    so the dashboard reads "/library/:exercise" rather than 172 separate rows, and
     which drills a person opened never leaves their device.
   - Nothing is sent from localhost or from Node, so development and the test scripts
     can't pollute real numbers.

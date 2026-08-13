@@ -22,8 +22,19 @@ export type MeasureType = 'time' | 'reps' | 'distance'
 export interface Exercise {
   id: string
   name: string
+  // The skill this drill is filed under, and the only one its minutes are counted
+  // towards. Deliberately one category: a session that spends 10 minutes on rondos
+  // has spent 10 minutes, and splitting those minutes across every skill a rondo
+  // touches would make the weekly totals add up to more training than you did.
   category: Category
-  rank?: number // effectiveness rank within its category (1 = highest return); optional
+  // The other skills it genuinely works, best first. This is for finding drills, not
+  // for counting them — filtering the library by "Defending" surfaces the rondo,
+  // because the two players in the middle are defending.
+  alsoTrains?: Category[]
+  // 1–100: how much one minute here moves your actual match performance. See the
+  // rubric at the top of src/data/exercises.ts for how the number is arrived at.
+  // Optional: drills you wrote yourself don't get one.
+  efficiency?: number
   shortDescription: string // one line, shown in lists
   instructions: string[] // numbered steps, shown during a session
   coachingCues: string[] // short "do this well" tips

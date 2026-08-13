@@ -1,12 +1,56 @@
 import type { Exercise } from '../types'
 
 /*
-  THE DRILL LIBRARY — 140 exercises across 7 skill categories, plus 6 recovery drills.
-  Within each category the drills are ordered by `rank`: #1 gives the most return for
-  the time you put in, higher numbers are more situational or specialised.
+  THE DRILL LIBRARY — 172 exercises across 7 skill categories, plus 6 recovery drills.
 
   To add your own: copy a block, give it a unique `id`, and fill in the fields.
   `category` must be one of the eight in src/types.ts. Times are in seconds.
+
+  ------------------------------------------------------------------------------
+  HOW `efficiency` IS DECIDED (1–100)
+
+  It answers one question: how much does a minute spent here move what you can do
+  in a real match? It is NOT how hard the drill is, how advanced it is, or how good
+  it looks. A hard drill can be a poor use of a minute, and often is.
+
+  Four inputs, weighted:
+
+    Transfer   40%  Does the practice resemble the game? An opponent, a decision
+                    and time pressure are what make a skill show up on a Saturday.
+                    This is the ecological-dynamics / representative-learning-design
+                    finding, and it is the single biggest reason two drills that
+                    look similar score 40 points apart. Small-sided and opposed
+                    forms beat decontextualised ones for passing and technical
+                    transfer; isolated technique work has low ecological validity
+                    because the decision-making is stripped out.
+    Evidence   25%  How well is THIS practice supported? The Nordic hamstring curl
+                    (injury rate roughly halved), squat strength → sprint transfer,
+                    and plyometrics → jump/sprint/COD are among the best-evidenced
+                    things in here. Static stretching and foam rolling are among the
+                    weakest, and are scored accordingly rather than generously.
+    Density    20%  Useful repetitions and decisions per minute. Wall work scores
+                    well here even unopposed, because you get hundreds of touches
+                    with nobody to wait for.
+    Breadth    15%  How many qualities improve at once. A 1v1 trains dribbling,
+                    acceleration and reading a defender in the same minute.
+
+  The bands (also shown in the app, see lib/labels.ts):
+
+     85–100  Elite return — do these first, and often.
+     70–84   Strong — the backbone of a week.
+     55–69   Solid — worth its place, narrower payoff.
+     40–54   Narrow — real but limited, or mostly a warm-up.
+      1–39   Novelty — fun, low return per minute.
+
+  Some scores deliberately contradict how these drills are usually ranked. Cone
+  slaloms, ball-mastery circuits and juggling are popular and score in the 40s,
+  because nothing in them asks you to decide anything. Pre-planned zig-zag agility
+  scores 42: meta-analysis finds plyometric work improves change-of-direction
+  overall but specifically NOT the zig-zag and T-test measures. Bench press,
+  lateral raises and curls sit in the 20s–40s: they are good exercises that happen
+  to have little to do with football. Nothing here is worthless — 24 is still a
+  number, and an accessory lift you enjoy is a reason to keep training.
+  ------------------------------------------------------------------------------
 */
 
 export const exercises: Exercise[] = [
@@ -15,7 +59,7 @@ export const exercises: Exercise[] = [
     id: 'ath-repeated-sprints',
     name: 'Repeated sprint ability',
     category: 'athleticism',
-    rank: 1,
+    efficiency: 88,
     shortDescription: '6–8 max sprints of ~30m with short rest — the closest thing to real match running.',
     instructions: [
       'Mark out 30 metres of open space.',
@@ -38,7 +82,7 @@ export const exercises: Exercise[] = [
     id: 'ath-accel-starts',
     name: '10m acceleration starts',
     category: 'athleticism',
-    rank: 2,
+    efficiency: 90,
     shortDescription: 'Explosive first-step starts from different stances over 10m.',
     instructions: [
       'Set a start line and a mark 10 metres away.',
@@ -61,7 +105,7 @@ export const exercises: Exercise[] = [
     id: 'ath-pro-agility',
     name: '5-10-5 pro agility',
     category: 'athleticism',
-    rank: 3,
+    efficiency: 66,
     shortDescription: 'Sprint 5m one way, 10m back the other, 5m to finish — change of direction under speed.',
     instructions: [
       'Place three cones 5 metres apart in a line.',
@@ -84,7 +128,7 @@ export const exercises: Exercise[] = [
     id: 'ath-hiit',
     name: 'High-intensity intervals',
     category: 'athleticism',
-    rank: 4,
+    efficiency: 84,
     shortDescription: '4 × 4min at ~90% effort with 3min jogs — builds the engine for repeated sprinting.',
     instructions: [
       'Run hard at about 90% effort for 4 minutes.',
@@ -107,7 +151,8 @@ export const exercises: Exercise[] = [
     id: 'ath-decel',
     name: 'Deceleration drill',
     category: 'athleticism',
-    rank: 5,
+    alsoTrains: ['defending'],
+    efficiency: 80,
     shortDescription: 'Sprint 20m and stop dead inside a small box — braking strength that prevents injuries.',
     instructions: [
       'Mark a 2-metre box 20 metres from the start.',
@@ -130,7 +175,7 @@ export const exercises: Exercise[] = [
     id: 'ath-yoyo',
     name: 'Yo-Yo style shuttles',
     category: 'athleticism',
-    rank: 6,
+    efficiency: 82,
     shortDescription: '20m out-and-back shuttles with shrinking rest — trains recovery between sprints.',
     instructions: [
       'Set cones 20 metres apart.',
@@ -153,7 +198,7 @@ export const exercises: Exercise[] = [
     id: 'ath-curved-sprint',
     name: 'Curved sprint runs',
     category: 'athleticism',
-    rank: 7,
+    efficiency: 74,
     shortDescription: 'Sprint along an arc — the way you actually run onto through balls and around defenders.',
     instructions: [
       'Lay out a gentle curved line of cones.',
@@ -176,7 +221,8 @@ export const exercises: Exercise[] = [
     id: 'ath-backpedal-sprint',
     name: 'Backpedal-to-sprint',
     category: 'athleticism',
-    rank: 8,
+    alsoTrains: ['defending'],
+    efficiency: 68,
     shortDescription: 'Backpedal, then turn and sprint on a signal — defensive transition speed.',
     instructions: [
       'Backpedal 5 metres under control.',
@@ -199,7 +245,8 @@ export const exercises: Exercise[] = [
     id: 'ath-bounding',
     name: 'Bounding / hurdle hops',
     category: 'athleticism',
-    rank: 9,
+    alsoTrains: ['strength'],
+    efficiency: 76,
     shortDescription: '3 × 6 explosive jumps — builds the power behind top speed.',
     instructions: [
       'Perform exaggerated, powerful bounds forward, driving your knees up.',
@@ -222,7 +269,8 @@ export const exercises: Exercise[] = [
     id: 'ath-broad-jump',
     name: 'Broad jump',
     category: 'athleticism',
-    rank: 10,
+    alsoTrains: ['strength'],
+    efficiency: 72,
     shortDescription: '5 × 3 max-distance standing jumps — a simple horizontal power trainer.',
     instructions: [
       'Stand with your feet shoulder-width apart.',
@@ -245,7 +293,8 @@ export const exercises: Exercise[] = [
     id: 'ath-tempo-runs',
     name: 'Tempo runs',
     category: 'athleticism',
-    rank: 11,
+    alsoTrains: ['recovery'],
+    efficiency: 58,
     shortDescription: '10 × 100m at 70% with walk-back rest — aerobic base with almost no soreness.',
     instructions: [
       'Mark out 100 metres.',
@@ -268,7 +317,8 @@ export const exercises: Exercise[] = [
     id: 'ath-reactive-t',
     name: 'Reactive T-drill',
     category: 'athleticism',
-    rank: 12,
+    alsoTrains: ['defending'],
+    efficiency: 78,
     shortDescription: 'Sprint, shuffle and backpedal through a T, reacting to a called direction.',
     instructions: [
       'Set up a T shape with cones.',
@@ -291,7 +341,8 @@ export const exercises: Exercise[] = [
     id: 'ath-zigzag',
     name: 'Zig-zag cone slalom',
     category: 'athleticism',
-    rank: 13,
+    alsoTrains: ['dribbling'],
+    efficiency: 42,
     shortDescription: 'Sprint through 6 cones set 3m apart — entry-level change of direction.',
     instructions: [
       'Place 6 cones in a zig-zag, 3 metres apart.',
@@ -314,7 +365,7 @@ export const exercises: Exercise[] = [
     id: 'ath-flying-20s',
     name: 'Flying 20s',
     category: 'athleticism',
-    rank: 14,
+    efficiency: 80,
     shortDescription: '20m build-up into 20m at absolute max — the way to train true top speed.',
     instructions: [
       'Use a 20m run-in to build to near-max speed.',
@@ -337,7 +388,8 @@ export const exercises: Exercise[] = [
     id: 'ath-resisted-sprints',
     name: 'Resisted sprints',
     category: 'athleticism',
-    rank: 15,
+    alsoTrains: ['strength'],
+    efficiency: 74,
     shortDescription: 'Sled or band-resisted 15m sprints — adds force to your first three steps.',
     instructions: [
       'Attach a sled or a resistance band around your waist (a partner can hold a band).',
@@ -360,7 +412,8 @@ export const exercises: Exercise[] = [
     id: 'ath-hop-stick',
     name: 'Single-leg hop and stick',
     category: 'athleticism',
-    rank: 16,
+    alsoTrains: ['strength'],
+    efficiency: 68,
     shortDescription: 'Hop and hold the landing for 2 seconds — balance, control and joint stability.',
     instructions: [
       'Stand on one leg.',
@@ -383,7 +436,8 @@ export const exercises: Exercise[] = [
     id: 'ath-lateral-shuffle',
     name: 'Lateral shuffle',
     category: 'athleticism',
-    rank: 17,
+    alsoTrains: ['defending'],
+    efficiency: 52,
     shortDescription: '10m shuffles, hips low, feet never crossing — defensive base movement.',
     instructions: [
       'Get into a low athletic stance.',
@@ -406,7 +460,7 @@ export const exercises: Exercise[] = [
     id: 'ath-askips',
     name: 'A-skips and high knees',
     category: 'athleticism',
-    rank: 18,
+    efficiency: 46,
     shortDescription: '3 × 20m form drills that clean up mechanics so speed work actually transfers.',
     instructions: [
       'A-skip: skip forward driving one knee up with a matching arm swing.',
@@ -429,7 +483,7 @@ export const exercises: Exercise[] = [
     id: 'ath-fartlek',
     name: 'Fartlek run',
     category: 'athleticism',
-    rank: 19,
+    efficiency: 50,
     shortDescription: '25min continuous run with random 30–60s hard bursts — easy aerobic volume.',
     instructions: [
       'Run at an easy, conversational pace.',
@@ -452,7 +506,8 @@ export const exercises: Exercise[] = [
     id: 'ath-hill-sprints',
     name: 'Stair or hill sprints',
     category: 'athleticism',
-    rank: 20,
+    alsoTrains: ['strength'],
+    efficiency: 72,
     shortDescription: '8–10 × 15s uphill efforts — power and conditioning with lower impact than flat sprints.',
     instructions: [
       'Find a hill or a flight of stairs.',
@@ -477,7 +532,8 @@ export const exercises: Exercise[] = [
     id: 'dr-1v1-endline',
     name: '1v1 to the endline',
     category: 'dribbling',
-    rank: 1,
+    alsoTrains: ['athleticism'],
+    efficiency: 95,
     shortDescription: 'Beat a live defender to a line — nothing builds real dribbling faster.',
     instructions: [
       'Mark a start and an endline 10–15 metres apart.',
@@ -500,7 +556,7 @@ export const exercises: Exercise[] = [
     id: 'dr-cone-slalom',
     name: 'Cone slalom, close control',
     category: 'dribbling',
-    rank: 2,
+    efficiency: 48,
     shortDescription: '8 cones a metre apart, both feet, every touch counts — the foundation drill.',
     instructions: [
       'Set 8 cones in a line, 1 metre apart.',
@@ -523,7 +579,7 @@ export const exercises: Exercise[] = [
     id: 'dr-inside-outside',
     name: 'Inside-outside touches',
     category: 'dribbling',
-    rank: 3,
+    efficiency: 52,
     shortDescription: 'Push in with the inside then out with the outside of the same foot down a line.',
     instructions: [
       'Set a line of cones a metre apart.',
@@ -546,7 +602,8 @@ export const exercises: Exercise[] = [
     id: 'dr-tight-grid',
     name: 'Tight-grid dribbling',
     category: 'dribbling',
-    rank: 4,
+    alsoTrains: ['first-touch'],
+    efficiency: 58,
     shortDescription: 'Dribble inside a 10×10m box avoiding traffic — forces your head up.',
     instructions: [
       'Mark a 10×10 metre box.',
@@ -569,7 +626,7 @@ export const exercises: Exercise[] = [
     id: 'dr-body-feint',
     name: 'Body feint and go',
     category: 'dribbling',
-    rank: 5,
+    efficiency: 60,
     shortDescription: 'Drop a shoulder one way, push the ball the other, accelerate — the highest-percentage move.',
     instructions: [
       'Dribble toward a cone or defender.',
@@ -592,7 +649,8 @@ export const exercises: Exercise[] = [
     id: 'dr-speed-dribble',
     name: 'Speed dribbling 30m',
     category: 'dribbling',
-    rank: 6,
+    alsoTrains: ['athleticism'],
+    efficiency: 74,
     shortDescription: 'Sprint 30m with a touch every second step — carrying the ball at pace on the counter.',
     instructions: [
       'Mark out 30 metres of open space.',
@@ -615,7 +673,8 @@ export const exercises: Exercise[] = [
     id: 'dr-cruyff',
     name: 'Cruyff turn',
     category: 'dribbling',
-    rank: 7,
+    alsoTrains: ['first-touch'],
+    efficiency: 55,
     shortDescription: 'Fake a pass, drag the ball behind your standing leg, and go the other way.',
     instructions: [
       'Dribble forward and plant your standing foot beside the ball.',
@@ -638,7 +697,7 @@ export const exercises: Exercise[] = [
     id: 'dr-croqueta',
     name: 'La Croqueta',
     category: 'dribbling',
-    rank: 8,
+    efficiency: 54,
     shortDescription: 'Push the ball across your body foot-to-foot at speed to slip between two defenders.',
     instructions: [
       'Dribble forward at a controlled pace.',
@@ -661,7 +720,8 @@ export const exercises: Exercise[] = [
     id: 'dr-scissors',
     name: 'Scissors into acceleration',
     category: 'dribbling',
-    rank: 9,
+    alsoTrains: ['athleticism'],
+    efficiency: 62,
     shortDescription: 'One or two step-overs at a cone, then explode past it — the burst makes it work.',
     instructions: [
       'Dribble up to a cone or defender.',
@@ -684,7 +744,8 @@ export const exercises: Exercise[] = [
     id: 'dr-shield-turn',
     name: 'Shield and turn out',
     category: 'dribbling',
-    rank: 10,
+    alsoTrains: ['strength', 'first-touch'],
+    efficiency: 78,
     shortDescription: 'Back to a defender, protect the ball with your body, then roll away into space.',
     instructions: [
       'Stand with your back to a defender or cone, ball at your feet.',
@@ -707,7 +768,7 @@ export const exercises: Exercise[] = [
     id: 'dr-sole-rolls',
     name: 'Sole rolls and drag-pulls',
     category: 'dribbling',
-    rank: 11,
+    efficiency: 44,
     shortDescription: 'Continuous rolls and pulls in a small box — the soft touch everything else needs.',
     instructions: [
       'Keep the ball under you in a small area.',
@@ -730,7 +791,7 @@ export const exercises: Exercise[] = [
     id: 'dr-ronaldo-chop',
     name: 'Ronaldo chop',
     category: 'dribbling',
-    rank: 12,
+    efficiency: 50,
     shortDescription: 'Chop the ball behind your standing leg to escape pressure on the wing.',
     instructions: [
       'Dribble along the touchline at pace.',
@@ -753,7 +814,7 @@ export const exercises: Exercise[] = [
     id: 'dr-figure-8',
     name: 'Figure-8 dribble',
     category: 'dribbling',
-    rank: 13,
+    efficiency: 46,
     shortDescription: 'Weave around two cones 3m apart with tight touches, both directions.',
     instructions: [
       'Place two cones 3 metres apart.',
@@ -776,7 +837,8 @@ export const exercises: Exercise[] = [
     id: 'dr-head-up-reaction',
     name: 'Head-up reaction dribble',
     category: 'dribbling',
-    rank: 14,
+    alsoTrains: ['first-touch'],
+    efficiency: 82,
     shortDescription: 'Dribble in a box and change direction on a call or hand signal.',
     instructions: [
       'Dribble around a small box.',
@@ -799,7 +861,8 @@ export const exercises: Exercise[] = [
     id: 'dr-gate-decision',
     name: 'Gate exit decision',
     category: 'dribbling',
-    rank: 15,
+    alsoTrains: ['first-touch'],
+    efficiency: 84,
     shortDescription: 'Dribble at two gates and choose which to go through only at the last moment.',
     instructions: [
       'Set two cone gates side by side ahead of you.',
@@ -822,7 +885,7 @@ export const exercises: Exercise[] = [
     id: 'dr-nutmeg-gate',
     name: 'Nutmeg through a gate',
     category: 'dribbling',
-    rank: 16,
+    efficiency: 42,
     shortDescription: 'Push the ball through a 30cm gate and run around a marker to collect it.',
     instructions: [
       'Set a narrow 30cm gate with a marker just behind it.',
@@ -845,7 +908,8 @@ export const exercises: Exercise[] = [
     id: 'dr-mastery-circuit',
     name: 'Ball mastery circuit',
     category: 'dribbling',
-    rank: 17,
+    alsoTrains: ['first-touch'],
+    efficiency: 50,
     shortDescription: '60s of non-stop rolls, taps, V-pulls and drags — no rest, no stopping.',
     instructions: [
       'Chain together sole rolls, toe taps, V-pulls and drag-backs.',
@@ -868,7 +932,7 @@ export const exercises: Exercise[] = [
     id: 'dr-elastico',
     name: 'Elastico',
     category: 'dribbling',
-    rank: 18,
+    efficiency: 34,
     shortDescription: 'Push the ball out with the outside, then snap it back with the inside in one motion.',
     instructions: [
       'Address a stationary or slow-rolling ball.',
@@ -891,7 +955,8 @@ export const exercises: Exercise[] = [
     id: 'dr-maradona',
     name: 'Maradona / roulette turn',
     category: 'dribbling',
-    rank: 19,
+    alsoTrains: ['first-touch'],
+    efficiency: 38,
     shortDescription: 'A 360° spin over the ball with both soles — a great escape under pressure.',
     instructions: [
       'Approach the ball with your back turning to a defender.',
@@ -914,7 +979,8 @@ export const exercises: Exercise[] = [
     id: 'dr-juggle-dribble',
     name: 'Juggle into dribble',
     category: 'dribbling',
-    rank: 20,
+    alsoTrains: ['first-touch'],
+    efficiency: 32,
     shortDescription: 'Juggle, drop the ball, and attack a cone immediately — links touch to movement.',
     instructions: [
       'Juggle the ball a few times.',
@@ -939,7 +1005,7 @@ export const exercises: Exercise[] = [
     id: 'sh-side-foot-placement',
     name: 'Side-foot placement',
     category: 'shooting',
-    rank: 1,
+    efficiency: 86,
     shortDescription: 'Place the ball into the corners from 12m — most goals are placed, not blasted.',
     instructions: [
       'Set the ball 12 metres from goal.',
@@ -962,7 +1028,8 @@ export const exercises: Exercise[] = [
     id: 'sh-1v1-keeper',
     name: '1v1 with the keeper',
     category: 'shooting',
-    rank: 2,
+    alsoTrains: ['dribbling'],
+    efficiency: 92,
     shortDescription: 'Run onto a ball with a keeper closing you down — the most common real chance.',
     instructions: [
       'Start with the ball 20 metres out, keeper in goal.',
@@ -985,7 +1052,7 @@ export const exercises: Exercise[] = [
     id: 'sh-instep-drive',
     name: 'Instep drive after a set touch',
     category: 'shooting',
-    rank: 3,
+    efficiency: 74,
     shortDescription: 'Push the ball forward, then strike through the middle with your laces from 18m.',
     instructions: [
       'Start with the ball at your feet 20 metres out.',
@@ -1008,7 +1075,8 @@ export const exercises: Exercise[] = [
     id: 'sh-cutback',
     name: 'Finish from a cutback',
     category: 'shooting',
-    rank: 4,
+    alsoTrains: ['first-touch'],
+    efficiency: 84,
     shortDescription: 'Ball rolled back from the byline, finished first-time — a high-percentage modern chance.',
     instructions: [
       'Roll or have a ball delivered back from the byline area.',
@@ -1031,7 +1099,8 @@ export const exercises: Exercise[] = [
     id: 'sh-first-time-layoff',
     name: 'First-time finish from a lay-off',
     category: 'shooting',
-    rank: 5,
+    alsoTrains: ['first-touch'],
+    efficiency: 80,
     shortDescription: 'A ball laid into your path, struck first time without adjusting your feet.',
     instructions: [
       'Have the ball laid back into your path (a partner or wall).',
@@ -1054,7 +1123,7 @@ export const exercises: Exercise[] = [
     id: 'sh-weak-foot',
     name: 'Weak-foot only session',
     category: 'shooting',
-    rank: 6,
+    efficiency: 78,
     shortDescription: 'A full 20-shot set with your weaker foot — doubles the chances you can take.',
     instructions: [
       'Set up 12–16 metres from goal.',
@@ -1077,7 +1146,8 @@ export const exercises: Exercise[] = [
     id: 'sh-fatigue',
     name: 'Shooting under fatigue',
     category: 'shooting',
-    rank: 7,
+    alsoTrains: ['athleticism'],
+    efficiency: 76,
     shortDescription: "Sprint 20m, then finish — the finish you'll actually have in minute 80.",
     instructions: [
       'Place a ball 16 metres from goal.',
@@ -1100,7 +1170,8 @@ export const exercises: Exercise[] = [
     id: 'sh-turn-shoot',
     name: 'Turn and shoot',
     category: 'shooting',
-    rank: 8,
+    alsoTrains: ['first-touch'],
+    efficiency: 78,
     shortDescription: "Receive with your back to goal, turn out of the defender's shadow, and strike.",
     instructions: [
       'Receive a ball played into your feet, back to goal.',
@@ -1123,7 +1194,8 @@ export const exercises: Exercise[] = [
     id: 'sh-rebound',
     name: 'Rebound reactions',
     category: 'shooting',
-    rank: 9,
+    alsoTrains: ['first-touch'],
+    efficiency: 70,
     shortDescription: 'Shoot, a second ball is served immediately, finish again — poachers live off this.',
     instructions: [
       'Take a shot from close range.',
@@ -1146,7 +1218,8 @@ export const exercises: Exercise[] = [
     id: 'sh-volley-drop',
     name: 'Volley from a hand drop',
     category: 'shooting',
-    rank: 10,
+    alsoTrains: ['first-touch'],
+    efficiency: 48,
     shortDescription: 'Drop it yourself and strike before the second bounce — knee over the ball.',
     instructions: [
       'Hold the ball out in front of you.',
@@ -1169,7 +1242,8 @@ export const exercises: Exercise[] = [
     id: 'sh-cross-finish',
     name: 'Finish from a cross',
     category: 'shooting',
-    rank: 11,
+    alsoTrains: ['first-touch'],
+    efficiency: 80,
     shortDescription: 'Attack near and far post from wide serves, on the ground and in the air.',
     instructions: [
       'Have balls served from a wide area (or off a wall).',
@@ -1192,7 +1266,8 @@ export const exercises: Exercise[] = [
     id: 'sh-one-two-shot',
     name: 'One-two into a shot',
     category: 'shooting',
-    rank: 12,
+    alsoTrains: ['passing'],
+    efficiency: 74,
     shortDescription: 'Play a wall pass off a partner or board, then strike first time.',
     instructions: [
       'Play a one-two off a partner or a bounce board.',
@@ -1215,7 +1290,7 @@ export const exercises: Exercise[] = [
     id: 'sh-chip-keeper',
     name: 'Chip over the keeper',
     category: 'shooting',
-    rank: 13,
+    efficiency: 46,
     shortDescription: 'Keeper rushes out, so dink it over — a stab under the ball with no follow-through.',
     instructions: [
       'Approach a ball with the keeper (or a marker) off their line.',
@@ -1238,7 +1313,7 @@ export const exercises: Exercise[] = [
     id: 'sh-curl-mannequin',
     name: 'Curled shot around a mannequin',
     category: 'shooting',
-    rank: 14,
+    efficiency: 66,
     shortDescription: 'Bend it around an obstacle into the far top corner with the inside of the foot.',
     instructions: [
       'Place a mannequin or cone between the ball and goal.',
@@ -1261,7 +1336,7 @@ export const exercises: Exercise[] = [
     id: 'sh-penalty',
     name: 'Penalty routine',
     category: 'shooting',
-    rank: 15,
+    efficiency: 62,
     shortDescription: '10 penalties, corner chosen in advance, the same run-up every time.',
     instructions: [
       'Place the ball on the spot.',
@@ -1284,7 +1359,8 @@ export const exercises: Exercise[] = [
     id: 'sh-half-volley',
     name: 'Half volley',
     category: 'shooting',
-    rank: 16,
+    alsoTrains: ['first-touch'],
+    efficiency: 50,
     shortDescription: 'Strike as the ball hits the ground — the hardest timing, deadliest when clean.',
     instructions: [
       'Drop or serve a bouncing ball in front of you.',
@@ -1307,7 +1383,7 @@ export const exercises: Exercise[] = [
     id: 'sh-tight-angle',
     name: 'Tight-angle finish',
     category: 'shooting',
-    rank: 17,
+    efficiency: 52,
     shortDescription: 'Finish from the byline area — near-post roof or cut back across the keeper.',
     instructions: [
       'Start near the byline with the ball.',
@@ -1330,7 +1406,7 @@ export const exercises: Exercise[] = [
     id: 'sh-long-range',
     name: 'Long range strike',
     category: 'shooting',
-    rank: 18,
+    efficiency: 40,
     shortDescription: '25m+ dead-ball or set-touch strikes — low percentage but changes games.',
     instructions: [
       'Set the ball 25+ metres from goal.',
@@ -1353,7 +1429,7 @@ export const exercises: Exercise[] = [
     id: 'sh-free-kick',
     name: 'Free kick technique',
     category: 'shooting',
-    rank: 19,
+    efficiency: 38,
     shortDescription: '15 reps over a wall, one technique per session (bend or knuckle, not both).',
     instructions: [
       'Set the ball ~20 metres out with a wall (mannequins or imagined).',
@@ -1376,7 +1452,8 @@ export const exercises: Exercise[] = [
     id: 'sh-headed',
     name: 'Headed finishing',
     category: 'shooting',
-    rank: 20,
+    alsoTrains: ['athleticism'],
+    efficiency: 64,
     shortDescription: 'Attack served crosses, head down and through the ball toward the corners.',
     instructions: [
       'Have crosses served into the box (partner or self-toss).',
@@ -1401,7 +1478,8 @@ export const exercises: Exercise[] = [
     id: 'pa-rondo',
     name: 'Rondo (5v2 or 4v1)',
     category: 'passing',
-    rank: 1,
+    alsoTrains: ['first-touch', 'defending'],
+    efficiency: 96,
     shortDescription: 'Keep the ball in a circle under pressure — the single best passing exercise there is.',
     instructions: [
       'Form a circle with 1–2 defenders in the middle.',
@@ -1424,7 +1502,8 @@ export const exercises: Exercise[] = [
     id: 'pa-wall-passing',
     name: 'Wall passing',
     category: 'passing',
-    rank: 2,
+    alsoTrains: ['first-touch'],
+    efficiency: 76,
     shortDescription: '10min against a wall, both feet, one and two touch — endless reps, zero setup.',
     instructions: [
       'Stand 3–4 metres from a wall.',
@@ -1447,7 +1526,8 @@ export const exercises: Exercise[] = [
     id: 'pa-partner-two-touch',
     name: 'Partner passing, two touch',
     category: 'passing',
-    rank: 3,
+    alsoTrains: ['first-touch'],
+    efficiency: 70,
     shortDescription: '8–12m apart, receive across your body then pass — the base rhythm of everything.',
     instructions: [
       'Stand 8–12 metres from a partner (or wall).',
@@ -1470,7 +1550,8 @@ export const exercises: Exercise[] = [
     id: 'pa-one-touch',
     name: 'One-touch partner passing',
     category: 'passing',
-    rank: 4,
+    alsoTrains: ['first-touch'],
+    efficiency: 78,
     shortDescription: 'Same setup, no control touch — weight and accuracy have to be perfect.',
     instructions: [
       'Face a partner or wall 8–10 metres away.',
@@ -1493,7 +1574,8 @@ export const exercises: Exercise[] = [
     id: 'pa-under-pressure',
     name: 'Passing under pressure',
     category: 'passing',
-    rank: 5,
+    alsoTrains: ['first-touch', 'defending'],
+    efficiency: 90,
     shortDescription: "Grid with a defender — find the free man before you're closed down.",
     instructions: [
       'Set a grid with a passer, targets, and a defender.',
@@ -1516,7 +1598,7 @@ export const exercises: Exercise[] = [
     id: 'pa-through-ball',
     name: 'Through ball to a runner',
     category: 'passing',
-    rank: 6,
+    efficiency: 82,
     shortDescription: 'Time and weight a pass into the space ahead of a sprinting partner.',
     instructions: [
       'Have a partner make a running angle (or aim at a moving target zone).',
@@ -1539,7 +1621,7 @@ export const exercises: Exercise[] = [
     id: 'pa-driven-ball',
     name: 'Driven ball 20m',
     category: 'passing',
-    rank: 7,
+    efficiency: 72,
     shortDescription: 'Low, hard, along the ground with the laces — the pass that breaks lines.',
     instructions: [
       'Pick a target 20 metres away.',
@@ -1562,7 +1644,7 @@ export const exercises: Exercise[] = [
     id: 'pa-gates',
     name: 'Passing through gates',
     category: 'passing',
-    rank: 8,
+    efficiency: 62,
     shortDescription: 'Score points for splitting cone gates from 15m — pure accuracy work.',
     instructions: [
       'Set several cone gates at different angles.',
@@ -1585,7 +1667,8 @@ export const exercises: Exercise[] = [
     id: 'pa-give-go',
     name: 'Give-and-go around a mannequin',
     category: 'passing',
-    rank: 9,
+    alsoTrains: ['first-touch'],
+    efficiency: 68,
     shortDescription: 'Pass, sprint past the obstacle, and receive on the other side.',
     instructions: [
       'Pass into a wall or partner.',
@@ -1608,7 +1691,8 @@ export const exercises: Exercise[] = [
     id: 'pa-y-drill',
     name: 'Y-drill: pass, move, receive',
     category: 'passing',
-    rank: 10,
+    alsoTrains: ['first-touch'],
+    efficiency: 74,
     shortDescription: 'Pass, sprint to a new position, take a return, then play the next ball.',
     instructions: [
       'Set a Y-shaped pattern of cones.',
@@ -1631,7 +1715,7 @@ export const exercises: Exercise[] = [
     id: 'pa-long-diagonal',
     name: 'Long diagonal 30–40m',
     category: 'passing',
-    rank: 11,
+    efficiency: 66,
     shortDescription: "Under the ball with the instep, aimed at a target zone or partner's chest.",
     instructions: [
       'Pick a target 30–40 metres away.',
@@ -1654,7 +1738,8 @@ export const exercises: Exercise[] = [
     id: 'pa-third-man',
     name: 'Third man run combination',
     category: 'passing',
-    rank: 12,
+    alsoTrains: ['first-touch'],
+    efficiency: 80,
     shortDescription: 'A to B, B lays back to A, A finds C running — trains vision beyond the obvious.',
     instructions: [
       'Set up three players or targets: A, B, C.',
@@ -1677,7 +1762,7 @@ export const exercises: Exercise[] = [
     id: 'pa-switch',
     name: 'Switch of play',
     category: 'passing',
-    rank: 13,
+    efficiency: 72,
     shortDescription: 'Two long passes across the pitch in pairs, both feet — changes the point of attack.',
     instructions: [
       'Stand well apart across the width of the pitch.',
@@ -1700,7 +1785,8 @@ export const exercises: Exercise[] = [
     id: 'pa-triangle',
     name: 'Triangle pass and follow',
     category: 'passing',
-    rank: 14,
+    alsoTrains: ['first-touch'],
+    efficiency: 58,
     shortDescription: "Three players, pass and take your partner's spot — passing plus a movement habit.",
     instructions: [
       'Form a triangle with two others (or targets).',
@@ -1723,7 +1809,7 @@ export const exercises: Exercise[] = [
     id: 'pa-weak-foot',
     name: 'Weak-foot only set',
     category: 'passing',
-    rank: 15,
+    efficiency: 74,
     shortDescription: 'A full passing session on the weak side — makes you unpredictable.',
     instructions: [
       'Use a wall or partner 8–10 metres away.',
@@ -1746,7 +1832,7 @@ export const exercises: Exercise[] = [
     id: 'pa-lofted-zone',
     name: 'Lofted pass to a zone',
     category: 'passing',
-    rank: 16,
+    efficiency: 60,
     shortDescription: 'Chip into a marked circle 25m away — 20 reps, count how many land inside.',
     instructions: [
       'Mark a target circle about 25 metres away.',
@@ -1769,7 +1855,8 @@ export const exercises: Exercise[] = [
     id: 'pa-four-corner',
     name: 'Four-corner square pattern',
     category: 'passing',
-    rank: 17,
+    alsoTrains: ['first-touch'],
+    efficiency: 56,
     shortDescription: 'A fixed pass-and-move pattern around a square, both directions, increasing speed.',
     instructions: [
       'Set a square with a player at each corner.',
@@ -1792,7 +1879,7 @@ export const exercises: Exercise[] = [
     id: 'pa-chip-barrier',
     name: 'Chipped pass over a barrier',
     category: 'passing',
-    rank: 18,
+    efficiency: 52,
     shortDescription: "Lift it over a bench or bag to a partner's feet 15m away.",
     instructions: [
       'Place a low barrier between you and a target 15 metres away.',
@@ -1815,7 +1902,7 @@ export const exercises: Exercise[] = [
     id: 'pa-no-look',
     name: 'Disguised / no-look pass',
     category: 'passing',
-    rank: 19,
+    efficiency: 44,
     shortDescription: 'Body shape says one direction, the pass goes the other.',
     instructions: [
       'Set two targets, one obvious, one to the side.',
@@ -1838,7 +1925,8 @@ export const exercises: Exercise[] = [
     id: 'pa-first-time-switch',
     name: 'First-time switch under time',
     category: 'passing',
-    rank: 20,
+    alsoTrains: ['first-touch'],
+    efficiency: 70,
     shortDescription: 'Receive from one side, switch first time to the other — the highest-difficulty pass.',
     instructions: [
       'Receive a ball played in from one side.',
@@ -1863,7 +1951,8 @@ export const exercises: Exercise[] = [
     id: 'st-nordic',
     name: 'Nordic hamstring curl',
     category: 'strength',
-    rank: 1,
+    alsoTrains: ['athleticism'],
+    efficiency: 94,
     shortDescription: '3 × 5 slow lowers — the best single exercise for preventing hamstring tears.',
     instructions: [
       'Kneel with your ankles anchored (a partner or heavy furniture).',
@@ -1886,7 +1975,8 @@ export const exercises: Exercise[] = [
     id: 'st-bulgarian',
     name: 'Bulgarian split squat',
     category: 'strength',
-    rank: 2,
+    alsoTrains: ['athleticism'],
+    efficiency: 78,
     shortDescription: '3 × 8 per leg — single-leg strength, which is how football is actually played.',
     instructions: [
       'Rest your back foot on a step or bench behind you.',
@@ -1909,7 +1999,7 @@ export const exercises: Exercise[] = [
     id: 'st-copenhagen',
     name: 'Copenhagen plank',
     category: 'strength',
-    rank: 3,
+    efficiency: 82,
     shortDescription: 'Side plank with the top leg on a bench, 3 × 20s per side — protects the groin.',
     instructions: [
       'Lie on your side, top foot on a bench or step.',
@@ -1932,7 +2022,8 @@ export const exercises: Exercise[] = [
     id: 'st-rdl',
     name: 'Romanian deadlift',
     category: 'strength',
-    rank: 4,
+    alsoTrains: ['athleticism'],
+    efficiency: 84,
     shortDescription: '3 × 8 — builds the hamstrings and glutes that drive sprinting.',
     instructions: [
       'Hold a weight in front of your thighs (barbell, dumbbells, or a loaded bag).',
@@ -1957,7 +2048,7 @@ export const exercises: Exercise[] = [
     id: 'st-goblet',
     name: 'Goblet squat',
     category: 'strength',
-    rank: 5,
+    efficiency: 70,
     shortDescription: '3 × 10 holding a weight at the chest — the safest way to learn squat mechanics.',
     instructions: [
       'Hold a weight against your chest with both hands.',
@@ -1982,7 +2073,7 @@ export const exercises: Exercise[] = [
     id: 'st-single-leg-rdl',
     name: 'Single-leg RDL',
     category: 'strength',
-    rank: 6,
+    efficiency: 68,
     shortDescription: '3 × 8 per leg — strength plus balance in one movement.',
     instructions: [
       'Stand on one leg, slight knee bend.',
@@ -2005,7 +2096,8 @@ export const exercises: Exercise[] = [
     id: 'st-hip-thrust',
     name: 'Hip thrust / glute bridge',
     category: 'strength',
-    rank: 7,
+    alsoTrains: ['athleticism'],
+    efficiency: 66,
     shortDescription: '3 × 12 — direct glute power for acceleration.',
     instructions: [
       'Lie back (shoulders on a bench for a hip thrust, or flat on the floor for a bridge).',
@@ -2028,7 +2120,8 @@ export const exercises: Exercise[] = [
     id: 'st-back-squat',
     name: 'Back squat',
     category: 'strength',
-    rank: 8,
+    alsoTrains: ['athleticism'],
+    efficiency: 88,
     shortDescription: '4 × 5 heavy — the strength base once your technique is solid.',
     instructions: [
       'Set a barbell across your upper back.',
@@ -2053,7 +2146,8 @@ export const exercises: Exercise[] = [
     id: 'st-box-jump',
     name: 'Box jump',
     category: 'strength',
-    rank: 9,
+    alsoTrains: ['athleticism'],
+    efficiency: 72,
     shortDescription: '4 × 4 with a soft landing — converts strength into explosive power.',
     instructions: [
       'Stand in front of a sturdy box.',
@@ -2076,7 +2170,7 @@ export const exercises: Exercise[] = [
     id: 'st-pallof',
     name: 'Pallof press',
     category: 'strength',
-    rank: 10,
+    efficiency: 56,
     shortDescription: '3 × 10 per side — anti-rotation core, the kind that resists a shoulder charge.',
     instructions: [
       'Anchor a band at chest height and stand side-on.',
@@ -2099,7 +2193,7 @@ export const exercises: Exercise[] = [
     id: 'st-walking-lunges',
     name: 'Walking lunges',
     category: 'strength',
-    rank: 11,
+    efficiency: 60,
     shortDescription: '3 × 12 per leg — simple, effective, needs no equipment.',
     instructions: [
       'Step forward into a lunge, back knee toward the floor.',
@@ -2122,7 +2216,8 @@ export const exercises: Exercise[] = [
     id: 'st-calf-raises',
     name: 'Calf raises',
     category: 'strength',
-    rank: 12,
+    alsoTrains: ['athleticism'],
+    efficiency: 58,
     shortDescription: '3 × 15, straight and bent knee — ankle resilience for sprinting and cutting.',
     instructions: [
       'Stand tall, ideally with the balls of your feet on a step.',
@@ -2145,7 +2240,7 @@ export const exercises: Exercise[] = [
     id: 'st-side-plank-lift',
     name: 'Side plank with leg lift',
     category: 'strength',
-    rank: 13,
+    efficiency: 54,
     shortDescription: '3 × 30s per side — lateral core and hip stability for duels.',
     instructions: [
       'Get into a side plank on your forearm.',
@@ -2168,7 +2263,7 @@ export const exercises: Exercise[] = [
     id: 'st-step-ups',
     name: 'Step-ups',
     category: 'strength',
-    rank: 14,
+    efficiency: 56,
     shortDescription: '3 × 10 per leg onto a box — a great low-impact starting point.',
     instructions: [
       'Face a sturdy box or step.',
@@ -2191,7 +2286,8 @@ export const exercises: Exercise[] = [
     id: 'st-trap-bar',
     name: 'Trap bar deadlift',
     category: 'strength',
-    rank: 15,
+    alsoTrains: ['athleticism'],
+    efficiency: 82,
     shortDescription: '4 × 5 — maximum full-body force with a back-friendly bar path.',
     instructions: [
       'Stand inside a loaded trap bar.',
@@ -2216,7 +2312,8 @@ export const exercises: Exercise[] = [
     id: 'st-med-ball-throw',
     name: 'Med ball rotational throw',
     category: 'strength',
-    rank: 16,
+    alsoTrains: ['shooting'],
+    efficiency: 62,
     shortDescription: '3 × 6 per side — rotational power for shooting and long passes.',
     instructions: [
       'Stand side-on to a wall with a medicine ball.',
@@ -2241,7 +2338,7 @@ export const exercises: Exercise[] = [
     id: 'st-pull-ups',
     name: 'Pull-ups or inverted rows',
     category: 'strength',
-    rank: 17,
+    efficiency: 52,
     shortDescription: '3 × 6–10 — upper body pulling for aerial duels and shielding.',
     instructions: [
       'Hang from a bar (pull-ups) or set up under a fixed bar (rows).',
@@ -2264,7 +2361,7 @@ export const exercises: Exercise[] = [
     id: 'st-dead-bug',
     name: 'Dead bug',
     category: 'strength',
-    rank: 18,
+    efficiency: 48,
     shortDescription: '3 × 10 per side — core control that carries over to every other lift.',
     instructions: [
       'Lie on your back, arms up, knees bent at 90°.',
@@ -2287,7 +2384,7 @@ export const exercises: Exercise[] = [
     id: 'st-suitcase-carry',
     name: 'Suitcase carry',
     category: 'strength',
-    rank: 19,
+    efficiency: 54,
     shortDescription: '3 × 30m one-sided — grip, core and posture under load.',
     instructions: [
       'Hold a heavy weight in one hand.',
@@ -2312,7 +2409,7 @@ export const exercises: Exercise[] = [
     id: 'st-pushups',
     name: 'Push-ups',
     category: 'strength',
-    rank: 20,
+    efficiency: 46,
     shortDescription: '3 × 12 — basic upper body pressing strength for physical contests.',
     instructions: [
       'Set up in a plank with hands under your shoulders.',
@@ -2335,8 +2432,10 @@ export const exercises: Exercise[] = [
   /*
     UPPER BODY — the pack above is mostly legs and core, which is right for football,
     but shielding, throw-ins, headers and holding a sprint posture are all upper body.
-    These are ranked nowhere: the numbered ranks above are an effectiveness order for
-    the whole category, and claiming a place in it for these would be made up.
+    They score low, and that is the honest answer rather than a slight: a curl is a
+    fine exercise with almost nothing to do with football, so a minute there moves
+    your game less than a minute of Nordics. Neck isometrics and the med ball throws
+    score highest of this pack because they are the ones with a match action attached.
 
     The loaded ones carry `usesWeight`, so the builder asks for kilos alongside sets
     and reps — see types.ts. The suggested weights are a sane place for a teenager to
@@ -2346,6 +2445,7 @@ export const exercises: Exercise[] = [
     id: 'st-bench-press',
     name: 'Barbell bench press',
     category: 'strength',
+    efficiency: 38,
     shortDescription: '4 × 5–8 — pressing power for pushing an opponent off the ball.',
     instructions: [
       'Lie on the bench with your eyes under the bar, feet flat on the floor.',
@@ -2370,6 +2470,7 @@ export const exercises: Exercise[] = [
     id: 'st-incline-db-press',
     name: 'Incline dumbbell press',
     category: 'strength',
+    efficiency: 36,
     shortDescription: '3 × 8–10 — upper chest and shoulders, the muscles you shield with.',
     instructions: [
       'Set a bench to about 30–45° and sit back with a dumbbell in each hand.',
@@ -2394,6 +2495,7 @@ export const exercises: Exercise[] = [
     id: 'st-barbell-row',
     name: 'Bent-over barbell row',
     category: 'strength',
+    efficiency: 48,
     shortDescription: '4 × 6–10 — back strength that holds your posture together at full sprint.',
     instructions: [
       'Hold a barbell with an overhand grip, hands just outside your knees.',
@@ -2418,6 +2520,7 @@ export const exercises: Exercise[] = [
     id: 'st-one-arm-row',
     name: 'One-arm dumbbell row',
     category: 'strength',
+    efficiency: 46,
     shortDescription: '3 × 10 per side — back strength plus the core work of not twisting.',
     instructions: [
       'Put one knee and one hand on a bench, the other foot on the floor.',
@@ -2442,6 +2545,7 @@ export const exercises: Exercise[] = [
     id: 'st-weighted-pull-up',
     name: 'Weighted pull-up',
     category: 'strength',
+    efficiency: 46,
     shortDescription: '4 × 4–6 with added weight — the strength behind winning a header.',
     instructions: [
       'Add weight with a dip belt, or hold a dumbbell between your feet.',
@@ -2466,6 +2570,7 @@ export const exercises: Exercise[] = [
     id: 'st-overhead-press',
     name: 'Standing overhead press',
     category: 'strength',
+    efficiency: 42,
     shortDescription: '4 × 6–8 — shoulder strength for long throw-ins and body contact.',
     instructions: [
       'Hold a barbell at your collarbones, hands just outside your shoulders.',
@@ -2490,6 +2595,7 @@ export const exercises: Exercise[] = [
     id: 'st-lateral-raise',
     name: 'Lateral raise',
     category: 'strength',
+    efficiency: 28,
     shortDescription: '3 × 12–15 — shoulder width and stability, so you hold your ground.',
     instructions: [
       'Stand with a light dumbbell in each hand at your sides.',
@@ -2514,6 +2620,7 @@ export const exercises: Exercise[] = [
     id: 'st-face-pull',
     name: 'Face pull',
     category: 'strength',
+    efficiency: 40,
     shortDescription: '3 × 15 — the cheapest shoulder insurance there is, and it fixes your posture.',
     instructions: [
       'Set a cable or resistance band at about head height.',
@@ -2538,6 +2645,7 @@ export const exercises: Exercise[] = [
     id: 'st-landmine-press',
     name: 'Landmine press',
     category: 'strength',
+    efficiency: 40,
     shortDescription: '3 × 8 per side — angled pressing power driven straight out of the core.',
     instructions: [
       'Wedge one end of a barbell into a corner or landmine holder.',
@@ -2562,6 +2670,8 @@ export const exercises: Exercise[] = [
     id: 'st-woodchopper',
     name: 'Cable woodchopper',
     category: 'strength',
+    alsoTrains: ['shooting'],
+    efficiency: 50,
     shortDescription: '3 × 10 per side — trained rotation, which is where shot power comes from.',
     instructions: [
       'Set a cable or band high and stand side-on, feet a little wider than your hips.',
@@ -2586,6 +2696,8 @@ export const exercises: Exercise[] = [
     id: 'st-med-ball-overhead',
     name: 'Overhead med ball throw',
     category: 'strength',
+    alsoTrains: ['athleticism'],
+    efficiency: 54,
     shortDescription: '4 × 8 — this is a throw-in, trained as a power exercise.',
     instructions: [
       'Stand facing a wall with a medicine ball held above and behind your head.',
@@ -2610,6 +2722,7 @@ export const exercises: Exercise[] = [
     id: 'st-hammer-curl',
     name: 'Hammer curl',
     category: 'strength',
+    efficiency: 24,
     shortDescription: '3 × 10–12 — arm and grip strength for the shirt-pulling side of the game.',
     instructions: [
       'Stand with a dumbbell in each hand, palms facing your thighs.',
@@ -2634,6 +2747,7 @@ export const exercises: Exercise[] = [
     id: 'st-turkish-get-up',
     name: 'Turkish get-up',
     category: 'strength',
+    efficiency: 50,
     shortDescription: '3 × 3 per side — whole-body stability, and getting up under pressure.',
     instructions: [
       'Lie on your back holding a kettlebell straight up in one hand.',
@@ -2658,6 +2772,7 @@ export const exercises: Exercise[] = [
     id: 'st-diamond-pushup',
     name: 'Diamond push-up',
     category: 'strength',
+    efficiency: 34,
     shortDescription: '3 × 10–15 — triceps strength for bracing against a challenge.',
     instructions: [
       'Set up in a push-up position with your hands together under your chest.',
@@ -2680,6 +2795,7 @@ export const exercises: Exercise[] = [
     id: 'st-wide-pushup',
     name: 'Wide push-up',
     category: 'strength',
+    efficiency: 34,
     shortDescription: '3 × 12–15 — chest width, the frame you shield the ball with.',
     instructions: [
       'Set up in a push-up position with your hands well outside your shoulders.',
@@ -2702,6 +2818,7 @@ export const exercises: Exercise[] = [
     id: 'st-pike-pushup',
     name: 'Pike push-up',
     category: 'strength',
+    efficiency: 36,
     shortDescription: '3 × 8–12 — overhead shoulder strength without owning a single weight.',
     instructions: [
       'From a push-up position, walk your feet in and lift your hips into an upside-down V.',
@@ -2724,6 +2841,8 @@ export const exercises: Exercise[] = [
     id: 'st-clap-pushup',
     name: 'Clap push-up',
     category: 'strength',
+    alsoTrains: ['athleticism'],
+    efficiency: 44,
     shortDescription: '4 × 5–8 — explosive upper body, for getting off the floor and into a duel.',
     instructions: [
       'Set up as a normal push-up with your hands under your shoulders.',
@@ -2746,6 +2865,7 @@ export const exercises: Exercise[] = [
     id: 'st-archer-pushup',
     name: 'Archer push-up',
     category: 'strength',
+    efficiency: 38,
     shortDescription: '3 × 6 per side — one arm at a time, which is how it evens out a weak side.',
     instructions: [
       'Set up in a wide push-up position.',
@@ -2768,6 +2888,7 @@ export const exercises: Exercise[] = [
     id: 'st-chin-up',
     name: 'Chin-up',
     category: 'strength',
+    efficiency: 48,
     shortDescription: '3 × 6–10 underhand — the easiest way into pull-ups, and it builds the arms.',
     instructions: [
       'Hang from a bar with an underhand grip, hands about shoulder-width apart.',
@@ -2790,6 +2911,7 @@ export const exercises: Exercise[] = [
     id: 'st-inverted-row',
     name: 'Australian row',
     category: 'strength',
+    efficiency: 50,
     shortDescription: '3 × 12–15 under a bar or table — rowing strength with nothing to load.',
     instructions: [
       'Lie under a waist-height bar, or the edge of a sturdy table.',
@@ -2812,6 +2934,7 @@ export const exercises: Exercise[] = [
     id: 'st-dips',
     name: 'Dips',
     category: 'strength',
+    efficiency: 40,
     shortDescription: '3 × 8–12 — the strength to push off an opponent and hold them there.',
     instructions: [
       'Support yourself on parallel bars with your arms straight, or sit on the edge of a bench with your hands beside your hips.',
@@ -2834,6 +2957,7 @@ export const exercises: Exercise[] = [
     id: 'st-shoulder-taps',
     name: 'Plank shoulder taps',
     category: 'strength',
+    efficiency: 44,
     shortDescription: '3 × 20 taps — core that refuses to twist, under load.',
     instructions: [
       'Set up in a high plank with your feet a little wider than your hips.',
@@ -2856,6 +2980,7 @@ export const exercises: Exercise[] = [
     id: 'st-side-plank-reach',
     name: 'Side plank reach-through',
     category: 'strength',
+    efficiency: 52,
     shortDescription: '3 × 12 per side — the side of the core you fight shoulder-to-shoulder with.',
     instructions: [
       'Set up in a side plank on your forearm, hips lifted.',
@@ -2878,6 +3003,7 @@ export const exercises: Exercise[] = [
     id: 'st-hollow-hold',
     name: 'Hollow body hold',
     category: 'strength',
+    efficiency: 50,
     shortDescription: '4 × 30s — the core tension that gets force from your hips into your shot.',
     instructions: [
       'Lie on your back with your arms overhead and legs straight.',
@@ -2900,6 +3026,7 @@ export const exercises: Exercise[] = [
     id: 'st-ytw-raise',
     name: 'Superman Y-T-W raises',
     category: 'strength',
+    efficiency: 44,
     shortDescription: '3 × 12 — the lower back and rear shoulders that hold you upright late in a game.',
     instructions: [
       'Lie face down with your forehead resting on the floor.',
@@ -2922,6 +3049,8 @@ export const exercises: Exercise[] = [
     id: 'st-neck-iso',
     name: 'Neck isometrics',
     category: 'strength',
+    alsoTrains: ['defending'],
+    efficiency: 46,
     shortDescription: '3 × 15s per direction — a stronger neck heads the ball better and gets hurt less.',
     instructions: [
       'Place your own palm against your forehead and press your head into it. Nothing moves.',
@@ -2949,7 +3078,8 @@ export const exercises: Exercise[] = [
     id: 'ft-wall-rebound',
     name: 'Wall rebound control',
     category: 'first-touch',
-    rank: 1,
+    alsoTrains: ['passing'],
+    efficiency: 84,
     shortDescription: 'One touch to set, one to return, endlessly — the highest-rep touch drill there is.',
     instructions: [
       'Stand 3 metres from a wall.',
@@ -2972,7 +3102,8 @@ export const exercises: Exercise[] = [
     id: 'ft-directional-gate',
     name: 'Directional touch through a gate',
     category: 'first-touch',
-    rank: 2,
+    alsoTrains: ['dribbling'],
+    efficiency: 82,
     shortDescription: 'Receive and push your first touch through a cone gate to the side — never kill it dead.',
     instructions: [
       'Set a cone gate to your side.',
@@ -2995,7 +3126,8 @@ export const exercises: Exercise[] = [
     id: 'ft-half-turn',
     name: 'Half-turn receive (open body)',
     category: 'first-touch',
-    rank: 3,
+    alsoTrains: ['dribbling'],
+    efficiency: 86,
     shortDescription: 'Open your hips before the ball arrives so your first touch faces you forward.',
     instructions: [
       'Receive a ball played into your feet.',
@@ -3018,7 +3150,8 @@ export const exercises: Exercise[] = [
     id: 'ft-under-pressure',
     name: 'Receiving under pressure',
     category: 'first-touch',
-    rank: 4,
+    alsoTrains: ['dribbling', 'defending'],
+    efficiency: 90,
     shortDescription: 'Grid work with a defender arriving as the ball does — the real test.',
     instructions: [
       'Set a small grid with a feeder and a defender.',
@@ -3041,7 +3174,8 @@ export const exercises: Exercise[] = [
     id: 'ft-touch-sprint',
     name: 'Touch into a sprint',
     category: 'first-touch',
-    rank: 5,
+    alsoTrains: ['dribbling', 'athleticism'],
+    efficiency: 78,
     shortDescription: 'Push your first touch 3m ahead and accelerate onto it — turns control into a break.',
     instructions: [
       'Receive a ball rolling toward you.',
@@ -3064,7 +3198,7 @@ export const exercises: Exercise[] = [
     id: 'ft-cushion-lofted',
     name: 'Cushion control, lofted ball',
     category: 'first-touch',
-    rank: 6,
+    efficiency: 66,
     shortDescription: 'Withdraw the foot on contact to kill a dropping ball dead.',
     instructions: [
       'Toss the ball up or play it high off a wall.',
@@ -3087,7 +3221,8 @@ export const exercises: Exercise[] = [
     id: 'ft-back-foot',
     name: 'Receive on the back foot',
     category: 'first-touch',
-    rank: 7,
+    alsoTrains: ['passing'],
+    efficiency: 80,
     shortDescription: 'Take the ball with the far foot so your next action is already forward.',
     instructions: [
       'Receive a ball coming across you.',
@@ -3110,7 +3245,8 @@ export const exercises: Exercise[] = [
     id: 'ft-juggling',
     name: 'Juggling, feet only',
     category: 'first-touch',
-    rank: 8,
+    alsoTrains: ['dribbling'],
+    efficiency: 45,
     shortDescription: '100 touches, feet only — the base feel for the ball every other touch builds on.',
     instructions: [
       'Drop the ball onto your foot.',
@@ -3133,7 +3269,7 @@ export const exercises: Exercise[] = [
     id: 'ft-chest-feet',
     name: 'Chest control to feet',
     category: 'first-touch',
-    rank: 9,
+    efficiency: 62,
     shortDescription: 'Arch back, absorb, and drop it into your own stride.',
     instructions: [
       'Toss the ball up or take a high ball off a wall.',
@@ -3156,7 +3292,8 @@ export const exercises: Exercise[] = [
     id: 'ft-two-touch-rondo',
     name: 'Two-touch rondo',
     category: 'first-touch',
-    rank: 10,
+    alsoTrains: ['passing', 'defending'],
+    efficiency: 88,
     shortDescription: 'Control and pass under pressure — puts first touch straight into a game context.',
     instructions: [
       'Form a small rondo with one defender.',
@@ -3179,7 +3316,7 @@ export const exercises: Exercise[] = [
     id: 'ft-thigh-toss',
     name: 'Thigh control from a toss',
     category: 'first-touch',
-    rank: 11,
+    efficiency: 50,
     shortDescription: 'Soft thigh, ball drops vertically to your foot — 20 reps each leg.',
     instructions: [
       'Toss the ball up to yourself.',
@@ -3202,7 +3339,8 @@ export const exercises: Exercise[] = [
     id: 'ft-touch-away-cone',
     name: 'Touch away from a cone defender',
     category: 'first-touch',
-    rank: 12,
+    alsoTrains: ['dribbling'],
+    efficiency: 64,
     shortDescription: 'Treat the cone as a defender and take your first touch away from it every time.',
     instructions: [
       'Place a cone beside you as a defender.',
@@ -3225,7 +3363,8 @@ export const exercises: Exercise[] = [
     id: 'ft-weak-foot-juggle',
     name: 'Weak-foot juggling',
     category: 'first-touch',
-    rank: 13,
+    alsoTrains: ['dribbling'],
+    efficiency: 42,
     shortDescription: '50 touches, weak foot only — eliminates your one predictable side.',
     instructions: [
       'Drop the ball onto your weaker foot.',
@@ -3248,7 +3387,7 @@ export const exercises: Exercise[] = [
     id: 'ft-sole-bounce',
     name: 'Sole control, bouncing ball',
     category: 'first-touch',
-    rank: 14,
+    efficiency: 48,
     shortDescription: 'Trap a bouncing ball under your studs and settle it instantly.',
     instructions: [
       'Bounce the ball or take an awkward bouncing pass.',
@@ -3271,7 +3410,8 @@ export const exercises: Exercise[] = [
     id: 'ft-layoff',
     name: 'First-time lay-off',
     category: 'first-touch',
-    rank: 15,
+    alsoTrains: ['passing'],
+    efficiency: 70,
     shortDescription: 'Redirect the ball to a partner without controlling — a core midfielder skill.',
     instructions: [
       'Receive a ball into your feet with your back to a target.',
@@ -3294,7 +3434,7 @@ export const exercises: Exercise[] = [
     id: 'ft-aerial-driven',
     name: 'Aerial control, driven ball',
     category: 'first-touch',
-    rank: 16,
+    efficiency: 58,
     shortDescription: 'Take a hard, flat pass out of the air — timing and softness under speed.',
     instructions: [
       'Have a firm, flat ball played at you (or off a wall).',
@@ -3317,7 +3457,8 @@ export const exercises: Exercise[] = [
     id: 'ft-outside-receive',
     name: 'Outside-of-the-foot receive',
     category: 'first-touch',
-    rank: 17,
+    alsoTrains: ['dribbling'],
+    efficiency: 60,
     shortDescription: 'Receive with the outside to move the ball wide instantly.',
     instructions: [
       'Receive a ball coming toward you.',
@@ -3340,7 +3481,7 @@ export const exercises: Exercise[] = [
     id: 'ft-wall-volley',
     name: 'Wall volley control',
     category: 'first-touch',
-    rank: 18,
+    efficiency: 54,
     shortDescription: 'Return the ball to the wall before it bounces, repeatedly.',
     instructions: [
       'Play the ball into the wall at height.',
@@ -3363,7 +3504,8 @@ export const exercises: Exercise[] = [
     id: 'ft-blind-receive',
     name: 'Blind receive',
     category: 'first-touch',
-    rank: 19,
+    alsoTrains: ['dribbling'],
+    efficiency: 72,
     shortDescription: 'Partner calls your direction only after the ball has left their foot.',
     instructions: [
       'Keep your head up, unsure of the pass.',
@@ -3386,7 +3528,8 @@ export const exercises: Exercise[] = [
     id: 'ft-receive-turn-finish',
     name: 'Receive, turn, finish',
     category: 'first-touch',
-    rank: 20,
+    alsoTrains: ['shooting', 'dribbling'],
+    efficiency: 82,
     shortDescription: 'A full sequence at speed toward goal — puts everything together.',
     instructions: [
       'Receive a ball with your back to goal.',
@@ -3411,7 +3554,8 @@ export const exercises: Exercise[] = [
     id: 'de-1v1-channel',
     name: '1v1 in a channel',
     category: 'defending',
-    rank: 1,
+    alsoTrains: ['athleticism'],
+    efficiency: 94,
     shortDescription: 'Jockey, force the attacker onto their weak side, win the ball — the core defensive rep.',
     instructions: [
       'Set a channel 5–10 metres wide.',
@@ -3434,7 +3578,8 @@ export const exercises: Exercise[] = [
     id: 'de-jockey',
     name: 'Jockeying footwork',
     category: 'defending',
-    rank: 2,
+    alsoTrains: ['athleticism'],
+    efficiency: 68,
     shortDescription: 'Low stance, side-on, small steps, never crossing the feet. 3 × 30s.',
     instructions: [
       'Get into a low, side-on defensive stance.',
@@ -3457,7 +3602,8 @@ export const exercises: Exercise[] = [
     id: 'de-press-approach',
     name: 'Pressing approach',
     category: 'defending',
-    rank: 3,
+    alsoTrains: ['athleticism'],
+    efficiency: 78,
     shortDescription: 'Sprint 10m, then chop your steps down for the last 3m so you can react.',
     instructions: [
       'Sprint 10 metres toward the ball.',
@@ -3480,7 +3626,7 @@ export const exercises: Exercise[] = [
     id: 'de-interception',
     name: 'Interception drill',
     category: 'defending',
-    rank: 4,
+    efficiency: 80,
     shortDescription: 'Read a telegraphed pass and step in front of the receiver.',
     instructions: [
       'Watch a predictable pass develop.',
@@ -3503,7 +3649,8 @@ export const exercises: Exercise[] = [
     id: 'de-recovery-duel',
     name: 'Recovery run and duel',
     category: 'defending',
-    rank: 5,
+    alsoTrains: ['athleticism'],
+    efficiency: 76,
     shortDescription: 'Start behind the attacker, catch up, and win it shoulder to shoulder.',
     instructions: [
       'Start a couple of metres behind an attacker.',
@@ -3526,7 +3673,8 @@ export const exercises: Exercise[] = [
     id: 'de-back-to-goal',
     name: 'Defending back to goal',
     category: 'defending',
-    rank: 6,
+    alsoTrains: ['strength'],
+    efficiency: 72,
     shortDescription: "Stop the attacker from turning — pressure, but don't dive in.",
     instructions: [
       'Mark an attacker who receives with their back to goal.',
@@ -3549,7 +3697,7 @@ export const exercises: Exercise[] = [
     id: 'de-poke-tackle',
     name: 'Poke tackle',
     category: 'defending',
-    rank: 7,
+    efficiency: 66,
     shortDescription: 'Front-foot stab as the attacker touches too far — the lowest-risk tackle there is.',
     instructions: [
       'Jockey an attacker closely.',
@@ -3572,7 +3720,8 @@ export const exercises: Exercise[] = [
     id: 'de-2v2-cover',
     name: '2v2 cover and balance',
     category: 'defending',
-    rank: 8,
+    alsoTrains: ['athleticism'],
+    efficiency: 82,
     shortDescription: 'One presses, one covers — teaches defending as a pair, not an individual.',
     instructions: [
       'Defend a 2v2 with a partner.',
@@ -3595,7 +3744,8 @@ export const exercises: Exercise[] = [
     id: 'de-shadow',
     name: 'Shadow defending',
     category: 'defending',
-    rank: 9,
+    alsoTrains: ['athleticism'],
+    efficiency: 62,
     shortDescription: 'Mirror an attacker moving freely in a grid, without tackling — pure positioning.',
     instructions: [
       'Face an attacker dribbling in a grid.',
@@ -3618,7 +3768,8 @@ export const exercises: Exercise[] = [
     id: 'de-track-runner',
     name: 'Tracking a runner',
     category: 'defending',
-    rank: 10,
+    alsoTrains: ['athleticism'],
+    efficiency: 74,
     shortDescription: 'Follow a midfield runner from behind into the box without ball-watching.',
     instructions: [
       'Pick up a runner coming from midfield.',
@@ -3641,7 +3792,7 @@ export const exercises: Exercise[] = [
     id: 'de-block-tackle',
     name: 'Block tackle',
     category: 'defending',
-    rank: 11,
+    efficiency: 60,
     shortDescription: 'Plant, get side-on, meet the ball with the inside of the foot and hold firm.',
     instructions: [
       'Face an attacker or a ball rebounding off a wall.',
@@ -3664,7 +3815,7 @@ export const exercises: Exercise[] = [
     id: 'de-goal-side',
     name: 'Goal-side positioning',
     category: 'defending',
-    rank: 12,
+    efficiency: 70,
     shortDescription: 'Stay between your man and the goal as they move around you.',
     instructions: [
       'Mark an attacker moving in different directions.',
@@ -3687,7 +3838,7 @@ export const exercises: Exercise[] = [
     id: 'de-defend-cross',
     name: 'Defending the cross',
     category: 'defending',
-    rank: 13,
+    efficiency: 64,
     shortDescription: 'Attack the ball, head it high, wide and far. 15 serves.',
     instructions: [
       'Have crosses served into your box.',
@@ -3710,7 +3861,8 @@ export const exercises: Exercise[] = [
     id: 'de-screen',
     name: 'Screening the receiver',
     category: 'defending',
-    rank: 14,
+    alsoTrains: ['strength'],
+    efficiency: 58,
     shortDescription: "Body between the ball and your man so the pass can't be played.",
     instructions: [
       'Mark an attacker who wants the ball.',
@@ -3733,7 +3885,8 @@ export const exercises: Exercise[] = [
     id: 'de-press-trigger',
     name: 'Pressing trigger reaction',
     category: 'defending',
-    rank: 15,
+    alsoTrains: ['athleticism'],
+    efficiency: 76,
     shortDescription: 'Only press when the trigger appears — a bad touch, back pass, or ball in the air.',
     instructions: [
       'Hold your position and watch the ball.',
@@ -3756,7 +3909,7 @@ export const exercises: Exercise[] = [
     id: 'de-2v1-delay',
     name: '2v1 delay',
     category: 'defending',
-    rank: 16,
+    efficiency: 68,
     shortDescription: "Alone against two — slow them down, buy time, don't commit.",
     instructions: [
       'Defend a 2v1 situation.',
@@ -3779,7 +3932,8 @@ export const exercises: Exercise[] = [
     id: 'de-aerial-duel',
     name: 'Aerial duel timing',
     category: 'defending',
-    rank: 17,
+    alsoTrains: ['athleticism'],
+    efficiency: 62,
     shortDescription: 'Contest headers with a partner, focusing on jump timing rather than height.',
     instructions: [
       'Have a ball served between you and a partner.',
@@ -3802,7 +3956,7 @@ export const exercises: Exercise[] = [
     id: 'de-clear-pressure',
     name: 'Clearing under pressure',
     category: 'defending',
-    rank: 18,
+    efficiency: 56,
     shortDescription: 'First-time clearances with an attacker closing you down.',
     instructions: [
       'Receive a ball with an attacker bearing down.',
@@ -3825,7 +3979,8 @@ export const exercises: Exercise[] = [
     id: 'de-unit-press',
     name: 'Unit pressing shuttle',
     category: 'defending',
-    rank: 19,
+    alsoTrains: ['athleticism'],
+    efficiency: 54,
     shortDescription: 'A defensive line shifts across as a unit on command — team shape, not individual.',
     instructions: [
       'Line up with team-mates as a defensive unit.',
@@ -3848,7 +4003,7 @@ export const exercises: Exercise[] = [
     id: 'de-slide-tackle',
     name: 'Slide tackle',
     category: 'defending',
-    rank: 20,
+    efficiency: 40,
     shortDescription: 'Grass only, last resort — timing, contact with the ball, back on your feet fast.',
     instructions: [
       'Use only on grass, as a last resort.',
@@ -3875,6 +4030,7 @@ export const exercises: Exercise[] = [
     id: 'hip-mobility-flow',
     name: 'Hip mobility flow',
     category: 'recovery',
+    efficiency: 58,
     shortDescription: 'Flowing hip openers to restore range after training.',
     instructions: [
       'Move slowly through 90/90 hip rotations, sitting tall.',
@@ -3897,6 +4053,7 @@ export const exercises: Exercise[] = [
     id: 'calf-adductor-stretch',
     name: 'Calf and adductor stretch',
     category: 'recovery',
+    efficiency: 50,
     shortDescription: 'Static stretches for the calves and groin — common tight spots.',
     instructions: [
       'For the calf: press one heel into the floor with a straight back leg against a wall.',
@@ -3919,6 +4076,7 @@ export const exercises: Exercise[] = [
     id: 'foam-roll-legs',
     name: 'Foam roll legs',
     category: 'recovery',
+    efficiency: 46,
     shortDescription: 'Roll out quads, calves and glutes to ease tension (a rolled towel works too).',
     instructions: [
       'Roll slowly along your quads, pausing on tender spots.',
@@ -3941,6 +4099,7 @@ export const exercises: Exercise[] = [
     id: 'walking-cooldown',
     name: 'Easy walking cool-down',
     category: 'recovery',
+    efficiency: 38,
     shortDescription: 'A gentle walk to bring your heart rate down after a hard session.',
     instructions: [
       'Walk at an easy, relaxed pace.',
@@ -3963,6 +4122,7 @@ export const exercises: Exercise[] = [
     id: 'downreg-breathing',
     name: 'Down-regulation breathing',
     category: 'recovery',
+    efficiency: 44,
     shortDescription: 'Slow breathing to shift into recovery mode after training.',
     instructions: [
       'Sit or lie down comfortably.',
@@ -3985,6 +4145,7 @@ export const exercises: Exercise[] = [
     id: 'hip-flexor-stretch',
     name: 'Hip flexor stretch',
     category: 'recovery',
+    efficiency: 48,
     shortDescription: 'Open tight hip flexors from sprinting and sitting.',
     instructions: [
       'Kneel in a half-lunge, back knee on something soft.',

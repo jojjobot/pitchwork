@@ -32,7 +32,7 @@ export function getCustomExercises(): Exercise[] {
 
 export function useAllExercises(): Exercise[] {
   const custom = useStore(store)
-  // Yours first: a library of 146 built-ins would otherwise bury the six you wrote.
+  // Yours first: a library of 172 built-ins would otherwise bury the six you wrote.
   return useMemo(() => [...custom, ...exercises], [custom])
 }
 
@@ -80,6 +80,7 @@ export function blankExercise(): Exercise {
     id: newId(),
     name: 'Untitled drill',
     category: 'dribbling',
+    alsoTrains: [],
     shortDescription: '',
     instructions: [],
     coachingCues: [],
@@ -119,7 +120,10 @@ export function duplicateExercise(source: Exercise): Exercise {
     coachingCues: [...source.coachingCues],
     equipment: [...source.equipment],
     skillTags: [...source.skillTags],
-    rank: undefined, // the ranks are the library's effectiveness order, not yours
+    alsoTrains: source.alsoTrains ? [...source.alsoTrains] : undefined,
+    // The score is the library's own read on the built-in drill. Your version is
+    // about to change, so it can't inherit a judgement of what it used to be.
+    efficiency: undefined,
   })
 }
 

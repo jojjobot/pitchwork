@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { createCustomExercise, useAllExercises } from '../lib/customExercises'
 import type { Category, Difficulty, Equipment, Space } from '../types'
 import {
+  byEfficiency,
   CATEGORY_ACCENT,
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -10,6 +11,7 @@ import {
   EQUIPMENT_LABELS,
   SPACE_LABELS,
   SPACE_RANK,
+  trains,
 } from '../lib/labels'
 import ExerciseCard from '../components/ExerciseCard'
 import { Chip, Segmented } from '../components/Filters'
@@ -50,7 +52,9 @@ export default function LibraryScreen() {
   const matches = useMemo(() => {
     const q = search.trim().toLowerCase()
     return allExercises.filter((ex) => {
-      if (category !== 'all' && ex.category !== category) return false
+      // A drill matches a skill it also trains, not just the one it's filed under —
+      // asking for defending work and not being shown the rondo would be a bad answer.
+      if (category !== 'all' && !trains(ex, category)) return false
       if (difficulty !== 'any' && ex.difficulty !== difficulty) return false
       if (space !== 'any' && SPACE_RANK[ex.spaceNeeded] > SPACE_RANK[space]) return false
       // an exercise needs "none", or every piece of its kit must be available
@@ -73,11 +77,22 @@ export default function LibraryScreen() {
     navigate(`/library/${ex.id}/edit`)
   }
 
-  // Group results by category, preserving our display order.
-  const groups = CATEGORY_ORDER.map((cat) => ({
-    cat,
-    items: matches.filter((e) => e.category === cat),
-  })).filter((g) => g.items.length > 0)
+  /*
+    Group results by category, preserving our display order, best return first.
+
+    When you've picked a skill the answer is one list — everything that trains it,
+    however it happens to be filed. Only the unfiltered view splits into sections,
+    and there each drill appears once, under its primary skill, so the section counts
+    still add up to the number in the header.
+  */
+  const groups = useMemo(() => {
+    const sorted = [...matches].sort(byEfficiency)
+    if (category !== 'all') return [{ cat: category, items: sorted }]
+    return CATEGORY_ORDER.map((cat) => ({
+      cat,
+      items: sorted.filter((e) => e.category === cat),
+    })).filter((g) => g.items.length > 0)
+  }, [matches, category])
 
   return (
     <section>
@@ -85,8 +100,12 @@ export default function LibraryScreen() {
         <h1 className="text-3xl font-extrabold tracking-tight">Exercise library</h1>
         <div className="chalk-line mt-2 w-20" aria-hidden="true" />
         <p className="mt-3 text-slate">
-          {matches.length} {matches.length === 1 ? 'drill' : 'drills'}, ready when you are.
+          {matches.length} {matches.length === 1 ? 'drill' : 'drills'}, best return first.
           {mineCount > 0 && ` ${mineCount} of them ${mineCount === 1 ? 'is' : 'are'} yours.`}
+        </p>
+        <p className="mt-1 text-sm text-slate">
+          The number on each drill is its efficiency out of 100 — how much one minute there moves
+          your actual game, not how hard it is.
         </p>
       </header>
 

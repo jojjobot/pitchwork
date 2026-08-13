@@ -1,7 +1,15 @@
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { duplicateExercise, useExercise } from '../lib/customExercises'
 import { useWorkout } from '../lib/customWorkouts'
-import { CATEGORY_ACCENT, CATEGORY_LABELS, DIFFICULTY_LABELS, EQUIPMENT_LABELS, SPACE_LABELS } from '../lib/labels'
+import {
+  CATEGORY_ACCENT,
+  CATEGORY_LABELS,
+  DIFFICULTY_LABELS,
+  efficiencyBand,
+  EQUIPMENT_LABELS,
+  SPACE_LABELS,
+  trainedCategories,
+} from '../lib/labels'
 import { prescription, formatSeconds } from '../lib/format'
 import Badge from '../components/Badge'
 import NotFound from '../components/NotFound'
@@ -30,6 +38,8 @@ export default function ExerciseDetailScreen() {
   }
 
   const kit = ex.equipment.filter((e) => e !== 'none')
+  const skills = trainedCategories(ex)
+  const band = ex.efficiency != null ? efficiencyBand(ex.efficiency) : null
 
   return (
     <section>
@@ -37,17 +47,38 @@ export default function ExerciseDetailScreen() {
         <span aria-hidden="true">←</span> {fromWorkout ? `Back to ${fromWorkout.name}` : 'Back'}
       </button>
 
-      <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: CATEGORY_ACCENT[ex.category] }}>
-        {CATEGORY_LABELS[ex.category]}
+      {/* Every skill it works, filed one first. A drill that trains three things has
+          no reason to introduce itself as one. */}
+      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold uppercase tracking-widest">
+        {skills.map((cat, i) => (
+          <span key={cat} style={{ color: CATEGORY_ACCENT[cat] }}>
+            {i > 0 && <span className="mr-2 text-slate/60">+</span>}
+            {CATEGORY_LABELS[cat]}
+          </span>
+        ))}
       </p>
       <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{ex.name}</h1>
       {ex.isCustom && <p className="mt-1 text-sm font-semibold text-pitch">A drill you wrote</p>}
-      {ex.rank != null && (
-        <p className="mt-1 text-sm font-semibold text-slate">
-          #{ex.rank} most effective in {CATEGORY_LABELS[ex.category]}
-        </p>
-      )}
       <p className="mt-2 text-slate">{ex.shortDescription}</p>
+
+      {/* What the score means, said plainly. The number alone invites the wrong
+          reading — that a 50 is a bad drill rather than a narrower one. */}
+      {band && (
+        <div className="mt-4 flex items-start gap-3 rounded-2xl border border-slate/15 bg-white/70 p-4">
+          <span
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-xl font-display text-lg font-extrabold text-white"
+            style={{ backgroundColor: band.color }}
+          >
+            {ex.efficiency}
+          </span>
+          <div className="min-w-0">
+            <p className="font-display font-bold text-ink">
+              {band.label} <span className="font-body text-sm font-normal text-slate">· {ex.efficiency}/100 efficiency</span>
+            </p>
+            <p className="mt-0.5 text-sm text-slate">{band.blurb}</p>
+          </div>
+        </div>
+      )}
 
       {/* Meta */}
       <div className="mt-4 flex flex-wrap gap-2">

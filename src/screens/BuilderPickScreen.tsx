@@ -4,7 +4,7 @@ import { useAllExercises } from '../lib/customExercises'
 import { updateBlocks, useWorkout } from '../lib/customWorkouts'
 import { newBlockFor } from '../lib/builder'
 import { prescription } from '../lib/format'
-import { CATEGORY_ACCENT, CATEGORY_LABELS, CATEGORY_ORDER } from '../lib/labels'
+import { byEfficiency, CATEGORY_ACCENT, CATEGORY_LABELS, CATEGORY_ORDER, trains } from '../lib/labels'
 import { Chip } from '../components/Filters'
 import NotFound from '../components/NotFound'
 import type { Category, Exercise } from '../types'
@@ -22,13 +22,17 @@ export default function BuilderPickScreen() {
   const [category, setCategory] = useState<Category | 'all'>('all')
   const allExercises = useAllExercises()
 
+  // Same rules as the library: a skill chip finds everything that trains that skill,
+  // and the best return per minute comes first.
   const matches = useMemo(() => {
     const q = search.trim().toLowerCase()
-    return allExercises.filter((ex) => {
-      if (category !== 'all' && ex.category !== category) return false
-      if (!q) return true
-      return (ex.name + ' ' + ex.shortDescription + ' ' + ex.skillTags.join(' ')).toLowerCase().includes(q)
-    })
+    return allExercises
+      .filter((ex) => {
+        if (category !== 'all' && !trains(ex, category)) return false
+        if (!q) return true
+        return (ex.name + ' ' + ex.shortDescription + ' ' + ex.skillTags.join(' ')).toLowerCase().includes(q)
+      })
+      .sort(byEfficiency)
   }, [search, category, allExercises])
 
   if (!workout || !workout.isCustom) {

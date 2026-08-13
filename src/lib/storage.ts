@@ -193,7 +193,7 @@ export function saveCustomWorkouts(list: Workout[]): void {
 }
 
 // --- Drills you wrote yourself ---
-// The 146 drills in src/data/exercises.ts ship with the app and never change. These
+// The 172 drills in src/data/exercises.ts ship with the app and never change. These
 // are yours: same shape, same everything, just stored per account instead of built in.
 
 export function loadCustomExercises(): Exercise[] {
