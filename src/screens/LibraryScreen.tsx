@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createCustomExercise, useAllExercises } from '../lib/customExercises'
-import type { Category, Difficulty, Equipment, Space } from '../types'
+import { KIT, toggledKit, useLibraryFilters } from '../lib/filters'
+import type { Equipment } from '../types'
 import {
   byEfficiency,
   CATEGORY_ACCENT,
@@ -16,36 +17,24 @@ import {
 import ExerciseCard from '../components/ExerciseCard'
 import { Chip, Segmented } from '../components/Filters'
 
-// The kit the user can toggle on/off ("what have you got with you?").
-const KIT: Equipment[] = ['ball', 'cones', 'wall', 'goal', 'partner', 'weights', 'bar']
-
 export default function LibraryScreen() {
   const navigate = useNavigate()
   const allExercises = useAllExercises()
-  const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<Category | 'all'>('all')
-  const [space, setSpace] = useState<Space | 'any'>('any')
-  const [difficulty, setDifficulty] = useState<Difficulty | 'any'>('any')
-  const [available, setAvailable] = useState<Set<Equipment>>(new Set(KIT))
-  const [filtersOpen, setFiltersOpen] = useState(false)
+  // Held outside the screen so opening a drill and coming back doesn't wipe it.
+  const { filters, set, clear } = useLibraryFilters()
+  const { search, category, space, difficulty, available, panelOpen } = filters
 
   const activeFilters =
     (space !== 'any' ? 1 : 0) +
     (difficulty !== 'any' ? 1 : 0) +
     (available.size !== KIT.length ? 1 : 0)
 
-  function toggleKit(item: Equipment) {
-    setAvailable((prev) => {
-      const next = new Set(prev)
-      next.has(item) ? next.delete(item) : next.add(item)
-      return next
-    })
-  }
+  // What the Clear button clears: the panel filters plus the search box and the
+  // skill chip, since those are just as much "what am I looking at" as the rest.
+  const anythingSet = activeFilters > 0 || search !== '' || category !== 'all'
 
-  function resetFilters() {
-    setSpace('any')
-    setDifficulty('any')
-    setAvailable(new Set(KIT))
+  function toggleKit(item: Equipment) {
+    set({ available: toggledKit(available, item) })
   }
 
   // Apply every active filter to the full list.
@@ -123,7 +112,7 @@ export default function LibraryScreen() {
         <input
           type="search"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => set({ search: e.target.value })}
           placeholder="Search drills or skills…"
           className="w-full rounded-xl border border-slate/25 bg-white px-4 h-12 text-base outline-none focus:border-pitch"
           aria-label="Search the exercise library"
@@ -133,11 +122,16 @@ export default function LibraryScreen() {
       {/* Category chips */}
       <div className="mt-3 -mx-5 overflow-x-auto px-5">
         <div className="flex gap-2 w-max">
-          <Chip active={category === 'all'} onClick={() => setCategory('all')}>
+          <Chip active={category === 'all'} onClick={() => set({ category: 'all' })}>
             All
           </Chip>
           {CATEGORY_ORDER.map((cat) => (
-            <Chip key={cat} active={category === cat} onClick={() => setCategory(cat)} dot={CATEGORY_ACCENT[cat]}>
+            <Chip
+              key={cat}
+              active={category === cat}
+              onClick={() => set({ category: cat })}
+              dot={CATEGORY_ACCENT[cat]}
+            >
               {CATEGORY_LABELS[cat]}
             </Chip>
           ))}
@@ -147,9 +141,9 @@ export default function LibraryScreen() {
       {/* Filters toggle */}
       <div className="mt-3 flex items-center gap-2">
         <button
-          onClick={() => setFiltersOpen((v) => !v)}
+          onClick={() => set({ panelOpen: !panelOpen })}
           className="inline-flex items-center gap-2 rounded-xl border border-slate/25 bg-white px-4 h-11 text-sm font-semibold"
-          aria-expanded={filtersOpen}
+          aria-expanded={panelOpen}
         >
           Filters
           {activeFilters > 0 && (
@@ -158,15 +152,15 @@ export default function LibraryScreen() {
             </span>
           )}
         </button>
-        {activeFilters > 0 && (
-          <button onClick={resetFilters} className="px-2 h-11 text-sm font-semibold text-pitch">
-            Reset
+        {anythingSet && (
+          <button onClick={clear} className="px-2 h-11 text-sm font-semibold text-pitch">
+            Clear filters
           </button>
         )}
       </div>
 
       {/* Filter panel */}
-      {filtersOpen && (
+      {panelOpen && (
         <div className="mt-3 space-y-4 rounded-2xl border border-slate/15 bg-white/70 p-4">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate">What you've got</p>
@@ -182,7 +176,7 @@ export default function LibraryScreen() {
           <Segmented
             label="Space"
             value={space}
-            onChange={setSpace}
+            onChange={(v) => set({ space: v })}
             options={[
               ['any', 'Any'],
               ['small', SPACE_LABELS.small],
@@ -194,7 +188,7 @@ export default function LibraryScreen() {
           <Segmented
             label="Difficulty"
             value={difficulty}
-            onChange={setDifficulty}
+            onChange={(v) => set({ difficulty: v })}
             options={[
               ['any', 'Any'],
               ['beginner', DIFFICULTY_LABELS.beginner],
@@ -211,8 +205,8 @@ export default function LibraryScreen() {
           <div className="rounded-2xl border border-dashed border-slate/30 p-8 text-center">
             <p className="font-display text-lg font-bold">No drills match those filters</p>
             <p className="mt-1 text-slate">Try turning a filter off, or add some kit back.</p>
-            {activeFilters > 0 && (
-              <button onClick={resetFilters} className="mt-4 rounded-xl bg-ink px-4 h-11 font-semibold text-chalk">
+            {anythingSet && (
+              <button onClick={clear} className="mt-4 rounded-xl bg-ink px-4 h-11 font-semibold text-chalk">
                 Clear filters
               </button>
             )}

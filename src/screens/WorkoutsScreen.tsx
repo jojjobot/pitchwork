@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useAllWorkouts } from '../lib/customWorkouts'
 import { workoutMeta } from '../lib/workout'
-import type { Category, Difficulty, Equipment, Space } from '../types'
+import { KIT, toggledKit, useWorkoutFilters } from '../lib/filters'
+import type { Equipment } from '../types'
 import {
   CATEGORY_ACCENT,
   CATEGORY_LABELS,
@@ -14,20 +15,11 @@ import {
 import { Chip, Segmented } from '../components/Filters'
 import WorkoutCard from '../components/WorkoutCard'
 
-const KIT: Equipment[] = ['ball', 'cones', 'wall', 'goal', 'partner', 'weights', 'bar']
-type DurationBand = 'any' | 'short' | 'medium' | 'long'
-// The skill chips, plus two that aren't skills: everything, and everything you built.
-type Filing = Category | 'all' | 'mine'
-
 export default function WorkoutsScreen() {
   const allWorkouts = useAllWorkouts()
-  const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<Filing>('all')
-  const [difficulty, setDifficulty] = useState<Difficulty | 'any'>('any')
-  const [duration, setDuration] = useState<DurationBand>('any')
-  const [space, setSpace] = useState<Space | 'any'>('any')
-  const [available, setAvailable] = useState<Set<Equipment>>(new Set(KIT))
-  const [filtersOpen, setFiltersOpen] = useState(false)
+  // Held outside the screen so opening a session and coming back doesn't wipe it.
+  const { filters, set, clear } = useWorkoutFilters()
+  const { search, category, difficulty, duration, space, available, panelOpen } = filters
 
   // Pre-compute each workout's length, kit, categories, and space once.
   const withMeta = useMemo(
@@ -49,20 +41,11 @@ export default function WorkoutsScreen() {
     (space !== 'any' ? 1 : 0) +
     (available.size !== KIT.length ? 1 : 0)
 
-  function toggleKit(item: Equipment) {
-    setAvailable((prev) => {
-      const next = new Set(prev)
-      next.has(item) ? next.delete(item) : next.add(item)
-      return next
-    })
-  }
+  // The search box counts too — clearing should leave you with the whole list.
+  const anythingSet = activeFilters > 0 || search !== ''
 
-  function resetFilters() {
-    setCategory('all')
-    setDifficulty('any')
-    setDuration('any')
-    setSpace('any')
-    setAvailable(new Set(KIT))
+  function toggleKit(item: Equipment) {
+    set({ available: toggledKit(available, item) })
   }
 
   const results = useMemo(() => {
@@ -101,7 +84,7 @@ export default function WorkoutsScreen() {
         <input
           type="search"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => set({ search: e.target.value })}
           placeholder="Search workouts…"
           className="w-full rounded-xl border border-slate/25 bg-white px-4 h-12 text-base outline-none focus:border-pitch"
           aria-label="Search workouts"
@@ -111,16 +94,21 @@ export default function WorkoutsScreen() {
       {/* Category chips */}
       <div className="mt-3 -mx-5 overflow-x-auto px-5">
         <div className="flex gap-2 w-max">
-          <Chip active={category === 'all'} onClick={() => setCategory('all')}>
+          <Chip active={category === 'all'} onClick={() => set({ category: 'all' })}>
             All
           </Chip>
           {anyCustom && (
-            <Chip active={category === 'mine'} onClick={() => setCategory('mine')}>
+            <Chip active={category === 'mine'} onClick={() => set({ category: 'mine' })}>
               Yours
             </Chip>
           )}
           {categoriesInUse.map((cat) => (
-            <Chip key={cat} active={category === cat} onClick={() => setCategory(cat)} dot={CATEGORY_ACCENT[cat]}>
+            <Chip
+              key={cat}
+              active={category === cat}
+              onClick={() => set({ category: cat })}
+              dot={CATEGORY_ACCENT[cat]}
+            >
               {CATEGORY_LABELS[cat]}
             </Chip>
           ))}
@@ -130,9 +118,9 @@ export default function WorkoutsScreen() {
       {/* Filters */}
       <div className="mt-3 flex items-center gap-2">
         <button
-          onClick={() => setFiltersOpen((v) => !v)}
+          onClick={() => set({ panelOpen: !panelOpen })}
           className="inline-flex items-center gap-2 rounded-xl border border-slate/25 bg-white px-4 h-11 text-sm font-semibold"
-          aria-expanded={filtersOpen}
+          aria-expanded={panelOpen}
         >
           Filters
           {activeFilters > 0 && (
@@ -141,19 +129,19 @@ export default function WorkoutsScreen() {
             </span>
           )}
         </button>
-        {activeFilters > 0 && (
-          <button onClick={resetFilters} className="px-2 h-11 text-sm font-semibold text-pitch">
-            Reset
+        {anythingSet && (
+          <button onClick={clear} className="px-2 h-11 text-sm font-semibold text-pitch">
+            Clear filters
           </button>
         )}
       </div>
 
-      {filtersOpen && (
+      {panelOpen && (
         <div className="mt-3 space-y-4 rounded-2xl border border-slate/15 bg-white/70 p-4">
           <Segmented
             label="Length"
             value={duration}
-            onChange={setDuration}
+            onChange={(v) => set({ duration: v })}
             options={[
               ['any', 'Any'],
               ['short', '≤ 15 min'],
@@ -164,7 +152,7 @@ export default function WorkoutsScreen() {
           <Segmented
             label="Difficulty"
             value={difficulty}
-            onChange={setDifficulty}
+            onChange={(v) => set({ difficulty: v })}
             options={[
               ['any', 'Any'],
               ['beginner', DIFFICULTY_LABELS.beginner],
@@ -175,7 +163,7 @@ export default function WorkoutsScreen() {
           <Segmented
             label="Space"
             value={space}
-            onChange={setSpace}
+            onChange={(v) => set({ space: v })}
             options={[
               ['any', 'Any'],
               ['small', SPACE_LABELS.small],
@@ -202,8 +190,8 @@ export default function WorkoutsScreen() {
           <div className="rounded-2xl border border-dashed border-slate/30 p-8 text-center">
             <p className="font-display text-lg font-bold">No workouts match those filters</p>
             <p className="mt-1 text-slate">Try adding some kit back, or widen the length range.</p>
-            {activeFilters > 0 && (
-              <button onClick={resetFilters} className="mt-4 rounded-xl bg-ink px-4 h-11 font-semibold text-chalk">
+            {anythingSet && (
+              <button onClick={clear} className="mt-4 rounded-xl bg-ink px-4 h-11 font-semibold text-chalk">
                 Clear filters
               </button>
             )}
