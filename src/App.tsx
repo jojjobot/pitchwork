@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import AppShell from './components/AppShell'
 import HomeScreen from './screens/HomeScreen'
 import WorkoutsScreen from './screens/WorkoutsScreen'
@@ -15,6 +16,7 @@ import SessionDetailScreen from './screens/SessionDetailScreen'
 import SettingsScreen from './screens/SettingsScreen'
 import SignInScreen from './screens/SignInScreen'
 import { useAccount } from './lib/auth'
+import { countPageview } from './lib/analytics'
 
 /*
   All routes live here. Screens with the bottom nav are nested inside <AppShell>.
@@ -23,6 +25,7 @@ import { useAccount } from './lib/auth'
 */
 export default function App() {
   const account = useAccount()
+  usePageviews(Boolean(account))
 
   // One gate in front of everything. Signing out swaps this back in, and because
   // the stores reload with it, no screen is ever left holding the last person's data.
@@ -52,4 +55,21 @@ export default function App() {
       <Route path="/session/:workoutId" element={<SessionPlayer />} />
     </Routes>
   )
+}
+
+/*
+  Counts one pageview per screen. The GoatCounter script is loaded with
+  `no_onload`, so this is the only thing that ever counts a view — otherwise the
+  first load would be counted twice, and never again, because hash navigation
+  fires no page load at all.
+
+  While signed out every URL renders the sign-in screen, so counting the path
+  behind the gate would claim visits to screens nobody actually saw.
+*/
+function usePageviews(signedIn: boolean): void {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    countPageview(signedIn ? pathname : '/sign-in')
+  }, [pathname, signedIn])
 }

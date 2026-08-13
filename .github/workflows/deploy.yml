@@ -1,0 +1,50 @@
+# Builds Pitchwork and publishes it to GitHub Pages on every push to master.
+# Nothing is committed by this: dist/ stays gitignored and is handed straight to
+# Pages as an artifact, so the repo only ever holds source.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch: # so a deploy can be re-run by hand without an empty commit
+
+# Read the repo, mint the token Pages needs. Nothing else.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a newer push waits rather than racing an older one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` installs exactly what package-lock.json pins, so the site is built
+      # from the same dependency versions that were tested locally.
+      - run: npm ci
+      - run: npm run build # tsc -b && vite build — a type error fails the deploy
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

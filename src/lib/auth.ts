@@ -13,6 +13,7 @@ import {
 import { reload as reloadSessions } from './sessions'
 import { reload as reloadSettings } from './settings'
 import { reload as reloadCustomWorkouts } from './customWorkouts'
+import { countEvent } from './analytics'
 
 /*
   SIGNING IN — and being honest about what that means here.
@@ -221,6 +222,11 @@ export async function createAccount(
 
   accountsStore.set([...accountsStore.get(), account])
   openAccount(account, remember)
+
+  // A bare tally, so "how many people made an account" is answerable at all. The
+  // account itself never leaves this browser — there is nothing to send and no
+  // server to send it to. See lib/analytics.ts.
+  countEvent('account-created')
   return account
 }
 

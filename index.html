@@ -18,6 +18,19 @@
     />
 
     <title>Pitchwork — train alone, play sharper</title>
+
+    <!-- GoatCounter: cookieless visitor counts, no personal data, so no consent
+         banner. `no_onload` hands every pageview to the app (src/lib/analytics.ts),
+         because hash navigation fires no page load and the script would otherwise
+         only ever see the first screen. -->
+    <script>
+      window.goatcounter = { no_onload: true }
+    </script>
+    <script
+      defer
+      src="https://gc.zgo.at/count.js"
+      data-goatcounter="https://pitchwork.goatcounter.com/count"
+    ></script>
   </head>
   <body>
     <div id="root"></div>
