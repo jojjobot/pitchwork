@@ -1,5 +1,5 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { exerciseById } from '../data/exercises'
+import { useExercise } from '../lib/customExercises'
 import {
   createCustomWorkout,
   updateBlocks,
@@ -18,7 +18,7 @@ export default function BuilderScreen() {
   const navigate = useNavigate()
   const mine = useCustomWorkouts()
   const [params] = useSearchParams()
-  const adding = exerciseById[params.get('add') ?? '']
+  const adding = useExercise(params.get('add') ?? undefined)
 
   function startNew() {
     const workout = createCustomWorkout(adding ? { blocks: [newBlockFor(adding)] } : {})

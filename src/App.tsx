@@ -7,6 +7,7 @@ import WorkoutDetailScreen from './screens/WorkoutDetailScreen'
 import SessionPlayer from './screens/SessionPlayer'
 import LibraryScreen from './screens/LibraryScreen'
 import ExerciseDetailScreen from './screens/ExerciseDetailScreen'
+import ExerciseBuilderScreen from './screens/ExerciseBuilderScreen'
 import BuilderScreen from './screens/BuilderScreen'
 import BuilderEditScreen from './screens/BuilderEditScreen'
 import BuilderPickScreen from './screens/BuilderPickScreen'
@@ -39,6 +40,9 @@ export default function App() {
         <Route path="/workouts/:workoutId" element={<WorkoutDetailScreen />} />
         <Route path="/library" element={<LibraryScreen />} />
         <Route path="/library/:exerciseId" element={<ExerciseDetailScreen />} />
+        {/* Writing a drill of your own. Only ever reached for a drill you made — the
+            built-in library is read-only, and the screen says so if you arrive anyway. */}
+        <Route path="/library/:exerciseId/edit" element={<ExerciseBuilderScreen />} />
         {/* The builder is a few small screens rather than one long form: pick a
             session, pick a drill, set that drill's numbers. Each step is its own URL,
             so Back always undoes exactly one decision. */}

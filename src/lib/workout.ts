@@ -1,4 +1,4 @@
-import { exerciseById } from '../data/exercises'
+import { findExercise } from './customExercises'
 import { SPACE_RANK } from './labels'
 import type { Category, Equipment, Exercise, Space, Workout, WorkoutBlock } from '../types'
 
@@ -50,7 +50,7 @@ export function buildSteps(workout: Blocked): SessionStep[] {
   const steps: SessionStep[] = []
 
   workout.blocks.forEach((block, bi) => {
-    const ex = exerciseById[block.exerciseId]
+    const ex = findExercise(block.exerciseId)
     if (!ex) return // skip a block whose drill was deleted
 
     const isTimed = ex.measureType !== 'reps'
@@ -91,7 +91,7 @@ export function buildSteps(workout: Blocked): SessionStep[] {
     const isLast = bi === workout.blocks.length - 1
     if (!isLast && block.restAfter > 0) {
       const nextBlock = workout.blocks[bi + 1]
-      const nextEx = exerciseById[nextBlock.exerciseId] ?? null
+      const nextEx = findExercise(nextBlock.exerciseId) ?? null
       steps.push({
         kind: 'rest',
         seconds: block.restAfter,
@@ -144,7 +144,7 @@ export function workoutMeta(workout: Blocked): WorkoutMeta {
   let space: Space = 'small'
 
   for (const block of workout.blocks) {
-    const ex = exerciseById[block.exerciseId]
+    const ex = findExercise(block.exerciseId)
     if (!ex) continue
     categories.add(ex.category)
     ex.equipment.forEach((e) => {

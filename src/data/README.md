@@ -9,3 +9,13 @@ edit yourself — no app logic mixed in. Coming in Phase 1:
 
 Editing a value in these files changes what shows up in the app. You'll never need
 to touch the code in `components/`, `screens/`, or `lib/` to add or tweak a drill.
+
+## Drills written in the app
+
+These files are the drills that ship with Pitchwork — everyone's copy is identical,
+so they are read-only in the UI. Drills a user writes themselves have exactly the
+same shape but live in that account's storage instead (`lib/customExercises.ts`).
+
+Nothing downstream distinguishes the two. Once `findExercise(id)` has resolved an id,
+a drill from this folder and a drill someone wrote are the same object to the session
+builder, the length estimator and the player.

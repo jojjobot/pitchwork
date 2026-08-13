@@ -41,6 +41,7 @@ export interface Exercise {
   // weight — so the builder asks for kilos too, and the player shows them.
   usesWeight?: boolean
   defaultWeightKg?: number | null // a starting suggestion, not a prescription
+  isCustom?: boolean // true = you wrote it; the built-in library never sets this
 }
 
 export interface WorkoutBlock {

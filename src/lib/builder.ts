@@ -1,4 +1,4 @@
-import { exerciseById } from '../data/exercises'
+import { findExercise } from './customExercises'
 import { estimateWorkout } from './workout'
 import { formatSeconds } from './format'
 import type { Category, Difficulty, Exercise, WorkoutBlock } from '../types'
@@ -91,7 +91,7 @@ export function deriveFiling(blocks: WorkoutBlock[]): Filing {
 
   let hardest = 0
   for (const block of blocks) {
-    const ex = exerciseById[block.exerciseId]
+    const ex = findExercise(block.exerciseId)
     if (ex) hardest = Math.max(hardest, DIFFICULTY_RANK[ex.difficulty])
   }
 

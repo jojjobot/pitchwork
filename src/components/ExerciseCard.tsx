@@ -25,8 +25,13 @@ export default function ExerciseCard({ exercise }: { exercise: Exercise }) {
             <span className="mr-1.5 text-slate">#{exercise.rank}</span>
           )}
           {exercise.name}
+          {/* Ranks mark the built-in library's own order; this marks the ones you wrote,
+              which is the only distinction that matters once they're side by side. */}
+          {exercise.isCustom && <span className="ml-1.5 text-xs font-semibold text-pitch">Yours</span>}
         </p>
-        <p className="mt-0.5 truncate text-sm text-slate">{exercise.shortDescription}</p>
+        <p className="mt-0.5 truncate text-sm text-slate">
+          {exercise.shortDescription || 'No description yet'}
+        </p>
       </div>
       <div className="shrink-0 text-right">
         <p className="font-display font-bold text-ink">{prescription(exercise)}</p>

@@ -1,4 +1,4 @@
-import type { CompletedSession, Workout } from '../types'
+import type { CompletedSession, Exercise, Workout } from '../types'
 
 /*
   Everything Pitchwork keeps lives in this browser's localStorage. There is no
@@ -15,14 +15,23 @@ import type { CompletedSession, Workout } from '../types'
 const SIGNED_IN_KEY = 'pitchwork.signedIn.v1'
 export const ACCOUNTS_KEY = 'pitchwork.accounts.v1'
 
+/*
+  Everything an account owns, one drawer each. This list is the authority: anything
+  added here is namespaced per account, exported with the account, and removed when
+  the account is deleted, all without touching those functions.
+*/
+export type Bucket = 'sessions' | 'settings' | 'customWorkouts' | 'customExercises'
+
+const BUCKETS: Bucket[] = ['sessions', 'settings', 'customWorkouts', 'customExercises']
+
 // Where data lived before accounts existed. Claimed by the first account created.
-const LEGACY_KEYS = {
+// Only the buckets that predate the sign-in screen are in here — a bucket invented
+// afterwards has no unnamespaced data to inherit.
+const LEGACY_KEYS: Partial<Record<Bucket, string>> = {
   sessions: 'pitchwork.sessions.v1',
   settings: 'pitchwork.settings.v1',
   customWorkouts: 'pitchwork.customWorkouts.v1',
-} as const
-
-export type Bucket = keyof typeof LEGACY_KEYS
+}
 
 export interface Settings {
   soundEnabled: boolean
@@ -183,6 +192,19 @@ export function saveCustomWorkouts(list: Workout[]): void {
   write('customWorkouts', list)
 }
 
+// --- Drills you wrote yourself ---
+// The 146 drills in src/data/exercises.ts ship with the app and never change. These
+// are yours: same shape, same everything, just stored per account instead of built in.
+
+export function loadCustomExercises(): Exercise[] {
+  const value = read<Exercise[]>('customExercises', [])
+  return Array.isArray(value) ? value : []
+}
+
+export function saveCustomExercises(list: Exercise[]): void {
+  write('customExercises', list)
+}
+
 // --- Settings ---
 
 export function loadSettings(): Settings {
@@ -202,12 +224,12 @@ export function saveSettings(settings: Settings): void {
 */
 export function claimLegacyData(accountId: string): boolean {
   let claimed = false
-  for (const bucket of Object.keys(LEGACY_KEYS) as Bucket[]) {
+  for (const [bucket, legacyKey] of Object.entries(LEGACY_KEYS) as [Bucket, string][]) {
     try {
-      const raw = localStorage.getItem(LEGACY_KEYS[bucket])
+      const raw = localStorage.getItem(legacyKey)
       if (raw == null) continue
-      localStorage.setItem(`pitchwork.${accountId}.${bucket}.v1`, raw)
-      localStorage.removeItem(LEGACY_KEYS[bucket])
+      localStorage.setItem(accountBucketKey(accountId, bucket), raw)
+      localStorage.removeItem(legacyKey)
       claimed = true
     } catch {
       // if it can't be moved, leave it where it is rather than lose it
@@ -225,9 +247,9 @@ export function hasLegacyData(): boolean {
 }
 
 export function dropAccountData(accountId: string): void {
-  for (const bucket of Object.keys(LEGACY_KEYS) as Bucket[]) {
+  for (const bucket of BUCKETS) {
     try {
-      localStorage.removeItem(`pitchwork.${accountId}.${bucket}.v1`)
+      localStorage.removeItem(accountBucketKey(accountId, bucket))
     } catch {
       // nothing to do
     }

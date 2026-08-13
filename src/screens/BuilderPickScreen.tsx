@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { exercises } from '../data/exercises'
+import { useAllExercises } from '../lib/customExercises'
 import { updateBlocks, useWorkout } from '../lib/customWorkouts'
 import { newBlockFor } from '../lib/builder'
 import { prescription } from '../lib/format'
@@ -20,15 +20,16 @@ export default function BuilderPickScreen() {
   const workout = useWorkout(workoutId)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<Category | 'all'>('all')
+  const allExercises = useAllExercises()
 
   const matches = useMemo(() => {
     const q = search.trim().toLowerCase()
-    return exercises.filter((ex) => {
+    return allExercises.filter((ex) => {
       if (category !== 'all' && ex.category !== category) return false
       if (!q) return true
       return (ex.name + ' ' + ex.shortDescription + ' ' + ex.skillTags.join(' ')).toLowerCase().includes(q)
     })
-  }, [search, category])
+  }, [search, category, allExercises])
 
   if (!workout || !workout.isCustom) {
     return (
@@ -106,7 +107,10 @@ export default function BuilderPickScreen() {
                 aria-hidden="true"
               />
               <span className="min-w-0 flex-1">
-                <span className="block font-display font-bold leading-tight text-ink">{ex.name}</span>
+                <span className="block font-display font-bold leading-tight text-ink">
+                  {ex.name}
+                  {ex.isCustom && <span className="ml-1.5 text-xs font-semibold text-pitch">Yours</span>}
+                </span>
                 <span className="mt-0.5 block truncate text-sm text-slate">{ex.shortDescription}</span>
               </span>
               <span className="shrink-0 text-right">

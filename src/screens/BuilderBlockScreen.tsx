@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { exerciseById } from '../data/exercises'
+import { useExercise } from '../lib/customExercises'
 import { updateBlocks, useWorkout } from '../lib/customWorkouts'
 import { blockSeconds, blockWeightKg, formatKg, removeBlock, replaceBlock } from '../lib/builder'
 import { formatSeconds } from '../lib/format'
@@ -29,7 +29,7 @@ export default function BuilderBlockScreen() {
 
   const index = Number(blockIndex)
   const block = workout && Number.isInteger(index) ? workout.blocks[index] : undefined
-  const ex = block ? exerciseById[block.exerciseId] : undefined
+  const ex = useExercise(block?.exerciseId)
 
   if (!workout || !workout.isCustom || !block || !ex) {
     return (

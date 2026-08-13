@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { exerciseById } from '../data/exercises'
+import { duplicateExercise, useExercise } from '../lib/customExercises'
 import { useWorkout } from '../lib/customWorkouts'
 import { CATEGORY_ACCENT, CATEGORY_LABELS, DIFFICULTY_LABELS, EQUIPMENT_LABELS, SPACE_LABELS } from '../lib/labels'
 import { prescription, formatSeconds } from '../lib/format'
@@ -10,7 +10,7 @@ export default function ExerciseDetailScreen() {
   const { exerciseId } = useParams()
   const navigate = useNavigate()
   const [params] = useSearchParams()
-  const ex = exerciseId ? exerciseById[exerciseId] : undefined
+  const ex = useExercise(exerciseId)
 
   // Arrived from a workout? Then that session's prescription is what matters here,
   // not the drill's own defaults. Read from the URL so the link survives a refresh.
@@ -41,6 +41,7 @@ export default function ExerciseDetailScreen() {
         {CATEGORY_LABELS[ex.category]}
       </p>
       <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{ex.name}</h1>
+      {ex.isCustom && <p className="mt-1 text-sm font-semibold text-pitch">A drill you wrote</p>}
       {ex.rank != null && (
         <p className="mt-1 text-sm font-semibold text-slate">
           #{ex.rank} most effective in {CATEGORY_LABELS[ex.category]}
@@ -78,34 +79,48 @@ export default function ExerciseDetailScreen() {
         </div>
       )}
 
-      {/* Instructions */}
+      {/* Instructions. A drill you just created has none yet — an empty numbered list
+          under a heading reads as broken, so say what's missing instead. */}
       <div className="mt-8">
         <h2 className="text-lg font-bold">How to do it</h2>
         <div className="chalk-line mt-2 w-14" aria-hidden="true" />
-        <ol className="mt-4 space-y-3">
-          {ex.instructions.map((step, i) => (
-            <li key={i} className="flex gap-3">
-              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink font-display text-sm font-bold text-chalk">
-                {i + 1}
-              </span>
-              <span className="pt-0.5 leading-relaxed">{step}</span>
-            </li>
-          ))}
-        </ol>
+        {ex.instructions.length === 0 ? (
+          <p className="mt-4 text-slate">
+            No steps written yet.{' '}
+            {ex.isCustom && (
+              <Link to={`/library/${ex.id}/edit`} className="font-semibold text-pitch underline">
+                Add them
+              </Link>
+            )}
+          </p>
+        ) : (
+          <ol className="mt-4 space-y-3">
+            {ex.instructions.map((step, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink font-display text-sm font-bold text-chalk">
+                  {i + 1}
+                </span>
+                <span className="pt-0.5 leading-relaxed">{step}</span>
+              </li>
+            ))}
+          </ol>
+        )}
       </div>
 
       {/* Coaching cues */}
-      <div className="mt-8 rounded-2xl bg-ink p-5 text-chalk">
-        <h2 className="font-display text-lg font-bold text-lime">Coaching cues</h2>
-        <ul className="mt-3 space-y-2">
-          {ex.coachingCues.map((cue, i) => (
-            <li key={i} className="flex gap-2">
-              <span className="text-lime" aria-hidden="true">✓</span>
-              <span className="leading-relaxed">{cue}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {ex.coachingCues.length > 0 && (
+        <div className="mt-8 rounded-2xl bg-ink p-5 text-chalk">
+          <h2 className="font-display text-lg font-bold text-lime">Coaching cues</h2>
+          <ul className="mt-3 space-y-2">
+            {ex.coachingCues.map((cue, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="text-lime" aria-hidden="true">✓</span>
+                <span className="leading-relaxed">{cue}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Skill tags */}
       {ex.skillTags.length > 0 && (
@@ -125,6 +140,28 @@ export default function ExerciseDetailScreen() {
       >
         <span aria-hidden="true">+</span> Add to one of your sessions
       </Link>
+
+      {/*
+        The library is read-only for the same reason the programme is: everyone's copy
+        of a built-in drill should say the same thing. Wanting to change one is normal,
+        so the way through is a copy of your own — the same "make it mine" move that
+        sessions already offer.
+      */}
+      {ex.isCustom ? (
+        <Link
+          to={`/library/${ex.id}/edit`}
+          className="mt-3 flex h-12 items-center justify-center rounded-xl bg-ink font-semibold text-chalk active:brightness-110"
+        >
+          Edit this drill
+        </Link>
+      ) : (
+        <button
+          onClick={() => navigate(`/library/${duplicateExercise(ex).id}/edit`)}
+          className="mt-3 flex h-12 w-full items-center justify-center rounded-xl border border-slate/25 bg-white font-semibold active:bg-white/60"
+        >
+          Make my own version
+        </button>
+      )}
     </section>
   )
 }

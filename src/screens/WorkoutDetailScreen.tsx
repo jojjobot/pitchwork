@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { exerciseById } from '../data/exercises'
+import { useExerciseLookup } from '../lib/customExercises'
 import { duplicateWorkout, useWorkout } from '../lib/customWorkouts'
 import { workoutMeta } from '../lib/workout'
 import { formatSeconds } from '../lib/format'
@@ -18,6 +18,7 @@ export default function WorkoutDetailScreen() {
   const { workoutId } = useParams()
   const navigate = useNavigate()
   const workout = useWorkout(workoutId)
+  const lookup = useExerciseLookup()
 
   if (!workout) {
     return (
@@ -80,7 +81,7 @@ export default function WorkoutDetailScreen() {
         <p className="mt-2 text-sm text-slate">Tap any drill to see how to do it.</p>
         <ol className="mt-3 space-y-2">
           {workout.blocks.map((block, i) => {
-            const ex = exerciseById[block.exerciseId]
+            const ex = lookup(block.exerciseId)
             if (!ex) return null
             const isTimed = ex.measureType !== 'reps'
             const per = isTimed

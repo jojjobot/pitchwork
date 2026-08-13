@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { exercises } from '../data/exercises'
+import { useNavigate } from 'react-router-dom'
+import { createCustomExercise, useAllExercises } from '../lib/customExercises'
 import type { Category, Difficulty, Equipment, Space } from '../types'
 import {
   CATEGORY_ACCENT,
@@ -17,6 +18,8 @@ import { Chip, Segmented } from '../components/Filters'
 const KIT: Equipment[] = ['ball', 'cones', 'wall', 'goal', 'partner', 'weights', 'bar']
 
 export default function LibraryScreen() {
+  const navigate = useNavigate()
+  const allExercises = useAllExercises()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<Category | 'all'>('all')
   const [space, setSpace] = useState<Space | 'any'>('any')
@@ -46,7 +49,7 @@ export default function LibraryScreen() {
   // Apply every active filter to the full list.
   const matches = useMemo(() => {
     const q = search.trim().toLowerCase()
-    return exercises.filter((ex) => {
+    return allExercises.filter((ex) => {
       if (category !== 'all' && ex.category !== category) return false
       if (difficulty !== 'any' && ex.difficulty !== difficulty) return false
       if (space !== 'any' && SPACE_RANK[ex.spaceNeeded] > SPACE_RANK[space]) return false
@@ -59,7 +62,16 @@ export default function LibraryScreen() {
       }
       return true
     })
-  }, [search, category, space, difficulty, available])
+  }, [search, category, space, difficulty, available, allExercises])
+
+  const mineCount = allExercises.filter((ex) => ex.isCustom).length
+
+  // A new drill is created empty and opened straight in the editor, the same way a
+  // new session is — there is nothing useful to ask before it exists.
+  function startNewDrill() {
+    const ex = createCustomExercise()
+    navigate(`/library/${ex.id}/edit`)
+  }
 
   // Group results by category, preserving our display order.
   const groups = CATEGORY_ORDER.map((cat) => ({
@@ -74,8 +86,18 @@ export default function LibraryScreen() {
         <div className="chalk-line mt-2 w-20" aria-hidden="true" />
         <p className="mt-3 text-slate">
           {matches.length} {matches.length === 1 ? 'drill' : 'drills'}, ready when you are.
+          {mineCount > 0 && ` ${mineCount} of them ${mineCount === 1 ? 'is' : 'are'} yours.`}
         </p>
       </header>
+
+      {/* A drill you wrote behaves like any other one: it can be filtered to, opened,
+          and dropped into a session. This is just where it starts. */}
+      <button
+        onClick={startNewDrill}
+        className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate/25 bg-white font-semibold active:bg-white/60"
+      >
+        <span aria-hidden="true">+</span> Write your own drill
+      </button>
 
       {/* Search */}
       <div className="mt-4">

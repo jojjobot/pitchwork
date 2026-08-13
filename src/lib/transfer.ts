@@ -1,4 +1,4 @@
-import type { CompletedSession, Workout } from '../types'
+import type { CompletedSession, Exercise, Workout } from '../types'
 import {
   DEFAULT_SETTINGS,
   readAccountBucket,
@@ -8,6 +8,7 @@ import {
 import { adoptAccount, getAccount, type Account } from './auth'
 import { getSessions } from './sessions'
 import { getCustomWorkouts } from './customWorkouts'
+import { getCustomExercises } from './customExercises'
 import { getSettings } from './settings'
 
 /*
@@ -28,6 +29,14 @@ import { getSettings } from './settings'
 */
 
 const FORMAT = 'pitchwork.transfer'
+
+/*
+  Still 1 after custom drills were added, deliberately. The field is additive, and an
+  older copy of Pitchwork reading this file ignores what it doesn't know and imports
+  the rest — sessions and history still arrive. Bumping the version would make that
+  same file bounce off the old device entirely, which is a worse outcome than landing
+  without the drills. Bump it only for a change that genuinely can't be read as v1.
+*/
 const VERSION = 1
 
 export interface TransferFile {
@@ -37,6 +46,7 @@ export interface TransferFile {
   account: Account
   sessions: CompletedSession[]
   customWorkouts: Workout[]
+  customExercises: Exercise[]
   settings: Settings
 }
 
@@ -53,6 +63,7 @@ export function buildTransfer(): TransferFile {
     account,
     sessions: getSessions(),
     customWorkouts: getCustomWorkouts(),
+    customExercises: getCustomExercises(),
     settings: getSettings(),
   }
 }
@@ -101,6 +112,7 @@ export interface TransferResult {
   created: boolean
   sessionsAdded: number
   workoutsAdded: number
+  exercisesAdded: number
 }
 
 /*
@@ -141,6 +153,14 @@ export function applyTransfer(raw: unknown): TransferResult {
   )
   writeAccountBucket(accountId, 'customWorkouts', workouts.merged)
 
+  // Drills come across too, otherwise an imported session would arrive full of blocks
+  // pointing at drills this device has never heard of, and quietly play shorter.
+  const exercises = mergeById(
+    readAccountBucket<Exercise[]>(accountId, 'customExercises', []),
+    list<Exercise>(file.customExercises),
+  )
+  writeAccountBucket(accountId, 'customExercises', exercises.merged)
+
   // Preferences only ride along to a device that didn't have this account. On one
   // that did, the settings you chose *there* are the ones you meant.
   if (created && file.settings && typeof file.settings === 'object') {
@@ -152,5 +172,6 @@ export function applyTransfer(raw: unknown): TransferResult {
     created,
     sessionsAdded: sessions.added,
     workoutsAdded: workouts.added,
+    exercisesAdded: exercises.added,
   }
 }

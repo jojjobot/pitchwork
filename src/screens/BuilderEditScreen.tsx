@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { exerciseById } from '../data/exercises'
+import { useExerciseLookup } from '../lib/customExercises'
 import {
   deleteCustomWorkout,
   updateBlocks,
@@ -34,6 +34,7 @@ export default function BuilderEditScreen() {
   const { workoutId } = useParams()
   const navigate = useNavigate()
   const workout = useWorkout(workoutId)
+  const lookup = useExerciseLookup()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   if (!workout || !workout.isCustom) {
@@ -146,7 +147,7 @@ export default function BuilderEditScreen() {
 
         <ol className="mt-3 space-y-2">
           {workout.blocks.map((block, i) => {
-            const ex = exerciseById[block.exerciseId]
+            const ex = lookup(block.exerciseId)
             if (!ex) return null
             const last = i === workout.blocks.length - 1
             return (
