@@ -45,6 +45,8 @@ export const EQUIPMENT_LABELS: Record<Equipment, string> = {
   wall: 'Wall',
   goal: 'Goal',
   partner: 'Partner',
+  weights: 'Weights',
+  bar: 'Pull-up bar',
   none: 'No kit',
 }
 

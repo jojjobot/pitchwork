@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { exerciseById } from '../data/exercises'
 import { updateBlocks, useWorkout } from '../lib/customWorkouts'
-import { blockSeconds, removeBlock, replaceBlock } from '../lib/builder'
+import { blockSeconds, blockWeightKg, formatKg, removeBlock, replaceBlock } from '../lib/builder'
 import { formatSeconds } from '../lib/format'
 import { CATEGORY_ACCENT, CATEGORY_LABELS } from '../lib/labels'
 import Stepper from '../components/Stepper'
@@ -17,6 +17,10 @@ import type { WorkoutBlock } from '../types'
   separate estimate of how long a set takes, purely so the session length stays
   honest. Giving a rep drill a duration would turn it into a countdown, so there is
   simply no control here that can do it.
+
+  Loaded drills get one more control on top of that — kilos — and only those do. A
+  push-up has no weight to ask about, and a control that only ever reads "0 kg" is
+  noise on every other drill in the library.
 */
 export default function BuilderBlockScreen() {
   const { workoutId, blockIndex } = useParams()
@@ -45,6 +49,7 @@ export default function BuilderBlockScreen() {
   const reps = block.reps ?? ex.defaultReps ?? 10
   const restBetween = block.restBetweenSets ?? ex.restBetweenSets
   const perSet = blockSeconds({ ...block, sets: 1 })
+  const weightKg = blockWeightKg(ex, block) ?? 0
 
   const edit = (patch: Partial<WorkoutBlock>) =>
     updateBlocks(workout.id, (blocks) => replaceBlock(blocks, index, { ...block, ...patch }))
@@ -135,6 +140,26 @@ export default function BuilderBlockScreen() {
               onReset={block.estimateSeconds != null ? () => edit({ estimateSeconds: null }) : undefined}
             />
           </>
+        )}
+
+        {/* Loaded drills only. Sets and reps don't describe a bench press on their
+            own, so the weight sits with them rather than in the note field. */}
+        {ex.usesWeight && (
+          <Stepper
+            label="Weight"
+            value={weightKg}
+            min={0}
+            max={300}
+            step={2.5}
+            format={formatKg}
+            onChange={(value) => edit({ weightKg: value })}
+            hint={
+              ex.defaultWeightKg != null
+                ? `Drill suggests ${formatKg(ex.defaultWeightKg)}`
+                : 'Set what you actually lift'
+            }
+            onReset={block.weightKg != null && ex.defaultWeightKg != null ? () => edit({ weightKg: null }) : undefined}
+          />
         )}
 
         {block.sets > 1 && (

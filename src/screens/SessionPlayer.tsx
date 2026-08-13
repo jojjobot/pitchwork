@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useWorkout } from '../lib/customWorkouts'
 import { buildSteps } from '../lib/workout'
+import { formatKg } from '../lib/builder'
 import { formatSeconds } from '../lib/format'
 import { primeAudio, playTone, vibrate } from '../lib/audio'
 import { useWakeLock } from '../lib/useWakeLock'
@@ -271,6 +272,11 @@ function WorkView({
             {step.reps}
             <span className="ml-2 text-2xl font-bold text-chalk/60">reps</span>
           </p>
+        )}
+        {/* Loaded drills only. Shown under the number rather than beside it, because
+            the weight is the thing you have to go and set up before the set starts. */}
+        {step.weightKg != null && (
+          <p className="mt-2 font-display text-2xl font-extrabold text-lime">{formatKg(step.weightKg)}</p>
         )}
         {paused && <p className="mt-1 font-semibold text-chalk/60">Paused</p>}
       </div>

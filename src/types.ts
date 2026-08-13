@@ -14,7 +14,7 @@ export type Category =
   | 'strength'
   | 'recovery'
 
-export type Equipment = 'ball' | 'cones' | 'wall' | 'goal' | 'partner' | 'none'
+export type Equipment = 'ball' | 'cones' | 'wall' | 'goal' | 'partner' | 'weights' | 'bar' | 'none'
 export type Space = 'small' | 'medium' | 'full-pitch'
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced'
 export type MeasureType = 'time' | 'reps' | 'distance'
@@ -36,6 +36,11 @@ export interface Exercise {
   defaultSets: number
   restBetweenSets: number // seconds
   skillTags: string[]
+  // Drills you load with a bar, dumbbell, kettlebell or med ball. Sets and reps alone
+  // don't describe one of these — "4 × 6" of a bench press is meaningless without the
+  // weight — so the builder asks for kilos too, and the player shows them.
+  usesWeight?: boolean
+  defaultWeightKg?: number | null // a starting suggestion, not a prescription
 }
 
 export interface WorkoutBlock {
@@ -50,6 +55,10 @@ export interface WorkoutBlock {
   estimateSeconds: number | null
   restAfter: number // seconds of rest after this block, before the next
   note: string | null // an optional coaching note for this block
+  // Kilos on the bar for a LOADED drill (null = use the drill's suggestion). Optional
+  // because sessions saved before weights existed simply don't have the field, and a
+  // missing one has to keep meaning "whatever the drill says" rather than break them.
+  weightKg?: number | null
 }
 
 export interface Workout {

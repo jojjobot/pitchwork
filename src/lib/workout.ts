@@ -23,6 +23,7 @@ export type SessionStep =
       setCount: number
       seconds: number | null // for timed drills; null for rep-based (self-paced)
       reps: number | null // for rep-based drills
+      weightKg: number | null // for loaded drills; null when the drill isn't loaded
       estimateSeconds: number // how long this set is expected to take, timed or not
       note: string | null
     }
@@ -58,6 +59,7 @@ export function buildSteps(workout: Blocked): SessionStep[] {
     const setCount = Math.max(1, block.sets)
     const estimateSeconds = setSeconds(ex, block, reps)
     const restBetweenSets = block.restBetweenSets ?? ex.restBetweenSets
+    const weightKg = ex.usesWeight ? block.weightKg ?? ex.defaultWeightKg ?? null : null
 
     for (let s = 1; s <= setCount; s++) {
       steps.push({
@@ -68,6 +70,7 @@ export function buildSteps(workout: Blocked): SessionStep[] {
         setCount,
         seconds,
         reps,
+        weightKg,
         estimateSeconds,
         note: block.note,
       })

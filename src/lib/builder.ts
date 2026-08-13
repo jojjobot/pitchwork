@@ -25,7 +25,21 @@ export function newBlockFor(ex: Exercise): WorkoutBlock {
     estimateSeconds: null,
     restAfter: DEFAULT_REST_AFTER,
     note: null,
+    weightKg: null,
   }
+}
+
+// The kilos this block is done with: your own number if you set one, otherwise the
+// drill's suggestion. null means the drill isn't loaded and never asks about weight.
+export function blockWeightKg(ex: Exercise, block: WorkoutBlock): number | null {
+  if (!ex.usesWeight) return null
+  return block.weightKg ?? ex.defaultWeightKg ?? null
+}
+
+// Kilos as they're written everywhere: no trailing ".0" on whole numbers, because
+// half-kilo steps exist but most weights land on whole ones.
+export function formatKg(kg: number): string {
+  return `${Number.isInteger(kg) ? kg : kg.toFixed(1)} kg`
 }
 
 export function moveBlock(blocks: WorkoutBlock[], index: number, delta: number): WorkoutBlock[] {
@@ -90,11 +104,12 @@ export function blockSeconds(block: WorkoutBlock): number {
   return estimateWorkout({ blocks: [block] }).seconds
 }
 
-// The prescription as a short line, e.g. "3 × 45s" or "4 × 12 reps".
+// The prescription as a short line, e.g. "3 × 45s", "4 × 12 reps" or "4 × 6 reps @ 60 kg".
 export function blockPrescription(ex: Exercise, block: WorkoutBlock): string {
   const per =
     ex.measureType === 'reps'
       ? `${block.reps ?? ex.defaultReps} reps`
       : formatSeconds(block.duration ?? ex.defaultDuration)
-  return `${block.sets} × ${per}`
+  const kg = blockWeightKg(ex, block)
+  return `${block.sets} × ${per}${kg != null ? ` @ ${formatKg(kg)}` : ''}`
 }

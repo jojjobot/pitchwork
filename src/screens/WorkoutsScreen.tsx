@@ -14,7 +14,7 @@ import {
 import { Chip, Segmented } from '../components/Filters'
 import WorkoutCard from '../components/WorkoutCard'
 
-const KIT: Equipment[] = ['ball', 'cones', 'wall', 'goal', 'partner']
+const KIT: Equipment[] = ['ball', 'cones', 'wall', 'goal', 'partner', 'weights', 'bar']
 type DurationBand = 'any' | 'short' | 'medium' | 'long'
 // The skill chips, plus two that aren't skills: everything, and everything you built.
 type Filing = Category | 'all' | 'mine'

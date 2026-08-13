@@ -14,7 +14,7 @@ import ExerciseCard from '../components/ExerciseCard'
 import { Chip, Segmented } from '../components/Filters'
 
 // The kit the user can toggle on/off ("what have you got with you?").
-const KIT: Equipment[] = ['ball', 'cones', 'wall', 'goal', 'partner']
+const KIT: Equipment[] = ['ball', 'cones', 'wall', 'goal', 'partner', 'weights', 'bar']
 
 export default function LibraryScreen() {
   const [search, setSearch] = useState('')
