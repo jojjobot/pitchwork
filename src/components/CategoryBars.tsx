@@ -22,12 +22,14 @@ export default function CategoryBars({
       {breakdown.map(({ category, minutes }) => (
         <div key={category} className="flex items-center gap-3">
           <span className="w-24 shrink-0 text-sm font-medium">{CATEGORY_LABELS[category]}</span>
-          <div className="h-2.5 flex-1 rounded-full bg-slate/15">
+          <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate/12">
             <div
-              className="h-full rounded-full"
+              className="h-full rounded-full transition-[width] duration-700 ease-out"
               style={{
                 width: `${Math.min(100, (minutes / Math.max(1, totalMinutes)) * 100)}%`,
-                backgroundColor: CATEGORY_ACCENT[category],
+                // A light-to-solid sweep, so a bar reads as filled rather than as a
+                // block of flat colour sitting in a groove.
+                backgroundImage: `linear-gradient(90deg, color-mix(in oklab, ${CATEGORY_ACCENT[category]} 72%, white) 0%, ${CATEGORY_ACCENT[category]} 100%)`,
               }}
             />
           </div>

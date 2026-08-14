@@ -59,11 +59,19 @@ export default function WeeklyChart({ weeks, goalMinutes }: { weeks: Week[]; goa
                     CSS order rather than to this condition. */}
                 <span
                   className={[
-                    'w-full rounded-t transition-[height]',
-                    week.minutes === 0 ? 'bg-slate/25' : 'bg-pitch',
+                    'w-full rounded-t-md transition-[height] duration-500 ease-out',
+                    week.minutes === 0 ? 'bg-slate/25' : '',
                     isSelected ? 'ring-2 ring-ink' : '',
                   ].join(' ')}
-                  style={{ height: week.minutes === 0 ? '2px' : `max(3px, ${height}%)` }}
+                  style={{
+                    height: week.minutes === 0 ? '2px' : `max(3px, ${height}%)`,
+                    // Bars fade towards the baseline so a tall column has weight at
+                    // the top, where you read it, instead of a flat slab of green.
+                    backgroundImage:
+                      week.minutes === 0
+                        ? undefined
+                        : 'linear-gradient(180deg, #2f9463 0%, #1f6f4b 100%)',
+                  }}
                 />
               </button>
             )

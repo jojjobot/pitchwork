@@ -13,6 +13,7 @@ import { EfficiencyTile } from '../components/Efficiency'
 import { prescription, formatSeconds } from '../lib/format'
 import Badge from '../components/Badge'
 import NotFound from '../components/NotFound'
+import PitchArt from '../components/PitchArt'
 
 export default function ExerciseDetailScreen() {
   const { exerciseId } = useParams()
@@ -42,23 +43,53 @@ export default function ExerciseDetailScreen() {
 
   return (
     <section>
-      <button onClick={() => navigate(-1)} className="mb-4 inline-flex items-center gap-1 text-sm font-semibold text-slate">
-        <span aria-hidden="true">←</span> {fromWorkout ? `Back to ${fromWorkout.name}` : 'Back'}
-      </button>
+      {/* The banner — the drill's own diagram, edge to edge. Same treatment as a
+          session's, because from here they're the same kind of object: a thing you
+          are about to go outside and do. */}
+      <div className="relative -mx-5 -mt-6 mb-5 h-44 overflow-hidden">
+        <PitchArt
+          category={ex.category}
+          className="h-full w-full rounded-none"
+          label={CATEGORY_LABELS[ex.category]}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(to top, rgba(10,28,20,0.92) 8%, rgba(10,28,20,0.45) 46%, rgba(10,28,20,0.08) 100%)',
+          }}
+          aria-hidden="true"
+        />
 
-      {/* Every skill it works, filed one first. A drill that trains three things has
-          no reason to introduce itself as one. */}
-      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold uppercase tracking-widest">
-        {skills.map((cat, i) => (
-          <span key={cat} style={{ color: CATEGORY_ACCENT[cat] }}>
-            {i > 0 && <span className="mr-2 text-slate/60">+</span>}
-            {CATEGORY_LABELS[cat]}
-          </span>
-        ))}
-      </p>
-      <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{ex.name}</h1>
-      {ex.isCustom && <p className="mt-1 text-sm font-semibold text-pitch">A drill you wrote</p>}
-      <p className="mt-2 text-slate">{ex.shortDescription}</p>
+        <button
+          onClick={() => navigate(-1)}
+          className="absolute left-4 top-4 inline-flex h-10 items-center gap-1.5 rounded-full bg-deep/45 px-3.5 text-sm font-semibold text-chalk backdrop-blur-sm active:bg-deep/70"
+        >
+          <span aria-hidden="true">←</span>
+          <span className="max-w-40 truncate">{fromWorkout ? fromWorkout.name : 'Back'}</span>
+        </button>
+
+        <div className="absolute inset-x-0 bottom-0 p-5">
+          {/* Every skill it works, filed one first. A drill that trains three things
+              has no reason to introduce itself as one. */}
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold uppercase tracking-widest text-lime">
+            {skills.map((cat, i) => (
+              <span key={cat}>
+                {i > 0 && <span className="mr-2 text-chalk/40">+</span>}
+                {CATEGORY_LABELS[cat]}
+              </span>
+            ))}
+          </p>
+          <h1 className="mt-1.5 text-3xl font-extrabold leading-tight tracking-tight text-chalk">
+            {ex.name}
+          </h1>
+          {ex.isCustom && (
+            <p className="mt-1 text-sm font-semibold text-chalk/70">A drill you wrote</p>
+          )}
+        </div>
+      </div>
+
+      <p className="text-slate leading-relaxed">{ex.shortDescription}</p>
 
       {ex.efficiency != null && (
         <div className="mt-4">
@@ -80,7 +111,7 @@ export default function ExerciseDetailScreen() {
 
       {/* What this particular session asks of you — overrides the defaults above. */}
       {inSession && fromWorkout && (
-        <div className="mt-5 rounded-2xl border border-slate/15 bg-white/70 p-4">
+        <div className="card mt-5 border-l-4 border-l-pitch p-4">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate">
             In {fromWorkout.code} · {fromWorkout.name}
           </p>
@@ -129,7 +160,7 @@ export default function ExerciseDetailScreen() {
 
       {/* Coaching cues */}
       {ex.coachingCues.length > 0 && (
-        <div className="mt-8 rounded-2xl bg-ink p-5 text-chalk">
+        <div className="panel-deep mt-8 rounded-2xl p-5 shadow-card">
           <h2 className="font-display text-lg font-bold text-lime">Coaching cues</h2>
           <ul className="mt-3 space-y-2">
             {ex.coachingCues.map((cue, i) => (
@@ -177,7 +208,7 @@ export default function ExerciseDetailScreen() {
       ) : (
         <button
           onClick={() => navigate(`/library/${duplicateExercise(ex).id}/edit`)}
-          className="mt-3 flex h-12 w-full items-center justify-center rounded-xl border border-slate/25 bg-white font-semibold active:bg-white/60"
+          className="mt-3 flex h-12 w-full items-center justify-center rounded-xl border border-slate/20 bg-paper shadow-card font-semibold active:bg-white/60"
         >
           Make my own version
         </button>

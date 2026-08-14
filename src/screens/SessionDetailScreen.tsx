@@ -94,7 +94,7 @@ export default function SessionDetailScreen() {
       {workout ? (
         <Link
           to={`/workouts/${workout.id}`}
-          className="mt-7 flex h-12 items-center justify-center rounded-xl border border-slate/25 bg-white font-semibold text-ink active:bg-white/70"
+          className="mt-7 flex h-12 items-center justify-center rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink active:bg-white/70"
         >
           Do this session again
         </Link>
@@ -120,7 +120,7 @@ export default function SessionDetailScreen() {
               </button>
               <button
                 onClick={() => setConfirming(false)}
-                className="h-11 flex-1 rounded-xl border border-slate/25 bg-white font-semibold text-ink"
+                className="h-11 flex-1 rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink"
               >
                 Keep it
               </button>

@@ -4,7 +4,6 @@ import { duplicateWorkout, useWorkout } from '../lib/customWorkouts'
 import { workoutMeta } from '../lib/workout'
 import { formatSeconds } from '../lib/format'
 import {
-  CATEGORY_ACCENT,
   CATEGORY_LABELS,
   DIFFICULTY_LABELS,
   EQUIPMENT_LABELS,
@@ -13,6 +12,7 @@ import {
 import Badge from '../components/Badge'
 import CategoryBars from '../components/CategoryBars'
 import NotFound from '../components/NotFound'
+import PitchArt from '../components/PitchArt'
 import { EfficiencyTile } from '../components/Efficiency'
 
 export default function WorkoutDetailScreen() {
@@ -40,17 +40,56 @@ export default function WorkoutDetailScreen() {
 
   return (
     <section className="pb-24">
-      <button onClick={() => navigate(-1)} className="mb-4 inline-flex items-center gap-1 text-sm font-semibold text-slate">
-        <span aria-hidden="true">←</span> Back
-      </button>
+      {/*
+        The banner. It breaks the shell's padding on purpose (-mx-5 -mt-6) so the
+        session's own picture runs edge to edge — this is the screen you look at
+        while deciding to commit 40 minutes, and it should look like something.
+      */}
+      <div className="relative -mx-5 -mt-6 mb-5 h-52 overflow-hidden">
+        <PitchArt
+          category={workout.category}
+          className="h-full w-full rounded-none"
+          label={`${CATEGORY_LABELS[workout.category]} session`}
+        />
+        {/* The scrim: the title has to stay readable over every one of the eight
+            plates, so the bottom half darkens rather than trusting the artwork. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(to top, rgba(10,28,20,0.92) 8%, rgba(10,28,20,0.45) 46%, rgba(10,28,20,0.08) 100%)',
+          }}
+          aria-hidden="true"
+        />
 
-      <p className="text-sm font-bold uppercase tracking-widest" style={{ color: CATEGORY_ACCENT[workout.category] }}>
-        {workout.code} · {CATEGORY_LABELS[workout.category]}
-        {workout.isCustom && <span className="text-slate"> · Yours</span>}
-      </p>
-      <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{workout.name}</h1>
-      {workout.goal && <p className="mt-1 font-semibold text-pitch">{workout.goal}</p>}
-      {workout.description && <p className="mt-3 text-slate leading-relaxed">{workout.description}</p>}
+        <button
+          onClick={() => navigate(-1)}
+          className="absolute left-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-deep/45 text-lg text-chalk backdrop-blur-sm active:bg-deep/70"
+          aria-label="Back"
+        >
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div className="absolute inset-x-0 bottom-0 p-5">
+          <p className="text-xs font-bold uppercase tracking-widest text-lime">
+            {workout.code} · {CATEGORY_LABELS[workout.category]}
+            {workout.isCustom && <span className="text-chalk/60"> · Yours</span>}
+          </p>
+          <h1 className="mt-1.5 text-3xl font-extrabold leading-tight tracking-tight text-chalk">
+            {workout.name}
+          </h1>
+          <p className="mt-2 flex items-center gap-3 text-sm font-semibold text-chalk/75">
+            <span className="tnum">{meta.minutes} min</span>
+            <span aria-hidden="true">·</span>
+            <span>{workout.blocks.length} drills</span>
+            <span aria-hidden="true">·</span>
+            <span>{DIFFICULTY_LABELS[workout.difficulty]}</span>
+          </p>
+        </div>
+      </div>
+
+      {workout.goal && <p className="font-semibold text-pitch">{workout.goal}</p>}
+      {workout.description && <p className="mt-2 text-slate leading-relaxed">{workout.description}</p>}
 
       {/* Meta */}
       <div className="mt-4 flex flex-wrap gap-2">
@@ -103,9 +142,9 @@ export default function WorkoutDetailScreen() {
                     show this workout's numbers instead of the drill's defaults. */}
                 <Link
                   to={`/library/${ex.id}?from=${workout.id}&block=${i}`}
-                  className="flex items-center gap-3 rounded-xl border border-slate/15 bg-white/70 p-3 active:bg-white"
+                  className="card card-tap flex items-center gap-3 p-3"
                 >
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink font-display text-sm font-bold text-chalk">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink font-display text-sm font-bold text-chalk tnum">
                     {i + 1}
                   </span>
                   <div className="min-w-0 flex-1">
@@ -130,7 +169,7 @@ export default function WorkoutDetailScreen() {
         {workout.isCustom ? (
           <Link
             to={`/builder/${workout.id}`}
-            className="flex h-12 items-center justify-center rounded-xl border border-slate/25 bg-white font-semibold text-ink active:bg-white/70"
+            className="flex h-12 items-center justify-center rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink active:bg-white/70"
           >
             Edit this session
           </Link>
@@ -138,7 +177,7 @@ export default function WorkoutDetailScreen() {
           <>
             <button
               onClick={makeItMine}
-              className="flex h-12 w-full items-center justify-center rounded-xl border border-slate/25 bg-white font-semibold text-ink active:bg-white/70"
+              className="flex h-12 w-full items-center justify-center rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink active:bg-white/70"
             >
               Make it mine
             </button>
@@ -154,9 +193,12 @@ export default function WorkoutDetailScreen() {
         <div className="mx-auto max-w-md">
           <Link
             to={`/session/${workout.id}`}
-            className="flex h-14 items-center justify-center rounded-2xl bg-blaze font-display text-lg font-extrabold text-white shadow-lg active:brightness-95"
+            className="sheen relative flex h-15 items-center justify-center gap-2 overflow-hidden rounded-2xl bg-blaze font-display text-lg font-extrabold text-white shadow-glow transition-transform duration-200 active:scale-[0.985]"
           >
             Start training
+            <span aria-hidden="true" className="text-xl">
+              →
+            </span>
           </Link>
         </div>
       </div>

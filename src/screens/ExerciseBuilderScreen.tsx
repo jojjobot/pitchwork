@@ -110,13 +110,13 @@ export default function ExerciseBuilderScreen() {
         </p>
       )}
 
-      <div className="mt-6 space-y-6 rounded-2xl border border-slate/15 bg-white/70 p-4">
+      <div className="mt-6 space-y-6 card p-4">
         <Field label="Name">
           <input
             value={ex.name}
             onChange={(e) => edit({ name: e.target.value })}
             placeholder="e.g. Wall pass under pressure"
-            className="w-full rounded-xl border border-slate/25 bg-white px-4 h-12 outline-none focus:border-pitch"
+            className="w-full rounded-xl border border-slate/20 bg-paper shadow-card px-4 h-12 outline-none focus:border-pitch"
           />
         </Field>
 
@@ -125,7 +125,7 @@ export default function ExerciseBuilderScreen() {
             value={ex.shortDescription}
             onChange={(e) => edit({ shortDescription: e.target.value })}
             placeholder="e.g. 4 × 40s — first touch away from pressure"
-            className="w-full rounded-xl border border-slate/25 bg-white px-4 h-12 outline-none focus:border-pitch"
+            className="w-full rounded-xl border border-slate/20 bg-paper shadow-card px-4 h-12 outline-none focus:border-pitch"
           />
         </Field>
 
@@ -208,7 +208,7 @@ export default function ExerciseBuilderScreen() {
       <h2 className="mt-8 text-lg font-bold">How much</h2>
       <div className="chalk-line mt-2 w-14" aria-hidden="true" />
 
-      <div className="mt-4 space-y-6 rounded-2xl border border-slate/15 bg-white/70 p-4">
+      <div className="mt-4 space-y-6 card p-4">
         <Segmented
           label="Measured in"
           value={ex.measureType}
@@ -317,7 +317,7 @@ export default function ExerciseBuilderScreen() {
           })
         }
         placeholder="e.g. weak foot, close control"
-        className="mt-3 w-full rounded-xl border border-slate/25 bg-white px-4 h-12 outline-none focus:border-pitch"
+        className="mt-3 w-full rounded-xl border border-slate/20 bg-paper shadow-card px-4 h-12 outline-none focus:border-pitch"
       />
 
       <button
@@ -344,7 +344,7 @@ export default function ExerciseBuilderScreen() {
             </button>
             <button
               onClick={() => setConfirmingDelete(false)}
-              className="h-12 flex-1 rounded-xl border border-slate/25 bg-white font-semibold"
+              className="h-12 flex-1 rounded-xl border border-slate/20 bg-paper shadow-card font-semibold"
             >
               Keep it
             </button>
@@ -353,7 +353,7 @@ export default function ExerciseBuilderScreen() {
       ) : (
         <button
           onClick={() => setConfirmingDelete(true)}
-          className="mt-3 h-12 w-full rounded-xl border border-slate/25 bg-white font-semibold text-blaze"
+          className="mt-3 h-12 w-full rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-blaze"
         >
           Delete drill
         </button>
@@ -418,14 +418,14 @@ function EditableList({
             onChange={(e) => setAt(i, e.target.value)}
             placeholder={placeholder}
             rows={2}
-            className="min-w-0 flex-1 rounded-xl border border-slate/25 bg-white px-4 py-3 text-sm leading-relaxed outline-none focus:border-pitch"
+            className="min-w-0 flex-1 rounded-xl border border-slate/20 bg-paper shadow-card px-4 py-3 text-sm leading-relaxed outline-none focus:border-pitch"
           />
           <div className="flex shrink-0 flex-col gap-1">
             <button
               onClick={() => move(i, -1)}
               disabled={i === 0}
               aria-label="Move up"
-              className="grid h-7 w-8 place-items-center rounded-lg border border-slate/25 bg-white text-xs disabled:opacity-30"
+              className="grid h-7 w-8 place-items-center rounded-lg border border-slate/20 bg-paper text-xs disabled:opacity-30"
             >
               ↑
             </button>
@@ -433,14 +433,14 @@ function EditableList({
               onClick={() => move(i, 1)}
               disabled={i === items.length - 1}
               aria-label="Move down"
-              className="grid h-7 w-8 place-items-center rounded-lg border border-slate/25 bg-white text-xs disabled:opacity-30"
+              className="grid h-7 w-8 place-items-center rounded-lg border border-slate/20 bg-paper text-xs disabled:opacity-30"
             >
               ↓
             </button>
             <button
               onClick={() => removeAt(i)}
               aria-label="Remove"
-              className="grid h-7 w-8 place-items-center rounded-lg border border-slate/25 bg-white text-xs font-bold text-blaze"
+              className="grid h-7 w-8 place-items-center rounded-lg border border-slate/20 bg-paper text-xs font-bold text-blaze"
             >
               ✕
             </button>

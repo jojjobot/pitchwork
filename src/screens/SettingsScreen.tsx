@@ -84,7 +84,7 @@ export default function SettingsScreen() {
       {account && (
         <div className="mt-6">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-slate">Account</h2>
-          <div className="mt-2 rounded-2xl border border-slate/15 bg-white/70 p-4">
+          <div className="mt-2 card p-4">
             <p className="font-semibold text-ink">{account.email}</p>
             <p className="mt-0.5 text-sm text-slate">
               {isRemembered()
@@ -96,7 +96,7 @@ export default function SettingsScreen() {
 
             <button
               onClick={signOut}
-              className="mt-4 h-11 w-full rounded-xl border border-slate/25 bg-white font-semibold text-ink active:bg-white/70"
+              className="mt-4 h-11 w-full rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink active:bg-white/70"
             >
               {accounts.length > 1 ? 'Sign out / switch account' : 'Sign out'}
             </button>
@@ -109,7 +109,7 @@ export default function SettingsScreen() {
       {/* During a session */}
       <div className="mt-6">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-slate">During a session</h2>
-        <div className="mt-2 divide-y divide-slate/15 rounded-2xl border border-slate/15 bg-white/70">
+        <div className="mt-2 divide-y divide-slate/15 card">
           <Toggle
             label="Sound"
             hint="A tone on every start, rest and countdown."
@@ -131,7 +131,7 @@ export default function SettingsScreen() {
       {/* Weekly goal */}
       <div className="mt-7">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-slate">Weekly goal</h2>
-        <div className="mt-2 rounded-2xl border border-slate/15 bg-white/70 p-4">
+        <div className="mt-2 card p-4">
           <Stepper
             label="Minutes per week"
             value={settings.weeklyGoalMinutes}
@@ -148,7 +148,7 @@ export default function SettingsScreen() {
       {/* Data */}
       <div className="mt-7">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-slate">Your data</h2>
-        <div className="mt-2 rounded-2xl border border-slate/15 bg-white/70 p-4">
+        <div className="mt-2 card p-4">
           <p className="text-sm leading-relaxed text-slate">
             {sessions.length} saved {sessions.length === 1 ? 'session' : 'sessions'} and {mine.length}{' '}
             {mine.length === 1 ? 'session you built' : 'sessions you built'}, kept in this browser
@@ -159,13 +159,13 @@ export default function SettingsScreen() {
             <button
               onClick={exportBackup}
               disabled={sessions.length === 0}
-              className="h-11 rounded-xl border border-slate/25 bg-white font-semibold text-ink disabled:opacity-40"
+              className="h-11 rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink disabled:opacity-40"
             >
               Back up
             </button>
             <button
               onClick={() => fileInput.current?.click()}
-              className="h-11 rounded-xl border border-slate/25 bg-white font-semibold text-ink"
+              className="h-11 rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink"
             >
               Restore
             </button>
@@ -192,7 +192,7 @@ export default function SettingsScreen() {
           <h2 className="text-xs font-semibold uppercase tracking-wider text-slate">
             Another device
           </h2>
-          <div className="mt-2 rounded-2xl border border-slate/15 bg-white/70 p-4">
+          <div className="mt-2 card p-4">
             <p className="text-sm leading-relaxed text-slate">
               Your account only exists in this browser, so signing in on your phone won't find
               it. This saves a file with your account, your history and the sessions you built —
@@ -202,7 +202,7 @@ export default function SettingsScreen() {
 
             <button
               onClick={moveToAnotherDevice}
-              className="mt-4 h-11 w-full rounded-xl border border-slate/25 bg-white font-semibold text-ink active:bg-white/70"
+              className="mt-4 h-11 w-full rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink active:bg-white/70"
             >
               Move to another device
             </button>
@@ -238,7 +238,7 @@ export default function SettingsScreen() {
               </button>
               <button
                 onClick={() => setConfirmingClear(false)}
-                className="h-11 flex-1 rounded-xl border border-slate/25 bg-white font-semibold text-ink"
+                className="h-11 flex-1 rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink"
               >
                 Cancel
               </button>
@@ -276,7 +276,7 @@ export default function SettingsScreen() {
                 </button>
                 <button
                   onClick={() => setConfirmingDelete(false)}
-                  className="h-11 flex-1 rounded-xl border border-slate/25 bg-white font-semibold text-ink"
+                  className="h-11 flex-1 rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink"
                 >
                   Cancel
                 </button>

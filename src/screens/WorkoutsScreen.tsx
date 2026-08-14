@@ -76,7 +76,8 @@ export default function WorkoutsScreen() {
         <h1 className="text-3xl font-extrabold tracking-tight">Workouts</h1>
         <div className="chalk-line mt-2 w-20" aria-hidden="true" />
         <p className="mt-3 text-slate">
-          {results.length} {results.length === 1 ? 'session' : 'sessions'} to choose from. Pick one and press start.
+          <span className="font-semibold text-ink tnum">{results.length}</span>{' '}
+          {results.length === 1 ? 'session' : 'sessions'} to choose from. Pick one and press start.
         </p>
       </header>
 
@@ -86,7 +87,7 @@ export default function WorkoutsScreen() {
           value={search}
           onChange={(e) => set({ search: e.target.value })}
           placeholder="Search workouts…"
-          className="w-full rounded-xl border border-slate/25 bg-white px-4 h-12 text-base outline-none focus:border-pitch"
+          className="w-full rounded-xl border border-slate/20 bg-paper px-4 h-12 text-base shadow-card outline-none transition-colors focus:border-pitch"
           aria-label="Search workouts"
         />
       </div>
@@ -119,7 +120,7 @@ export default function WorkoutsScreen() {
       <div className="mt-3 flex items-center gap-2">
         <button
           onClick={() => set({ panelOpen: !panelOpen })}
-          className="inline-flex items-center gap-2 rounded-xl border border-slate/25 bg-white px-4 h-11 text-sm font-semibold"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate/20 bg-paper px-4 h-11 text-sm font-semibold shadow-card active:scale-95"
           aria-expanded={panelOpen}
         >
           Filters
@@ -137,7 +138,7 @@ export default function WorkoutsScreen() {
       </div>
 
       {panelOpen && (
-        <div className="mt-3 space-y-4 rounded-2xl border border-slate/15 bg-white/70 p-4">
+        <div className="card mt-3 space-y-4 p-4 rise">
           <Segmented
             label="Length"
             value={duration}

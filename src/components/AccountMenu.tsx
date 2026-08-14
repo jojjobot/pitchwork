@@ -71,7 +71,7 @@ export default function AccountMenu() {
 
           <Link
             to="/settings"
-            className="mt-4 flex h-11 items-center justify-center rounded-xl border border-slate/25 bg-white font-semibold text-ink active:bg-chalk"
+            className="mt-4 flex h-11 items-center justify-center rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink active:bg-chalk"
           >
             Settings
           </Link>

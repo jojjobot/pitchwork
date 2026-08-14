@@ -6,10 +6,10 @@ import type { ReactNode } from 'react'
 */
 export default function Badge({ children, dot }: { children: ReactNode; dot?: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-slate/25 bg-white/60 px-2.5 py-1 text-xs font-medium text-ink">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-slate/20 bg-paper/70 px-3 py-1.5 text-xs font-medium text-ink shadow-card backdrop-blur">
       {dot && (
         <span
-          className="h-2 w-2 rounded-full"
+          className="h-2 w-2 rounded-full ring-1 ring-white/50"
           style={{ backgroundColor: dot }}
           aria-hidden="true"
         />

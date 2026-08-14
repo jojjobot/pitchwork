@@ -74,7 +74,7 @@ export default function BuilderEditScreen() {
           value={workout.name}
           onChange={(e) => set({ name: e.target.value })}
           placeholder="Untitled session"
-          className="mt-1 w-full rounded-xl border border-slate/25 bg-white px-4 h-12 font-display text-lg font-bold outline-none focus:border-pitch"
+          className="mt-1 w-full rounded-xl border border-slate/20 bg-paper shadow-card px-4 h-12 font-display text-lg font-bold outline-none focus:border-pitch"
         />
       </label>
 
@@ -86,12 +86,12 @@ export default function BuilderEditScreen() {
           value={workout.goal}
           onChange={(e) => set({ goal: e.target.value })}
           placeholder="e.g. A cleaner first touch under pressure"
-          className="mt-1 w-full rounded-xl border border-slate/25 bg-white px-4 h-12 outline-none focus:border-pitch"
+          className="mt-1 w-full rounded-xl border border-slate/20 bg-paper shadow-card px-4 h-12 outline-none focus:border-pitch"
         />
       </label>
 
       {/* Live measurement */}
-      <div className="mt-5 rounded-2xl border border-slate/15 bg-white/70 p-4">
+      <div className="mt-5 card p-4">
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate">This session</p>
@@ -163,7 +163,7 @@ export default function BuilderEditScreen() {
             if (!ex) return null
             const last = i === workout.blocks.length - 1
             return (
-              <li key={`${block.exerciseId}-${i}`} className="rounded-xl border border-slate/15 bg-white/70">
+              <li key={`${block.exerciseId}-${i}`} className="card">
                 <div className="flex items-center gap-2 p-2">
                   {/* Reorder. Plain buttons rather than drag-and-drop: they work with
                       one thumb, on a touchscreen, without a library. */}
@@ -235,7 +235,7 @@ export default function BuilderEditScreen() {
           onChange={(e) => set({ description: e.target.value })}
           rows={3}
           placeholder="Anything you want to remember about this session."
-          className="mt-1 w-full resize-y rounded-xl border border-slate/25 bg-white px-4 py-3 outline-none focus:border-pitch"
+          className="mt-1 w-full resize-y rounded-xl border border-slate/20 bg-paper shadow-card px-4 py-3 outline-none focus:border-pitch"
         />
       </label>
 
@@ -256,7 +256,7 @@ export default function BuilderEditScreen() {
               </button>
               <button
                 onClick={() => setConfirmingDelete(false)}
-                className="h-11 flex-1 rounded-xl border border-slate/25 bg-white font-semibold text-ink"
+                className="h-11 flex-1 rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink"
               >
                 Keep it
               </button>
@@ -306,7 +306,7 @@ function ReorderButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
-      className="grid h-8 w-8 place-items-center rounded-lg border border-slate/25 bg-white text-sm text-ink disabled:opacity-30"
+      className="grid h-8 w-8 place-items-center rounded-lg border border-slate/20 bg-paper text-sm text-ink disabled:opacity-30"
     >
       {children}
     </button>

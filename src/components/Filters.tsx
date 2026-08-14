@@ -20,11 +20,19 @@ export function Chip({
     <button
       onClick={onClick}
       className={[
-        'inline-flex items-center gap-1.5 rounded-full px-4 h-10 text-sm font-semibold whitespace-nowrap border',
-        active ? 'bg-ink text-chalk border-ink' : 'bg-white text-ink border-slate/25',
+        'inline-flex items-center gap-1.5 rounded-full px-4 h-10 text-sm font-semibold whitespace-nowrap border transition-all duration-150 active:scale-95',
+        active
+          ? 'bg-ink text-chalk border-ink shadow-card'
+          : 'bg-paper/80 text-ink border-slate/20 backdrop-blur',
       ].join(' ')}
     >
-      {dot && <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} aria-hidden="true" />}
+      {dot && (
+        <span
+          className="h-2.5 w-2.5 rounded-full ring-1 ring-white/50"
+          style={{ backgroundColor: dot }}
+          aria-hidden="true"
+        />
+      )}
       {children}
     </button>
   )
@@ -50,8 +58,10 @@ export function Segmented<T extends string>({
             key={val}
             onClick={() => onChange(val)}
             className={[
-              'rounded-lg px-3 h-10 text-sm font-semibold border',
-              value === val ? 'bg-pitch text-white border-pitch' : 'bg-white text-ink border-slate/25',
+              'rounded-lg px-3 h-10 text-sm font-semibold border transition-all duration-150 active:scale-95',
+              value === val
+                ? 'bg-pitch text-white border-pitch shadow-card'
+                : 'bg-paper/80 text-ink border-slate/20',
             ].join(' ')}
           >
             {text}

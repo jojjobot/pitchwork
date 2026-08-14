@@ -15,6 +15,7 @@ import {
   trains,
 } from '../lib/labels'
 import ExerciseCard from '../components/ExerciseCard'
+import PitchArt from '../components/PitchArt'
 import { Chip, Segmented } from '../components/Filters'
 
 export default function LibraryScreen() {
@@ -89,7 +90,8 @@ export default function LibraryScreen() {
         <h1 className="text-3xl font-extrabold tracking-tight">Exercise library</h1>
         <div className="chalk-line mt-2 w-20" aria-hidden="true" />
         <p className="mt-3 text-slate">
-          {matches.length} {matches.length === 1 ? 'drill' : 'drills'}, best return first.
+          <span className="font-semibold text-ink tnum">{matches.length}</span>{' '}
+          {matches.length === 1 ? 'drill' : 'drills'}, best return first.
           {mineCount > 0 && ` ${mineCount} of them ${mineCount === 1 ? 'is' : 'are'} yours.`}
         </p>
         <p className="mt-1 text-sm text-slate">
@@ -102,9 +104,9 @@ export default function LibraryScreen() {
           and dropped into a session. This is just where it starts. */}
       <button
         onClick={startNewDrill}
-        className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate/25 bg-white font-semibold active:bg-white/60"
+        className="card card-tap mt-4 flex h-12 w-full items-center justify-center gap-2 border-dashed border-pitch/35 font-semibold text-pitch"
       >
-        <span aria-hidden="true">+</span> Write your own drill
+        <span aria-hidden="true" className="text-lg">+</span> Write your own drill
       </button>
 
       {/* Search */}
@@ -114,7 +116,7 @@ export default function LibraryScreen() {
           value={search}
           onChange={(e) => set({ search: e.target.value })}
           placeholder="Search drills or skills…"
-          className="w-full rounded-xl border border-slate/25 bg-white px-4 h-12 text-base outline-none focus:border-pitch"
+          className="w-full rounded-xl border border-slate/20 bg-paper px-4 h-12 text-base shadow-card outline-none transition-colors focus:border-pitch"
           aria-label="Search the exercise library"
         />
       </div>
@@ -142,7 +144,7 @@ export default function LibraryScreen() {
       <div className="mt-3 flex items-center gap-2">
         <button
           onClick={() => set({ panelOpen: !panelOpen })}
-          className="inline-flex items-center gap-2 rounded-xl border border-slate/25 bg-white px-4 h-11 text-sm font-semibold"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate/20 bg-paper px-4 h-11 text-sm font-semibold shadow-card active:scale-95"
           aria-expanded={panelOpen}
         >
           Filters
@@ -161,7 +163,7 @@ export default function LibraryScreen() {
 
       {/* Filter panel */}
       {panelOpen && (
-        <div className="mt-3 space-y-4 rounded-2xl border border-slate/15 bg-white/70 p-4">
+        <div className="card mt-3 space-y-4 p-4 rise">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate">What you've got</p>
             <div className="flex flex-wrap gap-2">
@@ -214,9 +216,14 @@ export default function LibraryScreen() {
         ) : (
           groups.map((g) => (
             <div key={g.cat}>
-              <div className="mb-3 flex items-baseline justify-between">
+              {/* The section heading carries the skill's own picture, so scrolling
+                  the library gives you the same visual anchor the cards use. */}
+              <div className="mb-3 flex items-center gap-2.5">
+                <PitchArt category={g.cat} className="h-8 w-8 rounded-lg" />
                 <h2 className="text-lg font-bold">{CATEGORY_LABELS[g.cat]}</h2>
-                <span className="text-sm text-slate">{g.items.length}</span>
+                <span className="ml-auto rounded-full bg-slate/12 px-2.5 py-0.5 text-sm font-semibold text-slate tnum">
+                  {g.items.length}
+                </span>
               </div>
               <div className="space-y-2">
                 {g.items.map((ex) => (

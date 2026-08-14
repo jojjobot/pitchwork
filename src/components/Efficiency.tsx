@@ -14,10 +14,14 @@ export function EfficiencyBadge({ score, size = 'md' }: { score: number; size?: 
   return (
     <span
       className={[
-        'grid shrink-0 place-items-center rounded-xl font-display font-extrabold text-white',
-        size === 'sm' ? 'h-8 w-8 text-sm' : 'h-10 w-10 text-base',
+        'grid shrink-0 place-items-center rounded-xl font-display font-extrabold text-white tnum',
+        size === 'sm' ? 'h-8 w-8 text-sm' : 'h-11 w-11 text-lg',
       ].join(' ')}
-      style={{ backgroundColor: band.color }}
+      style={{
+        // A slight lift inside the swatch stops 172 of these reading as flat stickers.
+        backgroundImage: `linear-gradient(155deg, color-mix(in oklab, ${band.color} 82%, white) 0%, ${band.color} 100%)`,
+        boxShadow: `0 4px 12px -4px color-mix(in oklab, ${band.color} 70%, transparent)`,
+      }}
       title={`${band.label} — ${score}/100 efficiency`}
     >
       {score}
@@ -33,10 +37,13 @@ export function EfficiencyBadge({ score, size = 'md' }: { score: number; size?: 
 export function EfficiencyTile({ score, what }: { score: number; what: string }) {
   const band = efficiencyBand(score)
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-slate/15 bg-white/70 p-4">
+    <div className="card flex items-start gap-3.5 p-4">
       <span
-        className="grid h-12 w-12 shrink-0 place-items-center rounded-xl font-display text-lg font-extrabold text-white"
-        style={{ backgroundColor: band.color }}
+        className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl font-display text-xl font-extrabold text-white tnum"
+        style={{
+          backgroundImage: `linear-gradient(155deg, color-mix(in oklab, ${band.color} 82%, white) 0%, ${band.color} 100%)`,
+          boxShadow: `0 6px 16px -6px color-mix(in oklab, ${band.color} 70%, transparent)`,
+        }}
       >
         {score}
       </span>
@@ -45,7 +52,15 @@ export function EfficiencyTile({ score, what }: { score: number; what: string })
           {band.label}{' '}
           <span className="font-body text-sm font-normal text-slate">· {score}/100 efficiency</span>
         </p>
-        <p className="mt-0.5 text-sm text-slate">{band.blurb}</p>
+        {/* The scale, drawn once. Seeing where 62 sits between 1 and 100 does more
+            than the sentence does, and it's the same bar on every drill. */}
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate/15">
+          <div
+            className="h-full rounded-full transition-[width] duration-700 ease-out"
+            style={{ width: `${score}%`, backgroundColor: band.color }}
+          />
+        </div>
+        <p className="mt-2 text-sm text-slate">{band.blurb}</p>
         <p className="mt-1 text-xs text-slate">{what}</p>
       </div>
     </div>

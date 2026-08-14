@@ -2,11 +2,12 @@
 
 /*
   PITCHWORK — theme tokens.
-  This is the ONE file that defines the app's colours and fonts.
-  Change a value here and it updates everywhere. Tailwind turns each
-  token into utility classes automatically, e.g. --color-blaze -> bg-blaze / text-blaze.
+  This is the ONE file that defines the app's colours, type, depth and motion.
+  Change a value here and it updates everywhere. Tailwind turns each token into
+  utility classes automatically, e.g. --color-blaze -> bg-blaze / text-blaze.
 */
 @theme {
+  /* --- Core palette (unchanged: these are the brand) --- */
   --color-chalk: #f4f1e9; /* warm off-white background (the painted line) */
   --color-ink: #14231a; /* primary text + dark "training mode" surfaces */
   --color-pitch: #1f6f4b; /* brand green — headers, active states */
@@ -14,13 +15,44 @@
   --color-lime: #d8e64a; /* streaks, marks, small highlights */
   --color-slate: #6b7a72; /* muted text, borders, dividers */
 
+  /* --- Depth palette ---
+     The original six colours had no room between "background" and "card", which is
+     why every surface had to be the same white rectangle. These fill that gap. */
+  --color-deep: #0a1c14; /* darkest green-black — hero panels, the session player */
+  --color-turf: #2f9463; /* the lighter green a gradient runs to */
+  --color-paper: #fffdf8; /* card surface — warmer than pure white, sits on chalk */
+  --color-sun: #f2b134; /* second accent: streaks, records, "you did it" */
+
   --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+
+  /* --- Elevation ---
+     Two levels only. A card rests; the thing you're about to tap lifts. */
+  --shadow-card: 0 1px 2px rgba(10, 28, 20, 0.04), 0 10px 24px -14px rgba(10, 28, 20, 0.22);
+  --shadow-lift: 0 2px 6px rgba(10, 28, 20, 0.06), 0 22px 44px -20px rgba(10, 28, 20, 0.4);
+  --shadow-glow: 0 10px 30px -10px rgba(255, 90, 44, 0.55);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
   body {
     @apply bg-chalk text-ink font-body antialiased;
+
+    /*
+      THE PITCH TEXTURE.
+      Two layers, both deliberately faint: a green light-fall from the top of the
+      screen, and the diagonal mow stripes you get on a cut pitch. It has to read as
+      a surface rather than as a pattern — if you notice it, it's too strong.
+    */
+    background-image:
+      radial-gradient(1100px 520px at 50% -8%, rgba(31, 111, 75, 0.13), transparent 68%),
+      repeating-linear-gradient(
+        118deg,
+        rgba(20, 35, 26, 0.014) 0 26px,
+        rgba(20, 35, 26, 0) 26px 52px
+      );
+    background-attachment: fixed;
   }
 
   /* Numbers and headlines carry the app's personality. */
@@ -28,6 +60,13 @@
   h2,
   h3 {
     @apply font-display;
+    letter-spacing: -0.02em;
+  }
+
+  /* Bricolage is a variable font with an optical size axis — big text wants the
+     display cut, not the same shapes scaled up. */
+  h1 {
+    font-variation-settings: 'opsz' 40;
   }
 
   /* Always show a clear focus ring for keyboard users. */
@@ -47,14 +86,144 @@
 }
 
 /*
-  SIGNATURE ELEMENT — the chalk line.
-  A rough, hand-drawn stroke used to underline active things and mark progress.
-  We'll build on this in later phases (progress bars are chalk lines, not rings).
+  Everything below is in the `components` layer on purpose.
+
+  Tailwind's own utilities live in the `utilities` layer, which the cascade puts
+  AFTER this one — so `card border-dashed` or `chalk-line h-full` does what it
+  looks like it does. Unlayered rules would outrank every utility in the app and
+  these overrides would silently lose.
 */
-.chalk-line {
-  height: 4px;
-  border-radius: 999px;
-  background: var(--color-lime);
-  /* slightly uneven ends so it reads as chalk, not a UI bar */
-  box-shadow: 0 0 0 0.5px rgba(20, 35, 26, 0.15);
+@layer components {
+  /*
+    SIGNATURE ELEMENT — the chalk line.
+    A rough, hand-drawn stroke used to underline active things and mark progress.
+    The gradient tail is what stops it reading as a UI bar: real chalk runs out.
+  */
+  .chalk-line {
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      var(--color-lime) 0%,
+      var(--color-lime) 72%,
+      rgba(216, 230, 74, 0.45) 100%
+    );
+    box-shadow: 0 0 0 0.5px rgba(20, 35, 26, 0.12);
+  }
+
+  /*
+    --- SURFACES ---
+
+    One class, so every card in the app gains depth at once and none of them drift.
+    `.card` is the resting state; `.card-tap` adds the press feedback for the ones
+    that are links or buttons.
+  */
+  .card {
+    /* background-image, not the `background` shorthand: a card that wants its own
+       tint (the accent stat tile) can then set background-color as a utility and
+       have it show through, instead of being wiped by the shorthand. */
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.86) 0%,
+      rgba(255, 253, 248, 0.66) 100%
+    );
+    border: 1px solid rgba(107, 122, 114, 0.16);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-card);
+    /* Deliberately NO backdrop-filter. The library renders 172 of these in one
+       scroll and a blur on each one costs more than the effect is worth on a
+       phone — the fill is opaque enough that nothing would show through anyway. */
+  }
+
+  .card-tap {
+    transition:
+      transform 0.18s var(--ease-out-soft),
+      box-shadow 0.18s var(--ease-out-soft),
+      border-color 0.18s var(--ease-out-soft);
+  }
+  .card-tap:active {
+    transform: scale(0.985);
+    box-shadow: var(--shadow-card);
+  }
+  @media (hover: hover) {
+    .card-tap:hover {
+      box-shadow: var(--shadow-lift);
+      border-color: rgba(31, 111, 75, 0.3);
+      transform: translateY(-2px);
+    }
+  }
+
+  /*
+    The dark panel. Used for the home hero, the sign-in header and anything that
+    should feel like standing on the pitch at dusk rather than reading a form.
+  */
+  .panel-deep {
+    background:
+      radial-gradient(120% 90% at 82% 8%, rgba(47, 148, 99, 0.5) 0%, transparent 58%),
+      linear-gradient(158deg, #14392a 0%, var(--color-deep) 72%);
+    color: var(--color-chalk);
+  }
+}
+
+/*
+  --- MOTION ---
+
+  Content arrives instead of appearing. `--i` staggers a list: put style={{'--i':n}}
+  on each item and they cascade. Capped low so a long list never feels slow.
+*/
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@layer components {
+  .rise {
+    animation: rise 0.5s var(--ease-out-soft) both;
+    animation-delay: calc(var(--i, 0) * 55ms);
+  }
+}
+
+/* The live timer's pulse — one beat per second, matching the tick. */
+@keyframes beat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  8% {
+    transform: scale(1.035);
+  }
+}
+.beat {
+  animation: beat 1s ease-in-out infinite;
+}
+
+/* A slow shine across the Start button, so the primary action is never dead. */
+@keyframes sheen {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  60%,
+  100% {
+    transform: translateX(320%) skewX(-18deg);
+  }
+}
+.sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 34%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: sheen 4.2s var(--ease-out-soft) infinite;
+  pointer-events: none;
+}
+
+/* Numbers that change (timers, totals) shouldn't reflow the layout around them. */
+.tnum {
+  font-variant-numeric: tabular-nums;
 }

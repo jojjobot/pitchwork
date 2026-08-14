@@ -69,7 +69,7 @@ export default function BuilderPickScreen() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search drills or skills…"
-          className="w-full rounded-xl border border-slate/25 bg-white px-4 h-12 text-base outline-none focus:border-pitch"
+          className="w-full rounded-xl border border-slate/20 bg-paper shadow-card px-4 h-12 text-base outline-none focus:border-pitch"
           aria-label="Search drills to add"
         />
       </div>
@@ -103,7 +103,7 @@ export default function BuilderPickScreen() {
             <button
               key={ex.id}
               onClick={() => add(ex)}
-              className="flex w-full items-center gap-3 rounded-2xl border border-slate/15 bg-white/70 p-4 text-left active:bg-white"
+              className="flex w-full items-center gap-3 card p-4 text-left active:bg-white"
             >
               <span
                 className="h-10 w-1.5 shrink-0 rounded-full"

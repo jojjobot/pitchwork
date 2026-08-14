@@ -9,6 +9,7 @@ import { useWakeLock } from '../lib/useWakeLock'
 import { getSettings, updateSettings } from '../lib/settings'
 import { recordSession } from '../lib/sessions'
 import { CATEGORY_ACCENT, CATEGORY_LABELS } from '../lib/labels'
+import PitchArt, { PitchBackdrop } from '../components/PitchArt'
 import type { Category, CompletedSession } from '../types'
 
 export default function SessionPlayer() {
@@ -181,25 +182,59 @@ export default function SessionPlayer() {
   if (!step) return null
   const progress = steps.length ? (index / steps.length) * 100 : 0
 
+  /*
+    The room changes colour with the skill you're training. Working on shooting is
+    orange-lit, defending is grey-green — so a glance at a phone propped on a bag
+    tells you where you are without reading. Rest is always lime, so it reads as a
+    different state rather than a different drill.
+  */
+  const accent = step.kind === 'work' ? CATEGORY_ACCENT[step.exercise.category] : '#d8e64a'
+
   return (
-    <div className="min-h-[100svh] bg-ink text-chalk flex flex-col select-none">
+    <div
+      className="relative min-h-[100svh] bg-deep text-chalk flex flex-col select-none"
+      style={{
+        backgroundImage: `radial-gradient(130% 75% at 50% -5%, color-mix(in oklab, ${accent} 40%, #0a1c14) 0%, #0a1c14 60%)`,
+      }}
+    >
+      {/* The skill's diagram, ghosted behind everything. */}
+      {step.kind === 'work' && (
+        <div className="pointer-events-none fixed inset-0" aria-hidden="true">
+          <PitchBackdrop category={step.exercise.category} opacity={0.07} />
+        </div>
+      )}
+
       {/* Top bar */}
-      <header className="px-5 pt-4">
-        <div className="flex items-center justify-between">
-          <button onClick={() => setPhase('summary')} className="rounded-lg px-3 h-10 text-sm font-semibold text-chalk/80 border border-chalk/20">
+      <header className="relative px-5 pt-4">
+        <div className="flex items-center justify-between gap-3">
+          <button
+            onClick={() => setPhase('summary')}
+            className="rounded-xl border border-chalk/20 bg-chalk/5 px-3.5 h-10 text-sm font-semibold text-chalk/80 backdrop-blur active:bg-chalk/15"
+          >
             End
           </button>
-          <p className="font-display text-sm font-bold text-chalk/70">{workout.name}</p>
+          <p className="min-w-0 truncate font-display text-sm font-bold text-chalk/70">{workout.name}</p>
           <button
             onClick={toggleMute}
             aria-label={muted ? 'Unmute' : 'Mute'}
-            className="grid h-10 w-10 place-items-center rounded-lg border border-chalk/20"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-chalk/20 bg-chalk/5 backdrop-blur active:bg-chalk/15"
           >
             {muted ? <MuteIcon /> : <SoundIcon />}
           </button>
         </div>
-        <div className="mt-3 h-1 rounded-full bg-chalk/15">
-          <div className="h-full rounded-full bg-lime transition-[width] duration-500" style={{ width: `${progress}%` }} />
+
+        {/* How far through the whole session you are, plus the count in words —
+            "step 7 of 24" is the thing people actually want at minute thirty. */}
+        <div className="mt-3 flex items-center gap-3">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-chalk/15">
+            <div
+              className="h-full rounded-full bg-lime transition-[width] duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="shrink-0 text-xs font-semibold text-chalk/50 tnum">
+            {index + 1}/{steps.length}
+          </span>
         </div>
       </header>
 
@@ -210,14 +245,17 @@ export default function SessionPlayer() {
       )}
 
       {/* Controls */}
-      <footer className="px-5 pb-8 pt-4" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
+      <footer className="relative px-5 pb-8 pt-4" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
         {step.kind === 'work' && step.seconds == null ? (
           // rep-based drill: a big Done button, plus skip
           <div className="flex items-center gap-3">
             <ControlButton onClick={() => advance(false)} variant="ghost">
               Skip
             </ControlButton>
-            <button onClick={completeReps} className="h-14 flex-1 rounded-2xl bg-blaze font-display text-lg font-extrabold text-white active:brightness-95">
+            <button
+              onClick={completeReps}
+              className="h-15 flex-1 rounded-2xl bg-blaze font-display text-lg font-extrabold text-white shadow-glow transition-transform duration-200 active:scale-[0.985]"
+            >
               Done
             </button>
           </div>
@@ -251,52 +289,87 @@ function WorkView({
   paused: boolean
 }) {
   const ex = step.exercise
-  return (
-    <main className="flex-1 overflow-y-auto px-5 py-4">
-      <p className="text-sm font-bold uppercase tracking-widest" style={{ color: CATEGORY_ACCENT[ex.category] }}>
-        {CATEGORY_LABELS[ex.category]}
-      </p>
-      <h1 className="mt-1 font-display text-3xl font-extrabold leading-tight">{ex.name}</h1>
-      <p className="mt-1 font-semibold text-chalk/70">
-        Set {step.setIndex} of {step.setCount}
-      </p>
+  const total = step.seconds
+  const left = remaining ?? total ?? 0
+  const ringProgress = total && total > 0 ? left / total : 1
 
-      {/* The big number */}
-      <div className="my-6 text-center">
-        {step.seconds != null ? (
-          <p className={`font-display text-8xl font-extrabold tabular-nums ${paused ? 'text-chalk/40' : 'text-blaze'}`}>
-            {formatSeconds(remaining ?? step.seconds)}
+  return (
+    <main className="relative flex-1 overflow-y-auto px-5 py-4">
+      <div className="flex items-center gap-2.5">
+        <PitchArt category={ex.category} className="h-9 w-9 rounded-lg" />
+        <div className="min-w-0">
+          <p className="text-xs font-bold uppercase tracking-widest text-chalk/60">
+            {CATEGORY_LABELS[ex.category]}
           </p>
+          <p className="text-sm font-semibold text-chalk/80 tnum">
+            Set {step.setIndex} of {step.setCount}
+          </p>
+        </div>
+      </div>
+      <h1 className="mt-2.5 font-display text-3xl font-extrabold leading-tight">{ex.name}</h1>
+
+      {/*
+        THE CLOCK. The ring is what makes this readable from three metres away with
+        a ball at your feet — you can see a quarter left without reading digits.
+      */}
+      <div className="my-6">
+        {total != null ? (
+          <TimerRing progress={ringProgress} color={paused ? 'rgba(244,241,233,0.35)' : '#ff5a2c'}>
+            <p
+              className={[
+                'font-display text-6xl font-extrabold tnum',
+                paused ? 'text-chalk/40' : 'text-chalk',
+                !paused && left <= 3 ? 'beat text-blaze' : '',
+              ].join(' ')}
+            >
+              {formatSeconds(left)}
+            </p>
+            {paused ? (
+              <p className="mt-1 text-sm font-bold uppercase tracking-widest text-chalk/60">Paused</p>
+            ) : (
+              <p className="mt-1 text-xs font-bold uppercase tracking-widest text-chalk/40">
+                remaining
+              </p>
+            )}
+          </TimerRing>
         ) : (
-          <p className="font-display text-7xl font-extrabold text-blaze">
-            {step.reps}
-            <span className="ml-2 text-2xl font-bold text-chalk/60">reps</span>
-          </p>
+          // A rep drill is self-paced, so there's nothing to count down — the ring
+          // would be a lie. The number just stands there and waits for you.
+          <TimerRing progress={1} color="rgba(216,230,74,0.55)" dashed>
+            <p className="font-display text-6xl font-extrabold text-chalk tnum">{step.reps}</p>
+            <p className="mt-1 text-xs font-bold uppercase tracking-widest text-chalk/50">reps</p>
+          </TimerRing>
         )}
+
         {/* Loaded drills only. Shown under the number rather than beside it, because
             the weight is the thing you have to go and set up before the set starts. */}
         {step.weightKg != null && (
-          <p className="mt-2 font-display text-2xl font-extrabold text-lime">{formatKg(step.weightKg)}</p>
+          <p className="mt-3 text-center font-display text-2xl font-extrabold text-lime">
+            {formatKg(step.weightKg)}
+          </p>
         )}
-        {paused && <p className="mt-1 font-semibold text-chalk/60">Paused</p>}
       </div>
 
       {step.note && (
-        <p className="mb-4 rounded-xl bg-lime/15 px-4 py-2 text-sm font-medium text-lime">{step.note}</p>
+        <p className="mb-4 rounded-xl border border-lime/25 bg-lime/12 px-4 py-2.5 text-sm font-medium text-lime">
+          {step.note}
+        </p>
       )}
 
       {/* Instructions */}
       <ol className="space-y-2">
         {ex.instructions.map((s, i) => (
           <li key={i} className="flex gap-3">
-            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-chalk/15 text-xs font-bold">{i + 1}</span>
+            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-chalk/15 text-xs font-bold tnum">
+              {i + 1}
+            </span>
             <span className="text-sm leading-relaxed text-chalk/90">{s}</span>
           </li>
         ))}
       </ol>
 
       {/* Cues */}
-      <div className="mt-5 rounded-2xl border border-chalk/15 p-4">
+      <div className="mt-5 rounded-2xl border border-chalk/15 bg-chalk/5 p-4 backdrop-blur">
         <p className="text-xs font-bold uppercase tracking-wider text-lime">Coaching cues</p>
         <ul className="mt-2 space-y-1.5">
           {ex.coachingCues.map((c, i) => (
@@ -311,6 +384,47 @@ function WorkView({
   )
 }
 
+/*
+  The countdown ring. One SVG circle whose dash offset is the remaining fraction,
+  rotated so it starts at twelve o'clock. The 1s linear transition matches the
+  interval exactly, so it sweeps rather than stepping.
+*/
+function TimerRing({
+  progress,
+  color,
+  dashed = false,
+  children,
+}: {
+  progress: number
+  color: string
+  dashed?: boolean
+  children: React.ReactNode
+}) {
+  const R = 86
+  const C = 2 * Math.PI * R
+
+  return (
+    <div className="relative mx-auto grid h-60 w-60 place-items-center">
+      <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full -rotate-90" aria-hidden="true">
+        <circle cx="100" cy="100" r={R} fill="none" stroke="rgba(244,241,233,0.1)" strokeWidth="9" />
+        <circle
+          cx="100"
+          cy="100"
+          r={R}
+          fill="none"
+          stroke={color}
+          strokeWidth="9"
+          strokeLinecap="round"
+          strokeDasharray={dashed ? '3 12' : C}
+          strokeDashoffset={dashed ? 0 : C * (1 - progress)}
+          style={{ transition: 'stroke-dashoffset 1s linear' }}
+        />
+      </svg>
+      <div className="relative text-center">{children}</div>
+    </div>
+  )
+}
+
 function RestView({
   step,
   remaining,
@@ -319,22 +433,37 @@ function RestView({
   remaining: number | null
 }) {
   const next = step.nextExercise
+  const left = remaining ?? step.seconds
+  const progress = step.seconds > 0 ? left / step.seconds : 1
+
   return (
-    <main className="flex-1 grid place-items-center px-5 py-4 text-center">
-      <div>
-        <p className="text-sm font-bold uppercase tracking-widest text-lime">Rest</p>
-        <p className="my-4 font-display text-8xl font-extrabold tabular-nums text-lime">
-          {formatSeconds(remaining ?? step.seconds)}
-        </p>
+    <main className="relative flex-1 grid place-items-center px-5 py-4 text-center">
+      <div className="w-full">
+        <p className="text-sm font-bold uppercase tracking-[0.3em] text-lime">Rest</p>
+
+        <div className="mt-4">
+          <TimerRing progress={progress} color="#d8e64a">
+            <p className="font-display text-6xl font-extrabold text-lime tnum">
+              {formatSeconds(left)}
+            </p>
+            <p className="mt-1 text-xs font-bold uppercase tracking-widest text-chalk/40">
+              breathe
+            </p>
+          </TimerRing>
+        </div>
+
         {next && (
-          <div className="mx-auto max-w-xs rounded-2xl border border-chalk/15 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-chalk/50">Coming up</p>
-            <p className="mt-1 font-display text-xl font-bold">{next.name}</p>
-            {step.nextSetCount != null && (
-              <p className="text-sm text-chalk/60">
-                Set {step.nextSetIndex} of {step.nextSetCount}
-              </p>
-            )}
+          <div className="mx-auto mt-6 flex max-w-xs items-center gap-3 rounded-2xl border border-chalk/15 bg-chalk/5 p-3.5 text-left backdrop-blur">
+            <PitchArt category={next.category} className="h-12 w-12 rounded-xl" />
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-wider text-chalk/45">Coming up</p>
+              <p className="mt-0.5 truncate font-display text-lg font-bold leading-tight">{next.name}</p>
+              {step.nextSetCount != null && (
+                <p className="text-sm text-chalk/60 tnum">
+                  Set {step.nextSetIndex} of {step.nextSetCount}
+                </p>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -366,17 +495,28 @@ function SessionSummary({
     .map(([category, secs]) => ({ category, minutes: Math.max(1, Math.round(secs / 60)) }))
     .sort((a, b) => b.minutes - a.minutes)
   const totalCatMinutes = breakdown.reduce((sum, b) => sum + b.minutes, 0) || 1
+  // Whatever you spent most of the session on becomes the picture behind the total.
+  const topCategory = breakdown[0]?.category
 
   return (
     <div className="min-h-[100svh] bg-chalk text-ink flex flex-col">
-      <main className="mx-auto w-full max-w-md flex-1 px-5 py-8">
-        <p className="text-sm font-semibold uppercase tracking-widest text-pitch">Session complete</p>
-        <h1 className="mt-1 font-display text-3xl font-extrabold">Nice work.</h1>
-        <div className="chalk-line mt-2 w-20" aria-hidden="true" />
+      {/* The reward. Finishing a session deserves more than a heading, so the number
+          you earned is the size of the screen before anything else is asked of you. */}
+      <div className="panel-deep relative overflow-hidden px-5 pb-10 pt-12">
+        {topCategory && <PitchBackdrop category={topCategory} opacity={0.18} />}
+        <div className="relative mx-auto w-full max-w-md text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-lime">Session complete</p>
+          <p className="mt-4 font-display text-7xl font-extrabold leading-none text-chalk tnum">
+            {Math.max(1, Math.round(elapsed / 60))}
+          </p>
+          <p className="mt-1 font-display text-lg font-bold text-chalk/60">minutes trained</p>
+          <div className="chalk-line mx-auto mt-4 w-16" aria-hidden="true" />
+        </div>
+      </div>
 
+      <main className="mx-auto w-full max-w-md flex-1 px-5 py-7">
         {/* Headline stats */}
-        <div className="mt-6 grid grid-cols-3 gap-3 text-center">
-          <Stat value={Math.max(1, Math.round(elapsed / 60))} label="minutes" />
+        <div className="grid grid-cols-2 gap-3 text-center">
           <Stat value={completed} label="drills done" />
           <Stat value={skipped} label="skipped" />
         </div>
@@ -436,7 +576,7 @@ function SessionSummary({
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="How did it feel? Anything to remember?"
-            className="mt-2 w-full rounded-xl border border-slate/25 bg-white px-4 py-3 text-base outline-none focus:border-pitch"
+            className="mt-2 w-full rounded-xl border border-slate/20 bg-paper shadow-card px-4 py-3 text-base outline-none focus:border-pitch"
           />
         </div>
 
@@ -444,7 +584,7 @@ function SessionSummary({
         <div className="mt-8 space-y-3">
           <button
             onClick={() => onSave(effort, notes.trim() ? notes.trim() : null)}
-            className="h-14 w-full rounded-2xl bg-blaze font-display text-lg font-extrabold text-white active:brightness-95"
+            className="h-15 w-full rounded-2xl bg-blaze font-display text-lg font-extrabold text-white shadow-glow transition-transform duration-200 active:scale-[0.985]"
           >
             Save to history
           </button>
@@ -461,9 +601,9 @@ function SessionSummary({
 
 function Stat({ value, label }: { value: number; label: string }) {
   return (
-    <div className="rounded-2xl border border-slate/15 bg-white/70 py-4">
-      <p className="font-display text-3xl font-extrabold">{value}</p>
-      <p className="text-xs text-slate">{label}</p>
+    <div className="card py-4">
+      <p className="font-display text-3xl font-extrabold tnum">{value}</p>
+      <p className="mt-1 text-xs text-slate">{label}</p>
     </div>
   )
 }

@@ -79,7 +79,7 @@ export default function AccountPassword({ onDone }: { onDone: (message: string) 
         <button
           type="button"
           onClick={close}
-          className="h-11 flex-1 rounded-xl border border-slate/25 bg-white font-semibold text-ink"
+          className="h-11 flex-1 rounded-xl border border-slate/20 bg-paper shadow-card font-semibold text-ink"
         >
           Cancel
         </button>
@@ -107,7 +107,7 @@ function Field({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         autoComplete={autoComplete}
-        className="mt-1 w-full rounded-xl border border-slate/25 bg-white px-4 h-12 outline-none focus:border-pitch"
+        className="mt-1 w-full rounded-xl border border-slate/20 bg-paper shadow-card px-4 h-12 outline-none focus:border-pitch"
       />
     </label>
   )

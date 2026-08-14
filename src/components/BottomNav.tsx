@@ -3,8 +3,10 @@ import type { ReactNode } from 'react'
 
 /*
   Bottom navigation — the primary way around the app, kept low so it's reachable
-  with one thumb. Five destinations, each a large (56px+) tap target. The active
-  tab is marked with a chalk line, matching our signature stroke.
+  with one thumb. Five destinations, each a large (56px+) tap target.
+
+  The active tab is marked twice over: a green pill behind the icon and the label
+  going bold. One of those alone is easy to miss in daylight on a phone.
 */
 type Item = { to: string; label: string; icon: ReactNode }
 
@@ -19,8 +21,11 @@ const items: Item[] = [
 export default function BottomNav() {
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-10 bg-chalk/95 backdrop-blur border-t border-slate/15"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="fixed bottom-0 inset-x-0 z-20 border-t border-slate/12 bg-chalk/85 backdrop-blur-xl"
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        boxShadow: '0 -8px 24px -16px rgba(10,28,20,0.45)',
+      }}
     >
       <ul className="mx-auto w-full max-w-md grid grid-cols-5">
         {items.map((item) => (
@@ -30,19 +35,22 @@ export default function BottomNav() {
               end={item.to === '/'}
               className={({ isActive }) =>
                 [
-                  'flex flex-col items-center justify-center gap-1 h-16 text-xs font-medium',
-                  isActive ? 'text-pitch' : 'text-slate',
+                  'flex flex-col items-center justify-center gap-1 h-16 text-[11px]',
+                  isActive ? 'text-pitch font-bold' : 'text-slate font-medium',
                 ].join(' ')
               }
             >
               {({ isActive }) => (
                 <>
-                  {item.icon}
-                  <span>{item.label}</span>
                   <span
-                    className={`chalk-line w-6 ${isActive ? 'opacity-100' : 'opacity-0'}`}
-                    aria-hidden="true"
-                  />
+                    className={[
+                      'grid h-8 w-12 place-items-center rounded-full transition-all duration-200',
+                      isActive ? 'bg-pitch/12 scale-100' : 'bg-transparent scale-95',
+                    ].join(' ')}
+                  >
+                    {item.icon}
+                  </span>
+                  <span>{item.label}</span>
                 </>
               )}
             </NavLink>

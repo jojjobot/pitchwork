@@ -128,14 +128,14 @@ export default function BuilderScreen() {
                 {adding ? (
                   <button
                     onClick={() => addTo(workout.id)}
-                    className="flex w-full items-center gap-3 rounded-2xl border border-slate/15 bg-white/70 p-4 text-left active:bg-white"
+                    className="flex w-full items-center gap-3 card p-4 text-left active:bg-white"
                   >
                     {body}
                   </button>
                 ) : (
                   <Link
                     to={`/builder/${workout.id}`}
-                    className="flex items-center gap-3 rounded-2xl border border-slate/15 bg-white/70 p-4 active:bg-white"
+                    className="flex items-center gap-3 card p-4 active:bg-white"
                   >
                     {body}
                   </Link>

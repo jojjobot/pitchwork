@@ -90,7 +90,7 @@ export default function BuilderBlockScreen() {
         </p>
       </div>
 
-      <div className="mt-6 space-y-6 rounded-2xl border border-slate/15 bg-white/70 p-4">
+      <div className="mt-6 space-y-6 card p-4">
         <Stepper
           label="Sets"
           value={block.sets}
@@ -200,7 +200,7 @@ export default function BuilderBlockScreen() {
             value={block.note ?? ''}
             onChange={(e) => edit({ note: e.target.value.trim() === '' ? null : e.target.value })}
             placeholder="e.g. Weak foot only"
-            className="mt-1 w-full rounded-xl border border-slate/25 bg-white px-4 h-12 outline-none focus:border-pitch"
+            className="mt-1 w-full rounded-xl border border-slate/20 bg-paper shadow-card px-4 h-12 outline-none focus:border-pitch"
           />
           <span className="mt-1 block text-xs text-slate">Shown on screen while you train.</span>
         </label>
@@ -213,7 +213,7 @@ export default function BuilderBlockScreen() {
         >
           Done
         </button>
-        <button onClick={remove} className="h-12 rounded-xl border border-slate/25 bg-white px-4 font-semibold text-blaze">
+        <button onClick={remove} className="h-12 rounded-xl border border-slate/20 bg-paper shadow-card px-4 font-semibold text-blaze">
           Remove
         </button>
       </div>

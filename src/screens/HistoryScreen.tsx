@@ -61,17 +61,18 @@ export default function HistoryScreen() {
         </p>
       </header>
 
-      {/* Headline numbers */}
+      {/* Headline numbers. The streak is the only one that gets colour — it's the
+          only one of the three that's an achievement rather than a count. */}
       <div className="mt-5 grid grid-cols-3 gap-3">
         <StatTile value={stats.thisWeekMinutes} label="min this week" />
-        <StatTile value={stats.streakDays} label="day streak" />
+        <StatTile value={stats.streakDays} label="day streak" accent={stats.streakDays > 0} />
         <StatTile value={stats.totalSessions} label="sessions" />
       </div>
 
       {/* Trend */}
       <div className="mt-7">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-slate">Minutes per week</h2>
-        <div className="mt-3 rounded-2xl border border-slate/15 bg-white/70 p-4">
+        <div className="card mt-3 p-4">
           <WeeklyChart weeks={weeks} goalMinutes={settings.weeklyGoalMinutes} />
         </div>
       </div>
@@ -80,7 +81,7 @@ export default function HistoryScreen() {
       <div className="mt-7">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-slate">Where your time goes</h2>
         <p className="mt-2 text-sm text-slate">All-time, across every session you've saved.</p>
-        <div className="mt-3">
+        <div className="card mt-3 p-4">
           <CategoryBars
             categorySeconds={Object.fromEntries(
               Object.entries(stats.categoryMinutes).map(([c, m]) => [c, m * 60]),
@@ -117,7 +118,7 @@ export default function HistoryScreen() {
             <li key={session.id}>
               <Link
                 to={`/history/${session.id}`}
-                className="flex items-center gap-3 rounded-xl border border-slate/15 bg-white/70 p-3 active:bg-white"
+                className="card card-tap flex items-center gap-3 p-3"
               >
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold text-ink">{session.workoutName}</p>
@@ -126,7 +127,7 @@ export default function HistoryScreen() {
                     {session.perceivedEffort != null && ` · effort ${session.perceivedEffort}/5`}
                   </p>
                 </div>
-                <span className="shrink-0 text-sm font-semibold text-slate">
+                <span className="shrink-0 text-sm font-semibold text-slate tnum">
                   {session.totalMinutes} min
                 </span>
                 <span className="shrink-0 text-slate" aria-hidden="true">

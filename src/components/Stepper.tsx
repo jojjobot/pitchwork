@@ -74,7 +74,7 @@ function StepButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
-      className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-slate/25 bg-white font-display text-xl font-bold text-ink disabled:opacity-35"
+      className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-slate/20 bg-paper shadow-card font-display text-xl font-bold text-ink disabled:opacity-35"
     >
       {children}
     </button>
