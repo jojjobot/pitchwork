@@ -3,6 +3,7 @@ import { exercises, exerciseById } from '../data/exercises'
 import { loadCustomExercises, saveCustomExercises } from './storage'
 import { createStore, reloadFrom, useStore } from './store'
 import type { Category, Difficulty, Equipment, Exercise, MeasureType, Space } from '../types'
+import { registerReloader } from './reload'
 
 /*
   The drills you wrote yourself.
@@ -147,6 +148,9 @@ export function deleteCustomExercise(id: string): void {
 export function reload(): void {
   reloadFrom(store, loadCustomExercises)
 }
+
+// Signing in or out and a cloud sync both swap this store's contents; see lib/reload.ts.
+registerReloader(reload)
 
 // --- What a drill needs before it's worth saving ---
 

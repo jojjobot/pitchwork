@@ -22,7 +22,7 @@ export const ACCOUNTS_KEY = 'pitchwork.accounts.v1'
 */
 export type Bucket = 'sessions' | 'settings' | 'customWorkouts' | 'customExercises' | 'challenges'
 
-const BUCKETS: Bucket[] = [
+export const BUCKETS: Bucket[] = [
   'sessions',
   'settings',
   'customWorkouts',
@@ -161,6 +161,21 @@ function read<T>(bucket: Bucket, fallback: T): T {
   }
 }
 
+/*
+  Something changed on disk. lib/cloud.ts registers here so a cloud-backed account
+  pushes whatever just happened, and it is a callback rather than an import because
+  cloud.ts already imports this file — the arrow only goes one way.
+
+  Deliberately hung off `write` and not off `writeAccountBucket`: a sync applies what
+  it pulled through the latter, and hooking both would have every sync trigger the
+  next one forever.
+*/
+let onWrite: (() => void) | null = null
+
+export function onBucketWrite(callback: () => void): void {
+  onWrite = callback
+}
+
 function write(bucket: Bucket, value: unknown): void {
   const key = bucketKey(bucket)
   if (!key) return // signed out: never write someone's data into a nameless drawer
@@ -169,6 +184,84 @@ function write(bucket: Bucket, value: unknown): void {
   } catch {
     // storage full or unavailable — nothing more we can do here
   }
+  onWrite?.()
+}
+
+/*
+  --- Deletions, written down ---
+
+  A delete has to be a fact rather than an absence, or cloud sync cannot tell "I
+  removed this session on my phone" apart from "my laptop has a session this device
+  hasn't seen yet" — the two look identical, and guessing wrong either resurrects
+  what you deleted or deletes what you just did.
+
+  So every id that leaves a list is recorded here. This is deliberately NOT one of
+  the BUCKETS: buckets are things you own, and a tombstone is bookkeeping. It is
+  written by `writeList` below, which every list save goes through, so no delete
+  path can forget to leave a note — including ones written later.
+*/
+export interface Tombstone {
+  bucket: Bucket
+  id: string
+}
+
+function tombstoneKey(accountId: string): string {
+  return `pitchwork.${accountId}.tombstones.v1`
+}
+
+export function readTombstones(accountId: string): Tombstone[] {
+  try {
+    const raw = localStorage.getItem(tombstoneKey(accountId))
+    const value = raw ? (JSON.parse(raw) as Tombstone[]) : []
+    return Array.isArray(value) ? value : []
+  } catch {
+    return []
+  }
+}
+
+export function writeTombstones(accountId: string, list: Tombstone[]): void {
+  try {
+    localStorage.setItem(tombstoneKey(accountId), JSON.stringify(list))
+  } catch {
+    // storage full or unavailable — nothing more we can do here
+  }
+}
+
+/*
+  Save a list, noting anything that just disappeared from it. Everything below that
+  stores a list of things-with-ids goes through here rather than calling `write`.
+*/
+function writeList(bucket: Bucket, next: unknown[]): void {
+  const accountId = activeAccountId
+  if (accountId) {
+    const before = read<unknown[]>(bucket, [])
+    if (Array.isArray(before) && before.length > 0) {
+      const surviving = new Set(
+        next.map((item) => idOfItem(item)).filter((id): id is string => id != null),
+      )
+      const gone = before
+        .map((item) => idOfItem(item))
+        .filter((id): id is string => id != null && !surviving.has(id))
+
+      if (gone.length > 0) {
+        const stones = readTombstones(accountId)
+        const known = new Set(stones.map((t) => `${t.bucket}:${t.id}`))
+        for (const id of gone) {
+          if (!known.has(`${bucket}:${id}`)) stones.push({ bucket, id })
+        }
+        writeTombstones(accountId, stones)
+      }
+    }
+  }
+  write(bucket, next)
+}
+
+function idOfItem(item: unknown): string | null {
+  if (item && typeof item === 'object' && 'id' in item) {
+    const id = (item as { id: unknown }).id
+    if (typeof id === 'string') return id
+  }
+  return null
 }
 
 // --- Completed sessions (training history) ---
@@ -181,7 +274,7 @@ export function loadSessions(): CompletedSession[] {
 // The whole list is written at once, and only ever by lib/sessions.ts — one write
 // path means what's on screen and what's on disk can't disagree.
 export function saveSessions(sessions: CompletedSession[]): void {
-  write('sessions', sessions)
+  writeList('sessions', sessions)
 }
 
 // --- Workouts you built yourself ---
@@ -195,7 +288,7 @@ export function loadCustomWorkouts(): Workout[] {
 }
 
 export function saveCustomWorkouts(list: Workout[]): void {
-  write('customWorkouts', list)
+  writeList('customWorkouts', list)
 }
 
 // --- Drills you wrote yourself ---
@@ -208,7 +301,7 @@ export function loadCustomExercises(): Exercise[] {
 }
 
 export function saveCustomExercises(list: Exercise[]): void {
-  write('customExercises', list)
+  writeList('customExercises', list)
 }
 
 // --- Challenges you've started ---
@@ -221,7 +314,7 @@ export function loadChallenges(): ChallengeEnrolment[] {
 }
 
 export function saveChallenges(list: ChallengeEnrolment[]): void {
-  write('challenges', list)
+  writeList('challenges', list)
 }
 
 // --- Settings ---
@@ -272,5 +365,13 @@ export function dropAccountData(accountId: string): void {
     } catch {
       // nothing to do
     }
+  }
+  // Tombstones aren't a bucket, so they need saying out loud — otherwise deleting an
+  // account would leave a list of its deletions behind for the next account with
+  // that id to trip over.
+  try {
+    localStorage.removeItem(tombstoneKey(accountId))
+  } catch {
+    // nothing to do
   }
 }

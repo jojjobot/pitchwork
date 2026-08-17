@@ -5,6 +5,7 @@ import { createStore, reloadFrom, useStore } from './store'
 import { deriveFiling } from './builder'
 import { estimateWorkout } from './workout'
 import type { Workout, WorkoutBlock } from '../types'
+import { registerReloader } from './reload'
 
 /*
   The sessions you built, and the one list every screen should ask about.
@@ -119,3 +120,6 @@ export function deleteCustomWorkout(id: string): void {
 export function reload(): void {
   reloadFrom(store, loadCustomWorkouts)
 }
+
+// Signing in or out and a cloud sync both swap this store's contents; see lib/reload.ts.
+registerReloader(reload)

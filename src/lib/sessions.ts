@@ -1,6 +1,7 @@
 import { createStore, reloadFrom, useStore } from './store'
 import { loadSessions, saveSessions } from './storage'
 import type { CompletedSession } from '../types'
+import { registerReloader } from './reload'
 
 /*
   Your training history — every session you finished and saved. Kept newest-first,
@@ -43,3 +44,6 @@ export function replaceSessions(sessions: CompletedSession[]): void {
 export function reload(): void {
   reloadFrom(store, loadSessions)
 }
+
+// Signing in or out and a cloud sync both swap this store's contents; see lib/reload.ts.
+registerReloader(reload)

@@ -5,13 +5,18 @@ import { useCustomWorkouts } from '../lib/customWorkouts'
 import { deleteAccount, isRemembered, signOut, useAccount, useAccounts } from '../lib/auth'
 import { buildTransfer, transferFilename } from '../lib/transfer'
 import AccountPassword from '../components/AccountPassword'
+import CloudSync from '../components/CloudSync'
 import Stepper from '../components/Stepper'
 import type { CompletedSession } from '../types'
 
 /*
-  Preferences, and the honest truth about where your data lives. Everything in
-  Pitchwork is kept in this browser and nowhere else — no account, no server — so
-  the backup buttons aren't a power-user feature, they're the only copy you can keep.
+  Preferences, and the honest truth about where your data lives. By default
+  everything in Pitchwork is kept in this browser and nowhere else, which is why the
+  backup buttons aren't a power-user feature but the only copy you can keep.
+
+  "Sync across devices" is the one exception, and it is opt-in: switch it on and a
+  copy goes to a server so your phone and your laptop can be the same account.
+  Nothing else here changed because of it — signed out and offline still work.
 */
 export default function SettingsScreen() {
   const settings = useSettings()
@@ -143,6 +148,14 @@ export default function SettingsScreen() {
             hint={goalHint(settings.weeklyGoalMinutes)}
           />
         </div>
+      </div>
+
+      {/* Sync — the only thing here that leaves the device, so it says so itself */}
+      <div className="mt-7">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-slate">
+          Sync across devices
+        </h2>
+        <CloudSync />
       </div>
 
       {/* Data */}

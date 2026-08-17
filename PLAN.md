@@ -133,30 +133,38 @@ turns it red.
 
 ---
 
-## Phase 9 — An account that survives a lost phone
-*a week of evenings · €0 on the Supabase free tier · gated on the decision point*
+## Phase 9 — An account that survives a lost phone ✅ BUILT 2026-08-17
+*asked for directly, ahead of the decision point · €0 on the Supabase free tier*
 
 Goal: history outlives the browser it was made in, and a forgotten password stops being
 permanent — without undoing anything from Phase 6.
 
-- [ ] **Local-first stays literal.** Local storage remains what the screens read; the
-      cloud is a mirror behind it. If the app stops working signed out or offline, this
-      phase has broken the last one.
-- [ ] **Supabase Auth (email + password)** — brings the one thing a browser-only lock
-      never can: a real password reset email. Existing local profiles keep working
-      untouched; "back this profile up" is a button in Settings, not a gate.
-- [ ] **Four tables, RLS on from the first migration** (sessions, custom drills, custom
-      sessions, settings), each keyed by user. Turning RLS on afterwards is how weekend
-      projects leak strangers' data to each other.
-- [ ] **Sync = the `transfer.ts` rules over the wire.** Merge by id, never overwrite,
-      re-syncing adds zero. Deletes need one decision written down once — tombstones or
-      explicitly not synced — because "it came back" and "it vanished on my other phone"
-      are the same bug from opposite ends.
-- [ ] **Keep the transfer file.** It's the offline path and the fallback for anyone who
-      doesn't want an account.
-- [ ] **Fix the copy per account type.** "A lock, not a safe" stays true for local
-      profiles and stops being the whole story for cloud ones. One screen must not imply
-      both.
+- [x] **Local-first stays literal.** Local storage remains what the screens read; the
+      cloud is a mirror behind it. Signed out and offline are untouched.
+- [x] **Supabase Auth (email + password)**, with a real password reset email. Local
+      profiles keep working; sync is a section in Settings, never a gate.
+- [x] **RLS on in the same migration that creates the table** (`supabase/schema.sql`).
+      **One** table, not four: everything the app owns is already `{id, …}` JSON, so the
+      row is `(user, bucket, id, data)` and the server needs no opinion about what a
+      session contains.
+- [x] **Sync = the `transfer.ts` rules over the wire.** Merge by id, never overwrite,
+      re-syncing adds zero.
+- [x] **Deletes: tombstones**, and the decision is written down in `storage.ts`. A
+      delete had to become a fact rather than an absence, because "I deleted this on my
+      phone" and "my laptop has one this device hasn't seen" are the same shape. Every
+      list save goes through `writeList`, so no delete path can forget to leave a note.
+- [x] **Kept the transfer file** as the offline path for anyone who doesn't want an
+      account.
+- [x] **Copy per account type.** "A lock, not a safe" still describes a local profile;
+      the sync panel says plainly that this is the one part that leaves your device.
+
+Verified: 30 merge checks with no network (union, idempotence, local-wins, the
+resurrection bug, per-bucket tombstones, settings-only-on-a-fresh-device, ordering).
+⚠️ **Not yet verified against a real Supabase project** — needs the keys.
+
+Remaining, and it is the user's two minutes, not code: create the project, run
+`supabase/schema.sql`, and set `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` as Actions
+**variables**. Until then the app ships with sync switched off and says so.
 
 Done when: you sign in on a browser that has never seen the app and your history is
 there — and killing the network mid-session loses nothing.

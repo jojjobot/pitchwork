@@ -8,6 +8,7 @@ import { daysBetween, startOfDay } from './progress'
 import { estimateWorkout, workoutMeta } from './workout'
 import { SPACE_RANK } from './labels'
 import { countEvent } from './analytics'
+import { registerReloader } from './reload'
 import type {
   Category,
   Challenge,
@@ -380,6 +381,9 @@ export function leaveChallenge(enrolmentId: string): void {
 export function reload(): void {
   reloadFrom(store, loadChallenges)
 }
+
+// Signing in or out and a cloud sync both swap this store's contents; see lib/reload.ts.
+registerReloader(reload)
 
 // --- Dates, said the way a person would ---
 

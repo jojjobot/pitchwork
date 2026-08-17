@@ -33,7 +33,17 @@ jobs:
       # `npm ci` installs exactly what package-lock.json pins, so the site is built
       # from the same dependency versions that were tested locally.
       - run: npm ci
+
+      # Cloud sync is compiled in at build time, so the keys have to be available
+      # here rather than in the repo. Set them once at Settings → Secrets and
+      # variables → Actions → Variables — Variables, not Secrets: the anon key is
+      # public by design, it ships inside the bundle either way, and row level
+      # security is what actually guards the data. Leave them unset and the app
+      # builds exactly as before, with the sync section switched off.
       - run: npm run build # tsc -b && vite build — a type error fails the deploy
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -13,6 +13,7 @@ import { applyTransfer } from '../lib/transfer'
 import { exercises } from '../data/exercises'
 import { workouts } from '../data/workouts'
 import PitchArt, { Mark, PitchBackdrop } from '../components/PitchArt'
+import CloudRestore from '../components/CloudRestore'
 import type { Category } from '../types'
 
 // What's actually in the box, counted rather than claimed — the numbers move on
@@ -288,10 +289,13 @@ export default function SignInScreen() {
           <p className="mt-4 rounded-xl bg-lime/25 px-4 py-3 text-sm text-ink">{imported}</p>
         )}
 
-        {/* The bridge between devices. Quiet, because most people open this screen
-            on a device that already has their account. */}
+        {/* The bridge between devices, when there's an account in the cloud to
+            bridge to. Above the file route because it's the one that just works. */}
+        <CloudRestore onDone={() => setImported(null)} />
+
+        {/* The offline bridge, for anyone who hasn't turned syncing on. */}
         <div className="card mt-6 p-4">
-          <p className="text-sm font-semibold text-ink">Already have an account on another device?</p>
+          <p className="text-sm font-semibold text-ink">No syncing, but an account elsewhere?</p>
           <p className="mt-1 text-sm leading-relaxed text-slate">
             Accounts live in one browser, so signing in here won't find it. On that device open
             Settings → Move to another device, then open the saved file here.

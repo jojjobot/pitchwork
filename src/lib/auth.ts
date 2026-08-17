@@ -10,11 +10,14 @@ import {
   rememberSignedIn,
   setActiveAccount,
 } from './storage'
-import { reload as reloadSessions } from './sessions'
-import { reload as reloadSettings } from './settings'
-import { reload as reloadCustomWorkouts } from './customWorkouts'
-import { reload as reloadCustomExercises } from './customExercises'
-import { reload as reloadChallenges } from './challenges'
+// The stores are imported for their side effect only: each one registers its own
+// reload with lib/reload.ts, and reloadAll() then swaps all of them at once.
+import './sessions'
+import './settings'
+import './customWorkouts'
+import './customExercises'
+import './challenges'
+import { reloadAll } from './reload'
 import { countEvent } from './analytics'
 
 /*
@@ -190,11 +193,7 @@ function openAccount(account: Account | null, remember = false): void {
   if (account) rememberSignedIn(account.id, remember)
   else clearSignedIn()
 
-  reloadSessions()
-  reloadSettings()
-  reloadCustomWorkouts()
-  reloadCustomExercises()
-  reloadChallenges()
+  reloadAll()
   currentStore.replace(account)
 }
 
@@ -253,6 +252,56 @@ export async function signIn(email: string, password: string, remember: boolean)
 
 export function signOut(): void {
   openAccount(null)
+}
+
+/*
+  Open the local profile that belongs to a cloud account, making one if this device
+  has never seen it.
+
+  This is what makes a brand-new phone work. The local sign-in is still the thing
+  that opens the app — that hasn't changed and shouldn't — but on a device with no
+  accounts at all there is nothing to sign in to, and the cloud password is the only
+  one the person has. So the cloud password becomes the local one here, which also
+  means the app still opens on that phone in a tunnel with no signal.
+
+  If a profile for that email is already here with a DIFFERENT password, its lock is
+  re-keyed to the cloud password rather than the sign-in being refused. That is a
+  deliberate call and it is not a weakening: signing in to the cloud proved control
+  of the email, which is a stronger claim than the local lock ever made. The training
+  data is untouched either way — only the lock changes.
+
+  Called only after the cloud has already accepted the password.
+*/
+export async function openLocalProfileFor(
+  email: string,
+  password: string,
+  remember: boolean,
+): Promise<Account> {
+  const address = normaliseEmail(email)
+  const existing = accountsStore.get().find((a) => a.email === address)
+
+  const salt = globalThis.crypto.getRandomValues(new Uint8Array(SALT_BYTES))
+  const hash = await derive(password, salt, ITERATIONS)
+
+  if (existing) {
+    const rekeyed: Account = { ...existing, salt: toBase64(salt), hash, iterations: ITERATIONS }
+    accountsStore.set(accountsStore.get().map((a) => (a.id === existing.id ? rekeyed : a)))
+    openAccount(rekeyed, remember)
+    return rekeyed
+  }
+
+  const account: Account = {
+    id: globalThis.crypto.randomUUID(),
+    email: address,
+    createdAt: new Date().toISOString(),
+    salt: toBase64(salt),
+    hash,
+    iterations: ITERATIONS,
+  }
+  if (accountsStore.get().length === 0) claimLegacyData(account.id)
+  accountsStore.set([...accountsStore.get(), account])
+  openAccount(account, remember)
+  return account
 }
 
 export async function changePassword(current: string, next: string): Promise<void> {

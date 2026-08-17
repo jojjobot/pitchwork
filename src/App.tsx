@@ -21,6 +21,10 @@ import SignInScreen from './screens/SignInScreen'
 import UpdateBar from './components/UpdateBar'
 import { useAccount } from './lib/auth'
 import { countPageview } from './lib/analytics'
+import { useCloudSession, watchForeground } from './lib/cloud'
+
+// Coming back to the tab is the moment the other device's training should appear.
+watchForeground()
 
 /*
   All routes live here. Screens with the bottom nav are nested inside <AppShell>.
@@ -30,6 +34,10 @@ import { countPageview } from './lib/analytics'
 export default function App() {
   const account = useAccount()
   usePageviews(Boolean(account))
+
+  // Picks a cloud session back up on boot and syncs. Does nothing at all when the
+  // build has no project configured, or when the user never opted in.
+  useCloudSession()
 
   // One gate in front of everything. Signing out swaps this back in, and because
   // the stores reload with it, no screen is ever left holding the last person's data.
