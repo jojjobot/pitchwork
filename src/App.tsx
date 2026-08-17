@@ -18,6 +18,7 @@ import HistoryScreen from './screens/HistoryScreen'
 import SessionDetailScreen from './screens/SessionDetailScreen'
 import SettingsScreen from './screens/SettingsScreen'
 import SignInScreen from './screens/SignInScreen'
+import UpdateBar from './components/UpdateBar'
 import { useAccount } from './lib/auth'
 import { countPageview } from './lib/analytics'
 
@@ -32,39 +33,49 @@ export default function App() {
 
   // One gate in front of everything. Signing out swaps this back in, and because
   // the stores reload with it, no screen is ever left holding the last person's data.
-  if (!account) return <SignInScreen />
+  if (!account) {
+    return (
+      <>
+        <UpdateBar />
+        <SignInScreen />
+      </>
+    )
+  }
 
   return (
-    <Routes>
-      <Route element={<AppShell />}>
-        <Route path="/" element={<HomeScreen />} />
-        <Route path="/workouts" element={<WorkoutsScreen />} />
-        <Route path="/workouts/:workoutId" element={<WorkoutDetailScreen />} />
-        {/* Multi-week plans. The detail page is the whole calendar, and it's the
-            same page whether you're on the plan, have finished it, or are still
-            deciding — only what sits at the top of it changes. */}
-        <Route path="/challenges" element={<ChallengesScreen />} />
-        <Route path="/challenges/:challengeId" element={<ChallengeDetailScreen />} />
-        <Route path="/library" element={<LibraryScreen />} />
-        <Route path="/library/:exerciseId" element={<ExerciseDetailScreen />} />
-        {/* Writing a drill of your own. Only ever reached for a drill you made — the
-            built-in library is read-only, and the screen says so if you arrive anyway. */}
-        <Route path="/library/:exerciseId/edit" element={<ExerciseBuilderScreen />} />
-        {/* The builder is a few small screens rather than one long form: pick a
-            session, pick a drill, set that drill's numbers. Each step is its own URL,
-            so Back always undoes exactly one decision. */}
-        <Route path="/builder" element={<BuilderScreen />} />
-        <Route path="/builder/:workoutId" element={<BuilderEditScreen />} />
-        <Route path="/builder/:workoutId/add" element={<BuilderPickScreen />} />
-        <Route path="/builder/:workoutId/block/:blockIndex" element={<BuilderBlockScreen />} />
-        <Route path="/history" element={<HistoryScreen />} />
-        <Route path="/history/:sessionId" element={<SessionDetailScreen />} />
-        <Route path="/settings" element={<SettingsScreen />} />
-      </Route>
+    <>
+      <UpdateBar />
+      <Routes>
+        <Route element={<AppShell />}>
+          <Route path="/" element={<HomeScreen />} />
+          <Route path="/workouts" element={<WorkoutsScreen />} />
+          <Route path="/workouts/:workoutId" element={<WorkoutDetailScreen />} />
+          {/* Multi-week plans. The detail page is the whole calendar, and it's the
+              same page whether you're on the plan, have finished it, or are still
+              deciding — only what sits at the top of it changes. */}
+          <Route path="/challenges" element={<ChallengesScreen />} />
+          <Route path="/challenges/:challengeId" element={<ChallengeDetailScreen />} />
+          <Route path="/library" element={<LibraryScreen />} />
+          <Route path="/library/:exerciseId" element={<ExerciseDetailScreen />} />
+          {/* Writing a drill of your own. Only ever reached for a drill you made — the
+              built-in library is read-only, and the screen says so if you arrive anyway. */}
+          <Route path="/library/:exerciseId/edit" element={<ExerciseBuilderScreen />} />
+          {/* The builder is a few small screens rather than one long form: pick a
+              session, pick a drill, set that drill's numbers. Each step is its own URL,
+              so Back always undoes exactly one decision. */}
+          <Route path="/builder" element={<BuilderScreen />} />
+          <Route path="/builder/:workoutId" element={<BuilderEditScreen />} />
+          <Route path="/builder/:workoutId/add" element={<BuilderPickScreen />} />
+          <Route path="/builder/:workoutId/block/:blockIndex" element={<BuilderBlockScreen />} />
+          <Route path="/history" element={<HistoryScreen />} />
+          <Route path="/history/:sessionId" element={<SessionDetailScreen />} />
+          <Route path="/settings" element={<SettingsScreen />} />
+        </Route>
 
-      {/* Full-screen training mode, no bottom nav */}
-      <Route path="/session/:workoutId" element={<SessionPlayer />} />
-    </Routes>
+        {/* Full-screen training mode, no bottom nav */}
+        <Route path="/session/:workoutId" element={<SessionPlayer />} />
+      </Routes>
+    </>
   )
 }
 

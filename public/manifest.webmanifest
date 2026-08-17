@@ -1,0 +1,26 @@
+{
+  "name": "Pitchwork — train alone, play sharper",
+  "short_name": "Pitchwork",
+  "description": "A drill library, guided training sessions and multi-week challenges for the football training you do on your own.",
+  "id": "/pitchwork/",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f1e9",
+  "theme_color": "#14231a",
+  "categories": ["sports", "health", "fitness"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Today's session", "url": "./#/", "description": "Whatever your plan asks for today" },
+    { "name": "Challenges", "url": "./#/challenges", "description": "Your multi-week plan" },
+    { "name": "Drill library", "url": "./#/library", "description": "All 172 drills" }
+  ]
+}

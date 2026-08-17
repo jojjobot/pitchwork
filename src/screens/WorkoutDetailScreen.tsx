@@ -13,6 +13,7 @@ import Badge from '../components/Badge'
 import CategoryBars from '../components/CategoryBars'
 import NotFound from '../components/NotFound'
 import PitchArt from '../components/PitchArt'
+import StickyBar from '../components/StickyBar'
 import { EfficiencyTile } from '../components/Efficiency'
 
 export default function WorkoutDetailScreen() {
@@ -188,20 +189,18 @@ export default function WorkoutDetailScreen() {
         )}
       </div>
 
-      {/* Start — fixed above the bottom nav so it's always reachable */}
-      <div className="fixed inset-x-0 bottom-16 z-10 bg-gradient-to-t from-chalk via-chalk/95 to-transparent px-5 pt-6 pb-3">
-        <div className="mx-auto max-w-md">
-          <Link
-            to={`/session/${workout.id}`}
-            className="sheen relative flex h-15 items-center justify-center gap-2 overflow-hidden rounded-2xl bg-blaze font-display text-lg font-extrabold text-white shadow-glow transition-transform duration-200 active:scale-[0.985]"
-          >
-            Start training
-            <span aria-hidden="true" className="text-xl">
-              →
-            </span>
-          </Link>
-        </div>
-      </div>
+      {/* Start — floats above the bottom nav so it's always reachable */}
+      <StickyBar>
+        <Link
+          to={`/session/${workout.id}`}
+          className="sheen relative flex h-15 items-center justify-center gap-2 overflow-hidden rounded-2xl bg-blaze font-display text-lg font-extrabold text-white shadow-glow transition-transform duration-200 active:scale-[0.985]"
+        >
+          Start training
+          <span aria-hidden="true" className="text-xl">
+            →
+          </span>
+        </Link>
+      </StickyBar>
     </section>
   )
 }

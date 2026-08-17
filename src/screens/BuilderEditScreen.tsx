@@ -20,6 +20,7 @@ import {
 import Badge from '../components/Badge'
 import CategoryBars from '../components/CategoryBars'
 import NotFound from '../components/NotFound'
+import StickyBar from '../components/StickyBar'
 import { EfficiencyTile } from '../components/Efficiency'
 import type { Workout } from '../types'
 
@@ -270,22 +271,20 @@ export default function BuilderEditScreen() {
       </div>
 
       {/* Start — matches the ready-made sessions, but only once there's something to run */}
-      <div className="fixed inset-x-0 bottom-16 z-10 bg-gradient-to-t from-chalk via-chalk/95 to-transparent px-5 pt-6 pb-3">
-        <div className="mx-auto max-w-md">
-          {empty ? (
-            <p className="flex h-14 items-center justify-center rounded-2xl bg-slate/20 font-display text-lg font-extrabold text-slate">
-              Add a drill to start
-            </p>
-          ) : (
-            <Link
-              to={`/session/${workout.id}`}
-              className="flex h-14 items-center justify-center rounded-2xl bg-blaze font-display text-lg font-extrabold text-white shadow-lg active:brightness-95"
-            >
-              Start training
-            </Link>
-          )}
-        </div>
-      </div>
+      <StickyBar>
+        {empty ? (
+          <p className="flex h-14 items-center justify-center rounded-2xl bg-slate/20 font-display text-lg font-extrabold text-slate">
+            Add a drill to start
+          </p>
+        ) : (
+          <Link
+            to={`/session/${workout.id}`}
+            className="flex h-14 items-center justify-center rounded-2xl bg-blaze font-display text-lg font-extrabold text-white shadow-lg active:brightness-95"
+          >
+            Start training
+          </Link>
+        )}
+      </StickyBar>
     </section>
   )
 }

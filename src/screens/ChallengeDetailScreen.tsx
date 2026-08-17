@@ -27,6 +27,7 @@ import CategoryBars from '../components/CategoryBars'
 import NotFound from '../components/NotFound'
 import PitchArt from '../components/PitchArt'
 import StatTile from '../components/StatTile'
+import StickyBar from '../components/StickyBar'
 import { EfficiencyTile } from '../components/Efficiency'
 import type { Challenge, ChallengeDay } from '../types'
 
@@ -229,32 +230,30 @@ export default function ChallengeDetailScreen() {
 
       {/* ---- Starting ---- */}
       {!mine && (
-        <div className="fixed inset-x-0 bottom-16 z-10 bg-gradient-to-t from-chalk via-chalk/95 to-transparent px-5 pt-6 pb-3">
-          <div className="mx-auto max-w-md">
-            {busyElsewhere && (
-              <p className="mb-2 rounded-xl bg-sun/15 px-3 py-2 text-center text-xs font-semibold text-ink">
-                Starting this closes {current!.challenge.name}.
-              </p>
-            )}
-            <div className="flex gap-2">
-              <button
-                onClick={() => begin(new Date())}
-                className="sheen relative h-15 flex-1 overflow-hidden rounded-2xl bg-blaze font-display text-lg font-extrabold text-white shadow-glow transition-transform duration-200 active:scale-[0.985]"
-              >
-                {previous ? 'Run it again' : 'Start today'}
-              </button>
-              <button
-                onClick={() => begin(nextMonday())}
-                className="h-15 rounded-2xl border border-slate/25 bg-paper px-4 font-semibold text-ink shadow-card active:bg-white/70"
-              >
-                <span className="block text-sm leading-tight">Start Monday</span>
-                <span className="block text-xs font-medium leading-tight text-slate tnum">
-                  {shortDate(nextMonday())}
-                </span>
-              </button>
-            </div>
+        <StickyBar>
+          {busyElsewhere && (
+            <p className="mb-2 rounded-xl bg-sun/15 px-3 py-2 text-center text-xs font-semibold text-ink">
+              Starting this closes {current!.challenge.name}.
+            </p>
+          )}
+          <div className="flex gap-2">
+            <button
+              onClick={() => begin(new Date())}
+              className="sheen relative h-15 flex-1 overflow-hidden rounded-2xl bg-blaze font-display text-lg font-extrabold text-white shadow-glow transition-transform duration-200 active:scale-[0.985]"
+            >
+              {previous ? 'Run it again' : 'Start today'}
+            </button>
+            <button
+              onClick={() => begin(nextMonday())}
+              className="h-15 rounded-2xl border border-slate/25 bg-paper px-4 font-semibold text-ink shadow-card active:bg-white/70"
+            >
+              <span className="block text-sm leading-tight">Start Monday</span>
+              <span className="block text-xs font-medium leading-tight text-slate tnum">
+                {shortDate(nextMonday())}
+              </span>
+            </button>
           </div>
-        </div>
+        </StickyBar>
       )}
     </section>
   )

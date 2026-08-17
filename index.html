@@ -2,20 +2,41 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!--
+      ON A PHONE. Every path below is relative ("./"), never root-absolute: the app is
+      served from /pitchwork/ on GitHub Pages, and "/icon-192.png" would resolve to the
+      domain root and 404.
+    -->
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
 
     <!-- Colour of the phone status bar / browser chrome -->
     <meta name="theme-color" content="#14231A" />
 
-    <!-- Fonts: Bricolage Grotesque = display + numbers, Hanken Grotesk = body.
-         Loaded from Google Fonts for now; we'll self-host these in the PWA phase. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400..700&display=swap"
-      rel="stylesheet"
+    <!-- iOS still reads these rather than the manifest: without them, "Add to Home
+         Screen" gives you a bookmark that opens in Safari with its address bar,
+         instead of something that behaves like an app. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Pitchwork" />
+
+    <meta
+      name="description"
+      content="A drill library, guided training sessions and multi-week challenges for the football training you do on your own."
     />
+
+    <!-- Fonts: Bricolage Grotesque = display + numbers, Hanken Grotesk = body.
+         Self-hosted (public/fonts.css) — no third-party request on the critical path,
+         and the app can render its own typeface with no network at all. The two latin
+         files are preloaded because the CSS that asks for them is itself a request
+         deep in the chain, and on a phone that costs a visible flash of fallback. -->
+    <link rel="preload" href="./fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./fonts/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./fonts.css" />
 
     <title>Pitchwork — train alone, play sharper</title>
 

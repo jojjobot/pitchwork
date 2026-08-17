@@ -43,7 +43,15 @@ export default function AppShell() {
 
       {/* Screen content. Keyed on the route so every screen animates in rather
           than snapping — the app's only page transition. */}
-      <main key={pathname} className="rise flex-1 mx-auto w-full max-w-md px-5 pt-6 pb-28">
+      {/* NOTE: `rise` leaves an identity transform on this element (fill-mode both),
+          which makes it the containing block for anything `position: fixed` inside a
+          screen. That is why the sticky action bar is a portal — see StickyBar.tsx.
+          The bottom padding clears the nav plus the phone's home indicator. */}
+      <main
+        key={pathname}
+        className="rise flex-1 mx-auto w-full max-w-md px-5 pt-6"
+        style={{ paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}
+      >
         <Outlet />
       </main>
 
