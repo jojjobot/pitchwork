@@ -5,6 +5,19 @@ can rely on it*. Ordered cheap-to-expensive, with a real decision point in the m
 
 Readable version: https://claude.ai/code/artifact/7dc86dc7-7ccd-492c-a1b6-ffdbbbb75d30
 
+## Built out of order (2026-08-17)
+
+**Challenges shipped** — six multi-week plans, two to six weeks, written out day by day
+with two to four rest days a week. It was on the *deliberately not in this plan* list
+below and was asked for anyway, which is a fair thing to happen to a plan: the list was
+never a refusal, only a record of what was being kept out of the next six evenings.
+
+It changes the phases below in two places. Phase 5's "look at every screen" now has two
+more screens to look at (both were screenshotted when they were built, so they are ahead
+rather than behind). And the decision point's fallback — "the honest next move is content
+and habit" — has had its biggest piece done early, so if retention is poor, that reading
+is now *tested* rather than merely available.
+
 ## Settled before planning (2026-08-15)
 
 - **Local-first, cloud optional.** The app keeps working offline and signed out. An
@@ -92,8 +105,11 @@ If people came back a second and third week, sync is what stands between this an
 product → build Phase 9.
 
 If nobody came back twice, sync is **not** the problem and a week of evenings on Supabase
-buys nothing. The honest next move is content and habit — reminders, streaks that mean
-something, the multi-week plans `types.ts` already anticipates — not infrastructure.
+buys nothing. The honest next move is content and habit — reminders, and streaks that mean
+something — not infrastructure. The multi-week plans this line used to point at are built
+(see the top of this file), so that reading now comes with something to measure: if people
+start a challenge and stop in week one, the problem is not that their data lives on one
+phone.
 
 ---
 
@@ -172,8 +188,8 @@ their data out or deleted without emailing you.
 
 ## Deliberately not in this plan
 
-Multi-week plans · coach/team accounts · video demonstrations · German translation ·
-native apps · social feed.
+~~Multi-week plans~~ (built 2026-08-17) · coach/team accounts · video demonstrations ·
+German translation · native apps · social feed.
 
 Each is a phase of its own, and none of them is what stops a friend using the app
 tomorrow. Writing them down is how they stay out of the next six evenings.

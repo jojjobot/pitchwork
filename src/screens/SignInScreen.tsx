@@ -67,6 +67,8 @@ export default function SignInScreen() {
             `${result.workoutsAdded} built ${result.workoutsAdded === 1 ? 'session' : 'sessions'} added.`,
           result.exercisesAdded > 0 &&
             `${result.exercisesAdded} ${result.exercisesAdded === 1 ? 'drill' : 'drills'} you wrote added.`,
+          result.challengesAdded > 0 &&
+            `${result.challengesAdded} ${result.challengesAdded === 1 ? 'challenge' : 'challenges'} added.`,
           'Sign in with the same password.',
         ]
           .filter(Boolean)

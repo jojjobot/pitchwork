@@ -5,6 +5,8 @@ import HomeScreen from './screens/HomeScreen'
 import WorkoutsScreen from './screens/WorkoutsScreen'
 import WorkoutDetailScreen from './screens/WorkoutDetailScreen'
 import SessionPlayer from './screens/SessionPlayer'
+import ChallengesScreen from './screens/ChallengesScreen'
+import ChallengeDetailScreen from './screens/ChallengeDetailScreen'
 import LibraryScreen from './screens/LibraryScreen'
 import ExerciseDetailScreen from './screens/ExerciseDetailScreen'
 import ExerciseBuilderScreen from './screens/ExerciseBuilderScreen'
@@ -38,6 +40,11 @@ export default function App() {
         <Route path="/" element={<HomeScreen />} />
         <Route path="/workouts" element={<WorkoutsScreen />} />
         <Route path="/workouts/:workoutId" element={<WorkoutDetailScreen />} />
+        {/* Multi-week plans. The detail page is the whole calendar, and it's the
+            same page whether you're on the plan, have finished it, or are still
+            deciding — only what sits at the top of it changes. */}
+        <Route path="/challenges" element={<ChallengesScreen />} />
+        <Route path="/challenges/:challengeId" element={<ChallengeDetailScreen />} />
         <Route path="/library" element={<LibraryScreen />} />
         <Route path="/library/:exerciseId" element={<ExerciseDetailScreen />} />
         {/* Writing a drill of your own. Only ever reached for a drill you made — the

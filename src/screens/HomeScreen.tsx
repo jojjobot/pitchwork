@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom'
 import { useSessions } from '../lib/sessions'
 import { useSettings } from '../lib/settings'
 import { useAllWorkouts } from '../lib/customWorkouts'
+import { useCurrentRun } from '../lib/challenges'
 import { relativeDay, suggestSession, summarize } from '../lib/progress'
 import { workoutMeta } from '../lib/workout'
 import { CATEGORY_LABELS } from '../lib/labels'
+import ChallengeToday from '../components/ChallengeToday'
 import GoalProgress from '../components/GoalProgress'
 import PitchArt, { PitchBackdrop } from '../components/PitchArt'
 import type { Category } from '../types'
@@ -22,10 +24,24 @@ export default function HomeScreen() {
   const sessions = useSessions()
   const settings = useSettings()
   const workouts = useAllWorkouts()
+  const run = useCurrentRun()
 
   const stats = summarize(sessions)
   const suggestion = suggestSession(sessions, workouts)
   const trained = sessions.length > 0
+
+  /*
+    A challenge outranks the app's own suggestion — you already decided what today
+    is for, and being asked again is what makes a plan stop working. The exception
+    is a rest day or a plan that hasn't begun: then the suggestion comes back, under
+    a heading that's honest about it being off-plan.
+  */
+  const onPlanToday = run != null && run.state === 'active' && run.today?.day.kind === 'session'
+  const suggestionHeading = !run
+    ? 'Suggested next'
+    : run.state === 'upcoming'
+      ? 'Until then'
+      : 'Off the plan'
 
   return (
     <section>
@@ -75,10 +91,22 @@ export default function HomeScreen() {
         </div>
       </div>
 
-      {/* ---- What to do next ---- */}
-      {suggestion && (
+      {/* ---- Today, according to the plan ---- */}
+      {run && (
         <div className="mt-5 rise" style={{ '--i': 1 } as React.CSSProperties}>
-          <h2 className="text-xs font-bold uppercase tracking-widest text-slate">Suggested next</h2>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-slate">Your challenge</h2>
+          <div className="mt-2">
+            <ChallengeToday run={run} />
+          </div>
+        </div>
+      )}
+
+      {/* ---- What to do next ---- */}
+      {suggestion && !onPlanToday && (
+        <div className="mt-5 rise" style={{ '--i': 1 } as React.CSSProperties}>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-slate">
+            {suggestionHeading}
+          </h2>
 
           <Link
             to={`/workouts/${suggestion.workout.id}`}
@@ -154,7 +182,31 @@ export default function HomeScreen() {
       )}
 
       {/* ---- Ways in ---- */}
-      <div className="mt-7 grid grid-cols-2 gap-3 rise" style={{ '--i': 3 } as React.CSSProperties}>
+      {/* Challenges only advertise themselves while you aren't on one; once you are,
+          the card at the top of this screen is already saying it better. */}
+      {!run && (
+        <Link
+          to="/challenges"
+          className="card card-tap mt-7 flex items-center gap-3 p-4 rise"
+          style={{ '--i': 3 } as React.CSSProperties}
+        >
+          <PitchArt category="athleticism" className="h-11 w-11 shrink-0 rounded-xl" />
+          <span className="min-w-0 flex-1">
+            <span className="block font-display font-bold text-ink">Take on a challenge</span>
+            <span className="mt-0.5 block text-sm leading-snug text-slate">
+              Two to six weeks, written out day by day — rest days included.
+            </span>
+          </span>
+          <span className="shrink-0 text-lg text-slate" aria-hidden="true">
+            ›
+          </span>
+        </Link>
+      )}
+
+      <div
+        className={`${run ? 'mt-7' : 'mt-4'} grid grid-cols-2 gap-3 rise`}
+        style={{ '--i': 4 } as React.CSSProperties}
+      >
         <WayIn to="/workouts" title="Browse sessions" sub="Pick your own" category="passing" />
         <WayIn to="/builder" title="Build one" sub="Your sessions" category="dribbling" />
       </div>

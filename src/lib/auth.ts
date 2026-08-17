@@ -14,6 +14,7 @@ import { reload as reloadSessions } from './sessions'
 import { reload as reloadSettings } from './settings'
 import { reload as reloadCustomWorkouts } from './customWorkouts'
 import { reload as reloadCustomExercises } from './customExercises'
+import { reload as reloadChallenges } from './challenges'
 import { countEvent } from './analytics'
 
 /*
@@ -193,6 +194,7 @@ function openAccount(account: Account | null, remember = false): void {
   reloadSettings()
   reloadCustomWorkouts()
   reloadCustomExercises()
+  reloadChallenges()
   currentStore.replace(account)
 }
 

@@ -46,6 +46,7 @@ function send(vars: { path: string; title?: string; event?: boolean }): void {
 // Most specific first — /builder/x/add must win before /builder/:workout.
 const PATTERNS: [RegExp, string][] = [
   [/^\/workouts\/[^/]+$/, '/workouts/:workout'],
+  [/^\/challenges\/[^/]+$/, '/challenges/:challenge'],
   [/^\/library\/[^/]+$/, '/library/:exercise'],
   [/^\/history\/[^/]+$/, '/history/:session'],
   [/^\/builder\/[^/]+\/block\/[^/]+$/, '/builder/:workout/block/:index'],

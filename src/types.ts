@@ -100,14 +100,55 @@ export interface CompletedSession {
   notes: string | null
 }
 
-// Multi-week plans — data only for now, wired into the UI in a later phase.
-export interface PlanWeek {
-  week: number
-  workoutIds: string[]
+/*
+  --- CHALLENGES ---
+
+  A challenge is a written calendar: two to six weeks, seven days each, every day
+  either a named session or a rest day. You start one on a date and it tells you
+  what today is for.
+
+  The rest days are part of the plan, not gaps in it. A challenge that asks for
+  five sessions a week is a different thing from one that asks for three, and the
+  difference is what makes the six of them worth having.
+
+  Nothing in here records your progress — see lib/challenges.ts. All the app ever
+  stores is which challenge you're on and when you started it; whether a given day
+  is done is worked out from your training history, so it can't drift from what you
+  actually did.
+*/
+
+export type ChallengeDay =
+  | { kind: 'session'; workoutId: string; note?: string }
+  | { kind: 'rest'; note?: string }
+
+export interface ChallengeWeek {
+  /** What this week is for, e.g. "Base" or "Under pressure". Shown as its heading. */
+  focus: string
+  /** Exactly 7 — day 1 to day 7 of the week, in order. */
+  days: ChallengeDay[]
 }
-export interface Plan {
+
+export interface Challenge {
   id: string
   name: string
-  description: string
-  weeks: PlanWeek[]
+  tagline: string // one line, shown on the card
+  description: string // a short paragraph, shown on its page
+  promise: string // what you have at the end of it that you didn't have at the start
+  category: Category // the headline skill, and the artwork it's given
+  difficulty: Difficulty
+  weeks: ChallengeWeek[]
+}
+
+/*
+  Signing up for a challenge. The only thing about a challenge that is ever written
+  to disk, and it's two dates and an id — everything else is derived.
+
+  `startedAt` is local midnight of day 1, so "which day am I on" is a subtraction
+  and never a question about time zones.
+*/
+export interface ChallengeEnrolment {
+  id: string
+  challengeId: string
+  startedAt: string // ISO, local midnight of day 1
+  leftAt: string | null // ISO when you quit it; null = still yours
 }

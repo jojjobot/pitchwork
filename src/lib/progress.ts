@@ -27,7 +27,10 @@ export function startOfWeek(date: Date): Date {
   return d
 }
 
-function daysBetween(a: Date, b: Date): number {
+// Whole days from a to b, both taken as calendar days rather than instants — so a
+// challenge that started on Monday is on day 3 all through Wednesday. Rounded
+// because a clock change makes one of these days 23 or 25 hours long.
+export function daysBetween(a: Date, b: Date): number {
   return Math.round((startOfDay(b).getTime() - startOfDay(a).getTime()) / DAY_MS)
 }
 

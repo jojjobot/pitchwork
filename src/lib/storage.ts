@@ -1,4 +1,4 @@
-import type { CompletedSession, Exercise, Workout } from '../types'
+import type { ChallengeEnrolment, CompletedSession, Exercise, Workout } from '../types'
 
 /*
   Everything Pitchwork keeps lives in this browser's localStorage. There is no
@@ -20,9 +20,15 @@ export const ACCOUNTS_KEY = 'pitchwork.accounts.v1'
   added here is namespaced per account, exported with the account, and removed when
   the account is deleted, all without touching those functions.
 */
-export type Bucket = 'sessions' | 'settings' | 'customWorkouts' | 'customExercises'
+export type Bucket = 'sessions' | 'settings' | 'customWorkouts' | 'customExercises' | 'challenges'
 
-const BUCKETS: Bucket[] = ['sessions', 'settings', 'customWorkouts', 'customExercises']
+const BUCKETS: Bucket[] = [
+  'sessions',
+  'settings',
+  'customWorkouts',
+  'customExercises',
+  'challenges',
+]
 
 // Where data lived before accounts existed. Claimed by the first account created.
 // Only the buckets that predate the sign-in screen are in here — a bucket invented
@@ -203,6 +209,19 @@ export function loadCustomExercises(): Exercise[] {
 
 export function saveCustomExercises(list: Exercise[]): void {
   write('customExercises', list)
+}
+
+// --- Challenges you've started ---
+// Two dates and an id each. Which days you actually did is never stored — it's read
+// back out of your history, so this list can't outlive the training that earned it.
+
+export function loadChallenges(): ChallengeEnrolment[] {
+  const value = read<ChallengeEnrolment[]>('challenges', [])
+  return Array.isArray(value) ? value : []
+}
+
+export function saveChallenges(list: ChallengeEnrolment[]): void {
+  write('challenges', list)
 }
 
 // --- Settings ---

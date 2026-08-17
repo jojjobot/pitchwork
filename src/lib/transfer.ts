@@ -1,4 +1,4 @@
-import type { CompletedSession, Exercise, Workout } from '../types'
+import type { ChallengeEnrolment, CompletedSession, Exercise, Workout } from '../types'
 import {
   DEFAULT_SETTINGS,
   readAccountBucket,
@@ -9,6 +9,7 @@ import { adoptAccount, getAccount, type Account } from './auth'
 import { getSessions } from './sessions'
 import { getCustomWorkouts } from './customWorkouts'
 import { getCustomExercises } from './customExercises'
+import { getEnrolments } from './challenges'
 import { getSettings } from './settings'
 
 /*
@@ -47,6 +48,7 @@ export interface TransferFile {
   sessions: CompletedSession[]
   customWorkouts: Workout[]
   customExercises: Exercise[]
+  challenges: ChallengeEnrolment[]
   settings: Settings
 }
 
@@ -64,6 +66,7 @@ export function buildTransfer(): TransferFile {
     sessions: getSessions(),
     customWorkouts: getCustomWorkouts(),
     customExercises: getCustomExercises(),
+    challenges: getEnrolments(),
     settings: getSettings(),
   }
 }
@@ -113,6 +116,7 @@ export interface TransferResult {
   sessionsAdded: number
   workoutsAdded: number
   exercisesAdded: number
+  challengesAdded: number
 }
 
 /*
@@ -161,6 +165,15 @@ export function applyTransfer(raw: unknown): TransferResult {
   )
   writeAccountBucket(accountId, 'customExercises', exercises.merged)
 
+  // Challenges you've started come across too. They're two dates each, and without
+  // them a plan you're halfway through would arrive on the new phone as nothing at
+  // all — the history would be there and the calendar it belonged to would not.
+  const enrolments = mergeById(
+    readAccountBucket<ChallengeEnrolment[]>(accountId, 'challenges', []),
+    list<ChallengeEnrolment>(file.challenges),
+  )
+  writeAccountBucket(accountId, 'challenges', enrolments.merged)
+
   // Preferences only ride along to a device that didn't have this account. On one
   // that did, the settings you chose *there* are the ones you meant.
   if (created && file.settings && typeof file.settings === 'object') {
@@ -173,5 +186,6 @@ export function applyTransfer(raw: unknown): TransferResult {
     sessionsAdded: sessions.added,
     workoutsAdded: workouts.added,
     exercisesAdded: exercises.added,
+    challengesAdded: enrolments.added,
   }
 }
